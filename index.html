@@ -98,10 +98,10 @@
 
     <!-- Lógica de Controle e Banco de Dados -->
     <script>
-        // Mapeamento ISO das bandeiras (FlagCDN)
+        // Mapeamento ISO das bandeiras (FlagCDN) - CORRIGIDO
         const countryCodes = {
             "México": "mx", "África do Sul": "za", "Coreia do Sul": "kr", "República Tcheca": "cz",
-            "Canadá": "ca", "Bósnia e Herz.", "ba": "ba", "Bósnia e Herzegovina": "ba", "Estados Unidos": "us", "Paraguai": "py",
+            "Canadá": "ca", "Bósnia e Herzegovina": "ba", "Estados Unidos": "us", "Paraguai": "py",
             "Catar": "qa", "Suíça": "ch", "Brasil": "br", "Marrocos": "ma", "Haiti": "ht",
             "Escócia": "gb-sct", "Austrália": "au", "Turquia": "tr", "Alemanha": "de",
             "Curaçao": "cw", "Holanda": "nl", "Japão": "jp", "Costa do Marfim": "ci",
@@ -123,8 +123,7 @@
 
         /* 
            BANCO DE DADOS OFICIAL DA FASE DE GRUPOS
-           Para inserir placares definitivos, substitua o 'null' pelo número do placar.
-           Exemplo: scoreHome: 2, scoreAway: 1
+           Substitua o 'null' por números quando quiser definir placares oficiais.
         */
         const jogosGrupos = [
             { id: 1, data: "11/06 (Qui) - 16h00", grupo: "A", home: "México", away: "África do Sul", local: "Cidade do México (MEX)", scoreHome: null, scoreAway: null },
@@ -162,7 +161,7 @@
             { id: 33, data: "20/06 (Sáb) - 01h00", grupo: "F", home: "Tunísia", away: "Japão", local: "Monterrey (MEX)", scoreHome: null, scoreAway: null },
             { id: 34, data: "20/06 (Sáb) - 14h00", grupo: "F", home: "Holanda", away: "Suécia", local: "Houston (EUA)", scoreHome: null, scoreAway: null },
             { id: 35, data: "20/06 (Sáb) - 17h00", grupo: "E", home: "Alemanha", away: "Costa do Marfim", local: "Toronto (CAN)", scoreHome: null, scoreAway: null },
-            { id: 36, data: "20/06 (Sáb) - 21h00", grupo: "E", home: "Equador", away: "Curaçao", local: "Kansas City (EUA)", scoreHome: null, scoreAway: null },
+            { id: 36, text: "20/06 (Sáb) - 21h00", grupo: "E", home: "Equador", away: "Curaçao", local: "Kansas City (EUA)", scoreHome: null, scoreAway: null },
             { id: 37, data: "21/06 (Dom) - 13h00", grupo: "H", home: "Espanha", away: "Arábia Saudita", local: "Atlanta (EUA)", scoreHome: null, scoreAway: null },
             { id: 38, data: "21/06 (Dom) - 16h00", grupo: "G", home: "Bélgica", away: "Irã", local: "Los Angeles (EUA)", scoreHome: null, scoreAway: null },
             { id: 39, data: "21/06 (Dom) - 19h00", grupo: "H", home: "Uruguai", away: "Cabo Verde", local: "Miami (EUA)", scoreHome: null, scoreAway: null },
@@ -287,11 +286,7 @@
             localStorage.setItem(`wc2026_score_${id}_${side}`, value);
         }
 
-        /* 
-           NOVA FUNÇÃO DE LEITURA REFACTORADA (OPÇÃO 2)
-           Busca primeiro no LocalStorage (simulador do usuário). 
-           Se estiver vazio, puxa o placar estático oficial configurado no código.
-        */
+        // Função de leitura (Verifica LocalStorage e depois Valores Estáticos do Código)
         function getScore(id, side) {
             const salvoNoNavegador = localStorage.getItem(`wc2026_score_${id}_${side}`);
             if (salvoNoNavegador !== null && salvoNoNavegador !== '') {
