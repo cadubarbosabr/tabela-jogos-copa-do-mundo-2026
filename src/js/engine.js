@@ -94,9 +94,16 @@ export function recalcularTorneioCompleto() {
         todosTerceiros.push(timesDoGrupo[2]);
     });
 
-    // 4. Calcular os 8 Melhores 3º Colocados Gerais
-    todosTerceiros.sort((a, b) => b.P - a.P || b.SG - a.SG || b.GP - a.GP || a.name.localeCompare(b.name));
-    let terceirosQualificados = todosTerceiros.slice(0, 8);
+    // Helper para verificar se um grupo foi iniciado (se tem pelo menos 1 jogo com placar)
+    const isGrupoIniciado = (grp) => {
+        return jogosGrupos.some(jg => jg.grupo === grp && getScoreInput(jg.id, 'home') !== '' && getScoreInput(jg.id, 'away') !== '');
+    };
+
+    // 4. Calcular os 8 Melhores 3º Colocados Gerais (apenas considerando grupos já iniciados)
+    let terceirosQualificados = todosTerceiros
+        .filter(t => isGrupoIniciado(t.group))
+        .sort((a, b) => b.P - a.P || b.SG - a.SG || b.GP - a.GP || a.name.localeCompare(b.name))
+        .slice(0, 8);
 
     // 5. Resolver Chaveamento Dinâmico do Mata-Mata jogo por jogo
     mapaMataMataCalculado = {};
@@ -108,7 +115,13 @@ export function recalcularTorneioCompleto() {
 
             // Resolver quem é o Time da Casa
             if (j.origHome.tipo === "grupo") {
-                timeHome = gruposClassificacao[j.origHome.grp][j.origHome.pos - 1].name;
+                const grp = j.origHome.grp;
+                const pos = j.origHome.pos;
+                if (isGrupoIniciado(grp)) {
+                    timeHome = gruposClassificacao[grp][pos - 1].name;
+                } else {
+                    timeHome = `${pos}º Grupo ${grp}`;
+                }
             } else if (j.origHome.tipo === "venc") {
                 timeHome = calcularVencedorMataMata(j.origHome.j);
             } else if (j.origHome.tipo === "perd") {
@@ -117,7 +130,13 @@ export function recalcularTorneioCompleto() {
 
             // Resolver quem é o Time de Fora
             if (j.origAway.tipo === "grupo") {
-                timeAway = gruposClassificacao[j.origAway.grp][j.origAway.pos - 1].name;
+                const grp = j.origAway.grp;
+                const pos = j.origAway.pos;
+                if (isGrupoIniciado(grp)) {
+                    timeAway = gruposClassificacao[grp][pos - 1].name;
+                } else {
+                    timeAway = `${pos}º Grupo ${grp}`;
+                }
             } else if (j.origAway.tipo === "terceiro") {
                 // Filtra quais dos 8 terceiros qualificados pertencem aos grupos permitidos nesta vaga
                 let elegiveis = terceirosQualificados.filter(t => j.origAway.grps.includes(t.group));
