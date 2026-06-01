@@ -6,6 +6,132 @@ import {
 } from './engine.js';
 import { getFlagTag } from './teams.js';
 import { jogosGrupos, estruturaNosMataMata } from './matches.js';
+import { translations, translateTeam, translatePlaceholder } from './translate.js';
+
+// Estado global de Tema e Idioma
+export let currentLang = localStorage.getItem('wc2026_lang') || 'pt';
+export let currentTheme = localStorage.getItem('wc2026_theme') || 'dark';
+
+export function initToggles() {
+    const btnLang = document.getElementById('btn-lang');
+    const btnTheme = document.getElementById('btn-theme');
+
+    if (btnLang) {
+        btnLang.addEventListener('click', () => {
+            currentLang = currentLang === 'pt' ? 'en' : 'pt';
+            localStorage.setItem('wc2026_lang', currentLang);
+            applyLanguage();
+            renderTablesGrid();
+            renderGroupStage();
+            renderKnockoutStage();
+        });
+    }
+
+    if (btnTheme) {
+        btnTheme.addEventListener('click', () => {
+            currentTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            localStorage.setItem('wc2026_theme', currentTheme);
+            applyTheme();
+        });
+    }
+
+    // Aplicação inicial
+    applyLanguage();
+    applyTheme();
+}
+
+export function applyTheme() {
+    const htmlEl = document.documentElement;
+    const lblBtnTheme = document.getElementById('lbl-btn-theme');
+    
+    if (currentTheme === 'dark') {
+        htmlEl.classList.add('dark');
+        if (lblBtnTheme) lblBtnTheme.textContent = currentLang === 'pt' ? 'Modo Claro' : 'Light Mode';
+    } else {
+        htmlEl.classList.remove('dark');
+        if (lblBtnTheme) lblBtnTheme.textContent = currentLang === 'pt' ? 'Modo Escuro' : 'Dark Mode';
+    }
+}
+
+export function applyLanguage() {
+    const t = translations[currentLang];
+    
+    // Header
+    const titleApp = document.getElementById('title-app');
+    const subtitleApp = document.getElementById('subtitle-app');
+    if (titleApp) titleApp.textContent = t.title;
+    if (subtitleApp) subtitleApp.textContent = t.subtitle;
+
+    // Tabs
+    const btnGrupos = document.getElementById('btn-grupos');
+    const btnMataMata = document.getElementById('btn-mata-mata');
+    
+    // Atualiza apenas se não estiverem com classes ativas que dependem do switchTab
+    if (btnGrupos && !btnGrupos.classList.contains('bg-gradient-to-b')) btnGrupos.textContent = t.tabGroups;
+    if (btnMataMata && !btnMataMata.classList.contains('bg-gradient-to-b')) btnMataMata.textContent = t.tabKnockout;
+    
+    // Para manter a consistência da aba ativa:
+    const sectionGrupos = document.getElementById('section-grupos');
+    if (sectionGrupos) {
+        const isMataMataAtivo = sectionGrupos.classList.contains('hidden');
+        if (isMataMataAtivo) {
+            if (btnGrupos) btnGrupos.textContent = t.tabGroups;
+            if (btnMataMata) btnMataMata.textContent = t.tabKnockout;
+        } else {
+            if (btnGrupos) btnGrupos.textContent = t.tabGroups;
+            if (btnMataMata) btnMataMata.textContent = t.tabKnockout;
+        }
+    }
+
+    // Botão de idioma
+    const lblBtnLang = document.getElementById('lbl-btn-lang');
+    if (lblBtnLang) lblBtnLang.textContent = currentLang === 'pt' ? 'English' : 'Português';
+
+    // Botão de Tema
+    applyTheme();
+
+    // Filtros
+    const lblFilter = document.getElementById('lbl-filter-grupo');
+    const optAll = document.getElementById('opt-all-groups');
+    const lblGroupInfo = document.getElementById('lbl-group-info');
+    if (lblFilter) lblFilter.textContent = t.filterLabel;
+    if (optAll) optAll.textContent = t.filterAll;
+    if (lblGroupInfo) lblGroupInfo.textContent = t.groupInfo;
+
+    // Tabela calendário
+    const lblFixturesTitle = document.getElementById('lbl-fixtures-title');
+    const lblFixturesCount = document.getElementById('lbl-fixtures-count');
+    if (lblFixturesTitle) lblFixturesTitle.textContent = t.fixturesTitle;
+    if (lblFixturesCount) lblFixturesCount.textContent = t.fixturesCount;
+
+    const thMatch = document.getElementById('th-match');
+    const thDateTime = document.getElementById('th-datetime');
+    const thGroup = document.getElementById('th-group');
+    const thConfront = document.getElementById('th-confront');
+    const thStadium = document.getElementById('th-stadium');
+    
+    if (thMatch) thMatch.textContent = t.tableMatch;
+    if (thDateTime) thDateTime.textContent = t.tableDateTime;
+    if (thGroup) thGroup.textContent = t.tableGroup;
+    if (thConfront) thConfront.textContent = t.tableVs;
+    if (thStadium) thStadium.textContent = t.tableStadium;
+
+    // Banner do Campeão
+    const lblChampTitle = document.getElementById('lbl-champion-title');
+    const lblChampSub = document.getElementById('lbl-champion-subtitle');
+    if (lblChampTitle) lblChampTitle.textContent = t.championTitle;
+    if (lblChampSub) lblChampSub.textContent = t.championSubtitle;
+
+    // Footer
+    const lblFooterTitle = document.getElementById('lbl-footer-title');
+    const lblFooterSub = document.getElementById('lbl-footer-sub');
+    const lblBtnPix = document.getElementById('lbl-btn-pix');
+    if (lblFooterTitle) lblFooterTitle.textContent = `© 2026 ${t.title}`;
+    if (lblFooterSub) lblFooterSub.textContent = currentLang === 'pt' 
+        ? "Desenvolvido por Cadu Barbosa • Dados Públicos • FIFA World Cup 2026"
+        : "Developed by Cadu Barbosa • Public Data • FIFA World Cup 2026";
+    if (lblBtnPix) lblBtnPix.textContent = t.contribPix;
+}
 
 export function switchTab(tab) {
     const btnGrupos = document.getElementById('btn-grupos');
@@ -15,13 +141,19 @@ export function switchTab(tab) {
 
     if (!btnGrupos || !btnMataMata || !sectionGrupos || !sectionMataMata) return;
 
-    btnGrupos.className = tab === 'grupos' 
-        ? "px-5 py-2.5 rounded-lg text-sm font-bold bg-gradient-to-b from-white to-gray-100 text-blue-950 shadow-md transition-all transform scale-105" 
-        : "px-5 py-2.5 rounded-lg text-sm font-bold text-blue-200 hover:text-white transition-all";
+    const t = translations[currentLang];
 
-    btnMataMata.className = tab === 'mata-mata' 
-        ? "px-5 py-2.5 rounded-lg text-sm font-bold bg-gradient-to-b from-white to-gray-100 text-blue-950 shadow-md transition-all transform scale-105" 
-        : "px-5 py-2.5 rounded-lg text-sm font-bold text-blue-200 hover:text-white transition-all";
+    if (tab === 'grupos') {
+        btnGrupos.className = "px-5 py-2.5 rounded-lg text-sm font-bold bg-gradient-to-b from-white to-gray-100 text-blue-950 shadow-md transition-all transform scale-105 select-none";
+        btnGrupos.textContent = t.tabGroups;
+        btnMataMata.className = "px-5 py-2.5 rounded-lg text-sm font-bold text-blue-200 hover:text-white transition-all select-none";
+        btnMataMata.textContent = t.tabKnockout;
+    } else {
+        btnGrupos.className = "px-5 py-2.5 rounded-lg text-sm font-bold text-blue-200 hover:text-white transition-all select-none";
+        btnGrupos.textContent = t.tabGroups;
+        btnMataMata.className = "px-5 py-2.5 rounded-lg text-sm font-bold bg-gradient-to-b from-white to-gray-100 text-blue-950 shadow-md transition-all transform scale-105 select-none";
+        btnMataMata.textContent = t.tabKnockout;
+    }
     
     sectionGrupos.classList.toggle('hidden', tab !== 'grupos');
     sectionMataMata.classList.toggle('hidden', tab !== 'mata-mata');
@@ -40,43 +172,46 @@ export function renderTablesGrid() {
     container.innerHTML = '';
 
     const gruposParaMostrar = filtro === 'Todos' ? Object.keys(gruposClassificacao) : [filtro];
+    const t = translations[currentLang];
 
     gruposParaMostrar.forEach(g => {
         const div = document.createElement('div');
-        div.className = "bg-white rounded-2xl shadow-md border border-slate-200/80 p-4 transition-all hover:shadow-lg";
+        div.className = "bg-white dark:bg-slate-900 rounded-2xl shadow-md border border-slate-200/80 dark:border-slate-800/80 p-4 transition-all hover:shadow-lg transition-colors duration-300";
 
-        let rowsHtml = gruposClassificacao[g].map((t, idx) => {
-            let rowBg = "text-slate-700";
-            if (idx < 2) rowBg = "bg-emerald-50/40 text-emerald-900 font-bold";
+        let rowsHtml = gruposClassificacao[g].map((teamObj, idx) => {
+            let rowBg = "text-slate-700 dark:text-slate-300";
+            if (idx < 2) rowBg = "bg-emerald-50/40 dark:bg-emerald-950/20 text-emerald-900 dark:text-emerald-300 font-bold";
+            
+            const localizedTeamName = translateTeam(teamObj.name, currentLang);
             
             return `
-                <tr class="text-xs ${rowBg} border-b border-slate-100 last:border-0">
+                <tr class="text-xs ${rowBg} border-b border-slate-100 dark:border-slate-800/50 last:border-0">
                     <td class="py-2.5 font-bold text-center w-6">${idx + 1}º</td>
-                    <td class="py-2.5 font-semibold flex items-center gap-2 truncate max-w-[120px]">
-                        ${getFlagTag(t.name)} <span class="truncate">${t.name}</span>
+                    <td class="py-2.5 font-semibold flex items-center gap-2">
+                        ${getFlagTag(teamObj.name)} <span class="whitespace-nowrap">${localizedTeamName}</span>
                     </td>
-                    <td class="py-2.5 font-bold text-center">${t.P}</td>
-                    <td class="py-2.5 text-center text-slate-400">${t.J}</td>
-                    <td class="py-2.5 text-center font-medium">${t.SG > 0 ? '+' + t.SG : t.SG}</td>
-                    <td class="py-2.5 text-center text-slate-400">${t.GP}</td>
+                    <td class="py-2.5 font-bold text-center">${teamObj.P}</td>
+                    <td class="py-2.5 text-center text-slate-400 dark:text-slate-500">${teamObj.J}</td>
+                    <td class="py-2.5 text-center font-medium">${teamObj.SG > 0 ? '+' + teamObj.SG : teamObj.SG}</td>
+                    <td class="py-2.5 text-center text-slate-400 dark:text-slate-500">${teamObj.GP}</td>
                 </tr>
             `;
         }).join('');
 
         div.innerHTML = `
-            <h3 class="text-sm font-extrabold text-blue-950 uppercase tracking-wider mb-3 border-b pb-2 flex justify-between">
-                <span>Grupo ${g}</span>
-                <span class="text-[10px] text-slate-400 font-normal">Classificação Live</span>
+            <h3 class="text-sm font-extrabold text-blue-950 dark:text-blue-200 uppercase tracking-wider mb-3 border-b dark:border-slate-800/80 pb-2 flex justify-between">
+                <span>${t.groupTitle} ${g}</span>
+                <span class="text-[10px] text-slate-400 dark:text-slate-500 font-normal">${t.liveClass}</span>
             </h3>
             <table class="w-full text-left">
                 <thead>
-                    <tr class="text-[10px] font-bold text-slate-400 uppercase border-b">
-                        <th class="pb-1 text-center">Pos</th>
-                        <th class="pb-1">Seleção</th>
-                        <th class="pb-1 text-center">P</th>
-                        <th class="pb-1 text-center">J</th>
-                        <th class="pb-1 text-center">SG</th>
-                        <th class="pb-1 text-center">GP</th>
+                    <tr class="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase border-b dark:border-slate-800/80">
+                        <th class="pb-1 text-center">${t.tablePos}</th>
+                        <th class="pb-1">${t.tableTeam}</th>
+                        <th class="pb-1 text-center">${t.tablePts}</th>
+                        <th class="pb-1 text-center">${t.tablePl}</th>
+                        <th class="pb-1 text-center">${t.tableGd}</th>
+                        <th class="pb-1 text-center">${t.tableGf}</th>
                     </tr>
                 </thead>
                 <tbody>${rowsHtml}</tbody>
@@ -95,42 +230,64 @@ export function renderGroupStage() {
     tbody.innerHTML = '';
 
     const jogosFiltrados = filtro === 'Todos' ? jogosGrupos : jogosGrupos.filter(j => j.grupo === filtro);
+    const t = translations[currentLang];
 
     jogosFiltrados.forEach(j => {
         const tr = document.createElement('tr');
-        tr.className = j.destaque ? "bg-amber-50/30 hover:bg-amber-50 transition-colors" : "hover:bg-slate-50/80 transition-colors";
+        tr.className = j.destaque 
+            ? "bg-amber-50/30 dark:bg-amber-950/10 hover:bg-amber-50 dark:hover:bg-amber-950/20 transition-colors" 
+            : "hover:bg-slate-50/80 dark:hover:bg-slate-950/40 transition-colors border-b border-slate-100 dark:border-slate-800/50 last:border-0";
 
         const sh = getScoreInput(j.id, 'home');
         const sa = getScoreInput(j.id, 'away');
 
+        const homeName = translateTeam(j.home, currentLang);
+        const awayName = translateTeam(j.away, currentLang);
+
+        let localizedDate = j.data;
+        if (currentLang === 'en') {
+            localizedDate = localizedDate
+                .replace('(Qui)', '(Thu)').replace('(Sex)', '(Fri)').replace('(Sáb)', '(Sat)')
+                .replace('(Dom)', '(Sun)').replace('(Seg)', '(Mon)').replace('(Ter)', '(Tue)')
+                .replace('(Qua)', '(Wed)');
+        }
+
+        let localizedVenue = j.local;
+        if (currentLang === 'en') {
+            localizedVenue = localizedVenue
+                .replace('Cidade do México', 'Mexico City')
+                .replace('Nova York', 'New York')
+                .replace('Filadélfia', 'Philadelphia');
+        }
+
         tr.innerHTML = `
-            <td class="px-6 py-3.5 font-bold text-slate-400 text-xs">#${j.id}</td>
-            <td class="px-6 py-3.5 text-slate-600 font-medium text-xs">${j.data}</td>
+            <td class="px-6 py-3.5 font-bold text-slate-400 dark:text-slate-500 text-xs">#${j.id}</td>
+            <td class="px-6 py-3.5 text-slate-600 dark:text-slate-400 font-medium text-xs whitespace-nowrap">${localizedDate}</td>
             <td class="px-6 py-3.5">
-                <span class="px-2 py-0.5 bg-slate-100 text-slate-600 border rounded-md text-[11px] font-bold">Grupo ${j.grupo}</span>
+                <span class="px-2 py-0.5 bg-slate-100 dark:bg-slate-950 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-800 rounded-md text-[11px] font-bold">${t.groupTitle} ${j.grupo}</span>
             </td>
             <td class="px-6 py-3.5">
                 <div class="flex items-center justify-center gap-3">
-                    <div class="flex items-center justify-end gap-2 w-36 text-right">
-                        <span class="truncate font-semibold text-slate-800 text-sm">${j.home}</span>
+                    <div class="flex items-center justify-end gap-2 w-44 text-right">
+                        <span class="font-semibold text-slate-800 dark:text-slate-200 text-sm whitespace-nowrap">${homeName}</span>
                         ${getFlagTag(j.home)}
                     </div>
                     <input type="number" min="0" placeholder="- " value="${sh}" 
                         oninput="window.setScoreInput(${j.id}, 'home', this.value)"
-                        aria-label="Placar do time mandante, ${j.home}"
-                        class="w-11 h-9 text-center bg-white border border-slate-300 rounded-lg font-black text-slate-900 focus:ring-2 focus:ring-blue-500 shadow-sm transition-all">
-                    <span class="text-slate-300 font-bold text-xs">✕</span>
+                        aria-label="${t.tableVs} ${homeName}"
+                        class="w-11 h-9 text-center bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-800 rounded-lg font-black text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-blue-500 shadow-sm transition-all">
+                    <span class="text-slate-300 dark:text-slate-700 font-bold text-xs">✕</span>
                     <input type="number" min="0" placeholder="- " value="${sa}" 
                         oninput="window.setScoreInput(${j.id}, 'away', this.value)"
-                        aria-label="Placar do time visitante, ${j.away}"
-                        class="w-11 h-9 text-center bg-white border border-slate-300 rounded-lg font-black text-slate-900 focus:ring-2 focus:ring-blue-500 shadow-sm transition-all">
-                    <div class="flex items-center justify-start gap-2 w-36 text-left">
+                        aria-label="${t.tableVs} ${awayName}"
+                        class="w-11 h-9 text-center bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-800 rounded-lg font-black text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-blue-500 shadow-sm transition-all">
+                    <div class="flex items-center justify-start gap-2 w-44 text-left">
                         ${getFlagTag(j.away)}
-                        <span class="truncate font-semibold text-slate-800 text-sm">${j.away}</span>
+                        <span class="font-semibold text-slate-800 dark:text-slate-200 text-sm whitespace-nowrap">${awayName}</span>
                     </div>
                 </div>
             </td>
-            <td class="px-6 py-3.5 text-slate-400 text-xs max-w-[160px] truncate">${j.local}</td>
+            <td class="px-6 py-3.5 text-slate-400 dark:text-slate-500 text-xs max-w-[200px] truncate">${localizedVenue}</td>
         `;
         tbody.appendChild(tr);
     });
@@ -141,13 +298,25 @@ export function renderKnockoutStage() {
     if (!container) return;
     container.innerHTML = '';
 
+    const t = translations[currentLang];
+
     estruturaNosMataMata.forEach(fase => {
         const divFase = document.createElement('div');
         divFase.className = "space-y-4";
 
+        let localizedFase = fase.fase;
+        if (currentLang === 'en') {
+            if (fase.fase.includes('Dezesseis-avos')) localizedFase = t.round32;
+            else if (fase.fase.includes('Oitavas')) localizedFase = t.round16;
+            else if (fase.fase.includes('Quartas')) localizedFase = t.quarterFinals;
+            else if (fase.fase.includes('Semifinais')) localizedFase = t.semiFinals;
+            else if (fase.fase.includes('Disputa')) localizedFase = t.thirdPlace;
+            else if (fase.fase.includes('Final')) localizedFase = t.final;
+        }
+
         divFase.innerHTML = `
-            <h3 class="text-xl font-extrabold text-slate-800 tracking-tight flex items-center justify-between border-b border-slate-200 pb-3">
-                <span>${fase.fase}</span>
+            <h3 class="text-xl font-extrabold text-slate-800 dark:text-slate-200 tracking-tight flex items-center justify-between border-b border-slate-200 dark:border-slate-800/80 pb-3 transition-colors">
+                <span>${localizedFase}</span>
             </h3>
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                 ${fase.jogos.map(j => {
@@ -159,53 +328,58 @@ export function renderKnockoutStage() {
                     const penH = getPenaltiesInput(j.id, 'home');
                     const penA = getPenaltiesInput(j.id, 'away');
 
-                    let cardStyle = j.destaque ? "bg-gradient-to-br from-amber-50 via-white to-amber-50/20 border-amber-300 shadow-lg" : "bg-white border-slate-200 shadow-md";
+                    const homeDisplayName = translateTeam(translatePlaceholder(dadosCalculados.home, currentLang), currentLang);
+                    const awayDisplayName = translateTeam(translatePlaceholder(dadosCalculados.away, currentLang), currentLang);
+
+                    let cardStyle = j.destaque 
+                        ? "bg-gradient-to-br from-amber-50 via-white to-amber-50/20 dark:from-amber-950/10 dark:via-slate-900 dark:to-amber-950/5 border-amber-300 dark:border-amber-900/50 shadow-lg" 
+                        : "bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800/80 shadow-md";
 
                     return `
-                        <div class="p-5 rounded-2xl border ${cardStyle} transition-all flex flex-col justify-between space-y-4">
-                            <div class="flex justify-between items-center text-[10px] font-bold text-slate-400">
-                                <span>CONFRONTO #${j.id}</span>
-                                <span class="bg-slate-100 px-2 py-0.5 rounded text-slate-500">${j.data}</span>
+                        <div class="p-5 rounded-2xl border ${cardStyle} transition-all flex flex-col justify-between space-y-4 transition-colors duration-300">
+                            <div class="flex justify-between items-center text-[10px] font-bold text-slate-400 dark:text-slate-500">
+                                <span>${t.confrontation} #${j.id}</span>
+                                <span class="bg-slate-100 dark:bg-slate-950 px-2 py-0.5 rounded text-slate-500 dark:text-slate-400 border border-slate-200/50 dark:border-slate-800/50">${j.data}</span>
                             </div>
                             
                             <div class="space-y-3 py-1">
                                 <!-- Time Casa -->
                                 <div class="flex items-center justify-between">
-                                    <div class="flex items-center gap-2 max-w-[70%]">
+                                    <div class="flex items-center gap-2 max-w-[75%]">
                                         ${getFlagTag(dadosCalculados.home)}
-                                        <span class="text-sm font-bold text-slate-700 truncate">${dadosCalculados.home}</span>
+                                        <span class="text-sm font-bold text-slate-700 dark:text-slate-200 whitespace-nowrap truncate">${homeDisplayName}</span>
                                     </div>
                                     <input type="number" min="0" placeholder="-" value="${sh}"
                                         oninput="window.setScoreInput(${j.id}, 'home', this.value)"
-                                        aria-label="Placar do time mandante, ${dadosCalculados.home}"
-                                        class="w-11 h-9 text-center bg-slate-50 border border-slate-300 rounded-lg font-black text-sm text-slate-900 focus:ring-2 focus:ring-blue-500 shadow-sm transition-all">
+                                        aria-label="${t.tableVs} ${homeDisplayName}"
+                                        class="w-11 h-9 text-center bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-800 rounded-lg font-black text-sm text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-blue-500 shadow-sm transition-all">
                                 </div>
                                 <!-- Time Fora -->
                                 <div class="flex items-center justify-between">
-                                    <div class="flex items-center gap-2 max-w-[70%]">
+                                    <div class="flex items-center gap-2 max-w-[75%]">
                                         ${getFlagTag(dadosCalculados.away)}
-                                        <span class="text-sm font-bold text-slate-700 truncate">${dadosCalculados.away}</span>
+                                        <span class="text-sm font-bold text-slate-700 dark:text-slate-200 whitespace-nowrap truncate">${awayDisplayName}</span>
                                     </div>
                                     <input type="number" min="0" placeholder="-" value="${sa}"
                                         oninput="window.setScoreInput(${j.id}, 'away', this.value)"
-                                        aria-label="Placar do time visitante, ${dadosCalculados.away}"
-                                        class="w-11 h-9 text-center bg-slate-50 border border-slate-300 rounded-lg font-black text-sm text-slate-900 focus:ring-2 focus:ring-blue-500 shadow-sm transition-all">
+                                        aria-label="${t.tableVs} ${awayDisplayName}"
+                                        class="w-11 h-9 text-center bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-800 rounded-lg font-black text-sm text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-blue-500 shadow-sm transition-all">
                                 </div>
 
                                 <!-- Sub-painel de Desempate por Pênaltis se houver empate técnico -->
                                 ${isEmpate ? `
-                                    <div class="bg-slate-50 p-2 rounded-xl border border-dashed border-slate-200 flex items-center justify-between mt-2 animate-fade-in">
-                                        <span class="text-[10px] font-bold text-amber-600 uppercase">Pênaltis:</span>
+                                    <div class="bg-slate-50 dark:bg-slate-950 p-2 rounded-xl border border-dashed border-slate-200 dark:border-slate-800 flex items-center justify-between mt-2 animate-fade-in">
+                                        <span class="text-[10px] font-bold text-amber-600 dark:text-amber-400 uppercase">${t.penalties}</span>
                                         <div class="flex items-center gap-1">
-                                            <input type="number" placeholder="P" value="${penH}" oninput="window.setPenaltiesInput(${j.id}, 'home', this.value)" aria-label="Pênaltis convertidos por ${dadosCalculados.home}" class="w-8 h-6 text-center border text-xs font-bold rounded">
-                                            <span class="text-[9px] text-slate-400">x</span>
-                                            <input type="number" placeholder="P" value="${penA}" oninput="window.setPenaltiesInput(${j.id}, 'away', this.value)" aria-label="Pênaltis convertidos por ${dadosCalculados.away}" class="w-8 h-6 text-center border text-xs font-bold rounded">
+                                            <input type="number" placeholder="P" value="${penH}" oninput="window.setPenaltiesInput(${j.id}, 'home', this.value)" aria-label="${t.penalties} ${homeDisplayName}" class="w-8 h-6 text-center border dark:border-slate-800 text-xs font-bold rounded bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100">
+                                            <span class="text-[9px] text-slate-400 dark:text-slate-600">x</span>
+                                            <input type="number" placeholder="P" value="${penA}" oninput="window.setPenaltiesInput(${j.id}, 'away', this.value)" aria-label="${t.penalties} ${awayDisplayName}" class="w-8 h-6 text-center border dark:border-slate-800 text-xs font-bold rounded bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100">
                                         </div>
                                     </div>
                                 ` : ''}
                             </div>
 
-                            <div class="text-[10px] font-semibold text-slate-400 truncate">${j.local}</div>
+                            <div class="text-[10px] font-semibold text-slate-400 dark:text-slate-500 truncate">${j.local}</div>
                         </div>
                     `;
                 }).join('')}
@@ -220,7 +394,7 @@ export function showToast(message) {
     if (!container) return;
 
     const toast = document.createElement('div');
-    toast.className = `bg-slate-900 border border-slate-800 text-slate-100 px-5 py-3 rounded-2xl shadow-2xl flex items-center gap-3 animate-fade-in pointer-events-auto transform translate-y-10 opacity-0 transition-all duration-300 ease-out`;
+    toast.className = `bg-slate-900 dark:bg-slate-850 border border-slate-800 dark:border-slate-700 text-slate-100 px-5 py-3 rounded-2xl shadow-2xl flex items-center gap-3 animate-fade-in pointer-events-auto transform translate-y-10 opacity-0 transition-all duration-300 ease-out`;
     toast.innerHTML = `
         <span class="text-emerald-400 font-bold text-sm">🏆</span>
         <span class="text-xs font-semibold">${message}</span>

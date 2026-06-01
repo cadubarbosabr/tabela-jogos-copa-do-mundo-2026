@@ -1,5 +1,6 @@
 import { equipesIniciais, getFlagTag } from './teams.js';
 import { jogosGrupos, estruturaNosMataMata } from './matches.js';
+import { translateTeam } from './translate.js';
 
 export let gruposClassificacao = {};
 export let mapaMataMataCalculado = {};
@@ -218,8 +219,10 @@ export function atualizarPainelDoCampeao() {
 
     const finalVencedor = calcularVencedorMataMata(104);
 
-    if (finalVencedor && !finalVencedor.includes('Vencedor') && !finalVencedor.includes('/')) {
-        textCamp.innerHTML = `${getFlagTag(finalVencedor)} ${finalVencedor}`;
+    if (finalVencedor && !finalVencedor.includes('Vencedor') && !finalVencedor.includes('Winner') && !finalVencedor.includes('/')) {
+        const lang = localStorage.getItem('wc2026_lang') || 'pt';
+        const localizedWinner = translateTeam(finalVencedor, lang);
+        textCamp.innerHTML = `${getFlagTag(finalVencedor)} ${localizedWinner}`;
         banner.classList.remove('hidden');
     } else {
         banner.classList.add('hidden');

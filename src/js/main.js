@@ -9,8 +9,11 @@ import {
     renderGroupStage, 
     renderKnockoutStage,
     switchTab,
-    showToast 
+    showToast,
+    initToggles,
+    currentLang
 } from './ui.js';
+import { translations } from './translate.js';
 
 // Bind para as chamadas inline oninput presentes nas strings de templates HTML dinâmicos
 window.setScoreInput = (id, side, val) => {
@@ -22,6 +25,9 @@ window.setPenaltiesInput = (id, side, val) => {
 };
 
 document.addEventListener('DOMContentLoaded', () => {
+    // 0. Inicializa os alternadores de Idioma e Tema
+    initToggles();
+
     // 1. Roda a engine de cálculo lendo o LocalStorage do navegador
     recalcularTorneioCompleto();
 
@@ -67,7 +73,7 @@ document.addEventListener('DOMContentLoaded', () => {
         btnPix.addEventListener('click', (e) => {
             e.preventDefault();
             navigator.clipboard.writeText('sicwnb@outlook.com');
-            showToast('Chave PIX copiada! Finalize no app do seu banco. Obrigado pelo apoio! 🏆');
+            showToast(translations[currentLang].pixCopied);
         });
     }
 });

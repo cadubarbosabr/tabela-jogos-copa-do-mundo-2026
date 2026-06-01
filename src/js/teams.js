@@ -1,10 +1,21 @@
 export const countryCodes = {
+    // Portuguese Mappings
     "México": "mx", "África do Sul": "za", "Coreia do Sul": "kr", "República Tcheca": "cz",
     "Canadá": "ca", "Bósnia e Herzegovina": "ba", "Catar": "qa", "Suíça": "ch", "Brasil": "br", "Marrocos": "ma", "Haiti": "ht",
     "Escócia": "gb-sct", "Austrália": "au", "Turquia": "tr", "Alemanha": "de", "Curaçao": "cw", "Holanda": "nl", "Japão": "jp", "Costa do Marfim": "ci",
     "Equador": "ec", "Suécia": "se", "Tunísia": "tn", "Espanha": "es", "Cabo Verde": "cv", "Bélgica": "be", "Egito": "eg", "Arábia Saudita": "sa", "Uruguai": "uy",
     "Irã": "ir", "Nova Zelândia": "nz", "França": "fr", "Senegal": "sn", "Iraque": "iq", "Noruega": "no", "Argentina": "ar", "Argélia": "dz", "Áustria": "at", "Jordânia": "jo",
-    "Portugal": "pt", "RD Congo": "cd", "Inglaterra": "gb-eng", "Croácia": "hr", "Gana": "gh", "Panamá": "pa", "Uzbequistão": "uz", "Colômbia": "co"
+    "Portugal": "pt", "RD Congo": "cd", "Inglaterra": "gb-eng", "Croácia": "hr", "Gana": "gh", "Panamá": "pa", "Uzbequistão": "uz", "Colômbia": "co",
+    "Estados Unidos": "us", "Paraguai": "py",
+
+    // English Mappings
+    "Mexico": "mx", "South Africa": "za", "South Korea": "kr", "Czech Republic": "cz",
+    "Canada": "ca", "Bosnia and Herzegovina": "ba", "Qatar": "qa", "Switzerland": "ch", "Brazil": "br", "Morocco": "ma", "Haiti": "ht",
+    "Scotland": "gb-sct", "Australia": "au", "Turkey": "tr", "Germany": "de", "Curaçao": "cw", "Netherlands": "nl", "Japan": "jp", "Ivory Coast": "ci",
+    "Ecuador": "ec", "Sweden": "se", "Tunisia": "tn", "Spain": "es", "Cape Verde": "cv", "Belgium": "be", "Egypt": "eg", "Saudi Arabia": "sa", "Uruguay": "uy",
+    "Iran": "ir", "New Zealand": "nz", "France": "fr", "Senegal": "sn", "Iraq": "iq", "Norway": "no", "Argentina": "ar", "Algeria": "dz", "Austria": "at", "Jordan": "jo",
+    "Portugal": "pt", "DR Congo": "cd", "England": "gb-eng", "Croatia": "hr", "Ghana": "gh", "Panama": "pa", "Uzbekistan": "uz", "Colombia": "co",
+    "United States": "us", "Paraguay": "py"
 };
 
 export function getFlagTag(country) {

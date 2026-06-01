@@ -1,26 +1,49 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-BR" class="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Tabela Copa do Mundo FIFA 2026</title>
     <!-- Folha de estilo compilada em tempo de build (Vite + Tailwind CLI) -->
     <link rel="stylesheet" href="/src/index.css">
+    <script>
+        // Inicializa o tema escuro como padrão
+        const theme = localStorage.getItem('wc2026_theme') || 'dark';
+        if (theme === 'dark') {
+            document.documentElement.classList.add('dark');
+        } else {
+            document.documentElement.classList.remove('dark');
+        }
+    </script>
 </head>
-<body class="bg-slate-50 text-slate-900 antialiased min-h-screen flex flex-col">
+<body class="bg-slate-50 text-slate-900 dark:bg-slate-950 dark:text-slate-100 antialiased min-h-screen flex flex-col transition-colors duration-300">
 
     <!-- Header Principal -->
     <header class="bg-gradient-to-r from-blue-950 via-blue-900 to-indigo-950 text-white shadow-xl border-b border-blue-800">
         <div class="max-w-7xl mx-auto px-4 py-8 flex flex-col md:flex-row justify-between items-center gap-6">
             <div class="text-center md:text-left">
-                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/88/2026_FIFA_World_Cup_emblem_%28horizontal%2C_with_wordmark%29.svg/960px-2026_FIFA_World_Cup_emblem_%28horizontal%2C_with_wordmark%29.svg.png" alt="Logo Oficial FIFA 2026" class="h-16 w-auto mb-3 object-contain drop-shadow-lg filter brightness-110 select-none">
-                <h1 class="text-3xl md:text-4xl font-extrabold tracking-tight mt-2 drop-shadow-md">COPA DO MUNDO FIFA 2026</h1>
-                <p class="text-blue-200/80 text-sm mt-1 font-medium">Digite os placares: as tabelas e o chaveamento se calculam sozinhos</p>
+                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/88/2026_FIFA_World_Cup_emblem_%28horizontal%2C_with_wordmark%29.svg/960px-2026_FIFA_World_Cup_emblem_%28horizontal%2C_with_wordmark%29.svg.png" alt="Logo Oficial FIFA 2026" class="h-16 w-auto mb-3 object-contain drop-shadow-lg filter brightness-110 select-none mx-auto md:mx-0">
+                <h1 id="title-app" class="text-3xl md:text-4xl font-extrabold tracking-tight mt-2 drop-shadow-md">COPA DO MUNDO FIFA 2026</h1>
+                <p id="subtitle-app" class="text-blue-200/80 text-sm mt-1 font-medium">Digite os placares: as tabelas e o chaveamento se calculam sozinhos</p>
             </div>
-            <!-- Alternador de Abas -->
-            <div class="flex bg-blue-950/60 p-1.5 rounded-xl border border-blue-800/60 shadow-inner backdrop-blur-sm">
-                <button id="btn-grupos" class="px-5 py-2.5 rounded-lg text-sm font-bold bg-gradient-to-b from-white to-gray-100 text-blue-950 shadow-md transition-all duration-300 transform scale-105">Classificação & Grupos</button>
-                <button id="btn-mata-mata" class="px-5 py-2.5 rounded-lg text-sm font-bold text-blue-200 hover:text-white transition-all duration-300">Fase Eliminatória (Live)</button>
+            
+            <!-- Controles do Topo (Abas + Toggles de Idioma & Tema) -->
+            <div class="flex flex-col sm:flex-row items-center gap-4">
+                <!-- Alternador de Abas -->
+                <div class="flex bg-blue-950/60 p-1.5 rounded-xl border border-blue-800/60 shadow-inner backdrop-blur-sm">
+                    <button id="btn-grupos" class="px-5 py-2.5 rounded-lg text-sm font-bold bg-gradient-to-b from-white to-gray-100 text-blue-950 shadow-md transition-all duration-300 transform scale-105">Classificação & Grupos</button>
+                    <button id="btn-mata-mata" class="px-5 py-2.5 rounded-lg text-sm font-bold text-blue-200 hover:text-white transition-all duration-300">Fase Eliminatória (Live)</button>
+                </div>
+                
+                <!-- Toggles Rápidos -->
+                <div class="flex gap-2">
+                    <button id="btn-lang" class="bg-blue-950/60 hover:bg-blue-900/60 text-blue-200 hover:text-white px-3 py-2.5 rounded-xl border border-blue-800/60 transition-all text-xs font-bold shadow-md cursor-pointer select-none flex items-center gap-1.5">
+                        🌐 <span id="lbl-btn-lang">English</span>
+                    </button>
+                    <button id="btn-theme" class="bg-blue-950/60 hover:bg-blue-900/60 text-blue-200 hover:text-white px-3 py-2.5 rounded-xl border border-blue-800/60 transition-all text-xs font-bold shadow-md cursor-pointer select-none flex items-center gap-1.5">
+                        🌙 <span id="lbl-btn-theme">Modo Claro</span>
+                    </button>
+                </div>
             </div>
         </div>
     </header>
@@ -32,18 +55,18 @@
         <section id="section-grupos" class="space-y-8 transition-all duration-500">
             
             <!-- Painel de Filtros e Resumos -->
-            <div class="bg-white p-5 rounded-2xl shadow-md border border-slate-200/80 flex flex-col md:flex-row gap-4 items-center justify-between">
+            <div class="bg-white dark:bg-slate-900 p-5 rounded-2xl shadow-md border border-slate-200/80 dark:border-slate-800/80 flex flex-col md:flex-row gap-4 items-center justify-between transition-colors duration-300">
                 <div class="flex items-center gap-3">
-                    <label for="filter-grupo" class="text-sm font-bold text-slate-500 uppercase tracking-wider">Visualizar Grupo:</label>
-                    <select id="filter-grupo" class="bg-slate-50 border border-slate-300 text-slate-800 text-sm rounded-xl font-semibold focus:ring-2 focus:ring-blue-500 p-2.5 shadow-sm cursor-pointer hover:bg-slate-100 transition-colors">
-                        <option value="Todos">Todos os Grupos (A ao L)</option>
+                    <label id="lbl-filter-grupo" for="filter-grupo" class="text-sm font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Visualizar Grupo:</label>
+                    <select id="filter-grupo" class="bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-800 text-slate-800 dark:text-slate-200 text-sm rounded-xl font-semibold focus:ring-2 focus:ring-blue-500 p-2.5 shadow-sm cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-900 transition-colors">
+                        <option id="opt-all-groups" value="Todos">Todos os Grupos (A ao L)</option>
                         <option value="A">Grupo A</option><option value="B">Grupo B</option><option value="C">Grupo C</option>
                         <option value="D">Grupo D</option><option value="E">Grupo E</option><option value="F">Grupo F</option>
                         <option value="G">Grupo G</option><option value="H">Grupo H</option><option value="I">Grupo I</option>
                         <option value="J">Grupo J</option><option value="K">Grupo K</option><option value="L">Grupo L</option>
                     </select>
                 </div>
-                <div class="text-xs font-semibold bg-blue-50 text-blue-700 px-4 py-2 rounded-xl border border-blue-100 shadow-sm">
+                <div id="lbl-group-info" class="text-xs font-semibold bg-blue-50 dark:bg-blue-950/30 text-blue-700 dark:text-blue-300 px-4 py-2 rounded-xl border border-blue-100 dark:border-blue-900/50 shadow-sm transition-colors duration-300">
                     ℹ️ Os 2 melhores de cada grupo + os 8 melhores 3º colocados avançam dinamicamente.
                 </div>
             </div>
@@ -54,23 +77,23 @@
             </div>
 
             <!-- Tabela Cronológica de Partidas do Grupo -->
-            <div class="bg-white rounded-2xl shadow-xl border border-slate-200/60 overflow-hidden mt-6">
-                <div class="p-5 bg-slate-50 border-b border-slate-200 flex justify-between items-center">
-                    <h2 class="font-extrabold text-slate-800 tracking-tight">Jogos e Calendário da Fase de Grupos</h2>
-                    <span class="text-xs font-bold text-slate-400">72 PARTIDAS</span>
+            <div class="bg-white dark:bg-slate-900 rounded-2xl shadow-xl border border-slate-200/60 dark:border-slate-800/60 overflow-hidden mt-6 transition-colors duration-300">
+                <div class="p-5 bg-slate-50 dark:bg-slate-950 border-b border-slate-200 dark:border-slate-800/80 flex justify-between items-center transition-colors duration-300">
+                    <h2 id="lbl-fixtures-title" class="font-extrabold text-slate-800 dark:text-slate-200 tracking-tight">Jogos e Calendário da Fase de Grupos</h2>
+                    <span id="lbl-fixtures-count" class="text-xs font-bold text-slate-400 dark:text-slate-500">72 PARTIDAS</span>
                 </div>
                 <div class="overflow-x-auto">
                     <table class="w-full text-left border-collapse">
-                        <thead class="bg-slate-100/50 text-xs font-bold text-slate-500 uppercase tracking-wider border-b border-slate-200">
+                        <thead class="bg-slate-100/50 dark:bg-slate-950/50 text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider border-b border-slate-200 dark:border-slate-800/80">
                             <tr>
-                                <th class="px-6 py-4">Jogo</th>
-                                <th class="px-6 py-4">Data / Hora (BRT)</th>
-                                <th class="px-6 py-4">Grupo</th>
-                                <th class="px-6 py-4 text-center">Confronto & Placar</th>
-                                <th class="px-6 py-4">Estádio / Sede</th>
+                                <th id="th-match" class="px-6 py-4">Jogo</th>
+                                <th id="th-datetime" class="px-6 py-4">Data / Hora (BRT)</th>
+                                <th id="th-group" class="px-6 py-4">Grupo</th>
+                                <th id="th-confront" class="px-6 py-4 text-center">Confronto & Placar</th>
+                                <th id="th-stadium" class="px-6 py-4">Estádio / Sede</th>
                             </tr>
                         </thead>
-                        <tbody id="table-body-grupos" class="divide-y divide-slate-100 text-sm">
+                        <tbody id="table-body-grupos" class="divide-y divide-slate-100 dark:divide-slate-800/50 text-sm">
                             <!-- Renderizado via JS -->
                         </tbody>
                     </table>
@@ -83,9 +106,9 @@
             
             <!-- BANNER DO CAMPEÃO DINÂMICO -->
             <div id="banner-campeao" class="hidden bg-gradient-to-r from-amber-500 via-yellow-400 to-amber-600 p-6 rounded-3xl shadow-2xl text-white text-center border-2 border-amber-300 animate-bounce relative overflow-hidden">
-                <p class="text-xs uppercase font-extrabold tracking-widest text-amber-950">🏆 Campeão do Mundo 🏆</p>
+                <p id="lbl-champion-title" class="text-xs uppercase font-extrabold tracking-widest text-amber-950">🏆 Campeão do Mundo 🏆</p>
                 <h2 id="nome-campeao" class="text-3xl md:text-5xl font-black mt-2 drop-shadow-lg uppercase tracking-tight">---</h2>
-                <p class="text-sm font-bold text-amber-950/80 mt-1">VENCEDOR DA COPA DO MUNDO FIFA 2026</p>
+                <p id="lbl-champion-subtitle" class="text-sm font-bold text-amber-950/80 mt-1">VENCEDOR DA COPA DO MUNDO FIFA 2026</p>
             </div>
 
             <div id="container-mata-mata" class="space-y-10">
@@ -100,8 +123,8 @@
             
             <!-- Créditos e Copy -->
             <div class="text-center md:text-left">
-                <p class="font-bold text-slate-300">© 2026 Tabela Cronológica FIFA World Cup</p>
-                <p class="text-xs text-slate-500 mt-0.5">Desenvolvido por Cadu Barbosa • Dados Públicos • FIFA World Cup 2026</p>
+                <p id="lbl-footer-title" class="font-bold text-slate-300">© 2026 Tabela Cronológica FIFA World Cup</p>
+                <p id="lbl-footer-sub" class="text-xs text-slate-500 mt-0.5">Desenvolvido por Cadu Barbosa • Dados Públicos • FIFA World Cup 2026</p>
             </div>
             
             <!-- Bloco de Contatos, Redes Sociais e PIX -->
@@ -112,7 +135,7 @@
                         title="Chave: sicwnb@outlook.com"
                         class="flex items-center gap-2 bg-emerald-950/40 border border-emerald-900/50 text-emerald-400 px-4 py-2 rounded-xl hover:bg-emerald-900/40 hover:text-emerald-300 hover:border-emerald-700 transition-all shadow-sm cursor-pointer">
                     <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
-                    <span>Contribuir via PIX</span>
+                    <span id="lbl-btn-pix">Contribuir via PIX</span>
                 </button>
 
                 <!-- Link X (Twitter) -->
