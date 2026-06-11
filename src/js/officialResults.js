@@ -14,7 +14,7 @@ function hasOfficialScore(result) {
 
 export async function loadOfficialResults() {
     try {
-        const response = await fetch('/results.json', { cache: 'no-store' });
+        const response = await fetch('/results.json');
 
         if (!response.ok) {
             officialResults = {};

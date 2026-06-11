@@ -242,7 +242,7 @@ export function renderGroupStage() {
         const sh = getScoreInput(j.id, 'home');
         const sa = getScoreInput(j.id, 'away');
         const isLocked = hasOfficialResult(j.id);
-        const lockedAttrs = isLocked ? 'disabled aria-disabled="true"' : 'aria-disabled="false"';
+        const lockedAttrs = isLocked ? 'disabled aria-disabled="true"' : '';
         const lockedClasses = isLocked ? ' cursor-not-allowed opacity-70' : '';
 
         const homeName = translateTeam(j.home, currentLang);
@@ -330,7 +330,7 @@ export function renderKnockoutStage() {
                     const sh = getScoreInput(j.id, 'home');
                     const sa = getScoreInput(j.id, 'away');
                     const isLocked = hasOfficialResult(j.id);
-                    const lockedAttrs = isLocked ? 'disabled aria-disabled="true"' : 'aria-disabled="false"';
+                    const lockedAttrs = isLocked ? 'disabled aria-disabled="true"' : '';
                     const lockedClasses = isLocked ? ' cursor-not-allowed opacity-70' : '';
                     
                     const isEmpate = (sh !== '' && sa !== '' && parseInt(sh,10) === parseInt(sa,10));
