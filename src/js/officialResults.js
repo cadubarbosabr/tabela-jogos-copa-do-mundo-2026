@@ -1,6 +1,7 @@
 // Resultados oficiais vivem em arquivo versionado; palpites locais continuam no localStorage.
 let officialResults = {};
-const RESULTS_URL = `${import.meta.env.BASE_URL || '/'}results.json`;
+const baseUrl = import.meta.env.BASE_URL || '/';
+const RESULTS_URL = `${baseUrl.endsWith('/') ? baseUrl : `${baseUrl}/`}results.json`;
 
 function normalizeScoreValue(value) {
     if (value === undefined || value === null || value === '') return '';
@@ -24,7 +25,8 @@ export async function loadOfficialResults() {
 
         const data = await response.json();
         officialResults = data && typeof data === 'object' && !Array.isArray(data) ? data : {};
-    } catch {
+    } catch (error) {
+        console.warn('Falha ao carregar resultados oficiais.', error);
         officialResults = {};
     }
 

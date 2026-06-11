@@ -19,7 +19,7 @@ function getMatchLockState(matchId) {
     return {
         isLocked,
         lockedAttrs: isLocked ? 'disabled' : '',
-        lockedClasses: isLocked ? ' cursor-not-allowed' : ''
+        lockedClasses: isLocked ? ' cursor-not-allowed !bg-slate-100 dark:!bg-slate-900' : ''
     };
 }
 
