@@ -30,11 +30,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     initToggles();
 
     // 1. Carrega resultados oficiais versionados; se falhar, segue só com o LocalStorage.
-    try {
-        await loadOfficialResults();
-    } catch {
-        // O loader já faz fallback interno; este catch evita interromper a inicialização.
-    }
+    await loadOfficialResults();
 
     // 2. Roda a engine de cálculo lendo resultados oficiais e o LocalStorage do navegador
     recalcularTorneioCompleto();

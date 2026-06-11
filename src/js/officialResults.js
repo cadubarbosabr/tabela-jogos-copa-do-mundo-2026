@@ -1,5 +1,6 @@
 // Resultados oficiais vivem em arquivo versionado; palpites locais continuam no localStorage.
 let officialResults = {};
+const RESULTS_URL = `${import.meta.env.BASE_URL}results.json`;
 
 function normalizeScoreValue(value) {
     if (value === undefined || value === null || value === '') return '';
@@ -14,7 +15,7 @@ function hasOfficialScore(result) {
 
 export async function loadOfficialResults() {
     try {
-        const response = await fetch('/results.json');
+        const response = await fetch(RESULTS_URL);
 
         if (!response.ok) {
             officialResults = {};

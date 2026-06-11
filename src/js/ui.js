@@ -13,6 +13,16 @@ import { translations, translateTeam, translatePlaceholder } from './translate.j
 export let currentLang = localStorage.getItem('wc2026_lang') || 'pt';
 export let currentTheme = localStorage.getItem('wc2026_theme') || 'dark';
 
+function getMatchLockState(matchId) {
+    const isLocked = hasOfficialResult(matchId);
+
+    return {
+        isLocked,
+        lockedAttrs: isLocked ? 'disabled aria-disabled="true"' : '',
+        lockedClasses: isLocked ? ' cursor-not-allowed opacity-70' : ''
+    };
+}
+
 export function initToggles() {
     const btnLang = document.getElementById('btn-lang');
     const btnTheme = document.getElementById('btn-theme');
@@ -241,9 +251,7 @@ export function renderGroupStage() {
 
         const sh = getScoreInput(j.id, 'home');
         const sa = getScoreInput(j.id, 'away');
-        const isLocked = hasOfficialResult(j.id);
-        const lockedAttrs = isLocked ? 'disabled aria-disabled="true"' : '';
-        const lockedClasses = isLocked ? ' cursor-not-allowed opacity-70' : '';
+        const { lockedAttrs, lockedClasses } = getMatchLockState(j.id);
 
         const homeName = translateTeam(j.home, currentLang);
         const awayName = translateTeam(j.away, currentLang);
@@ -329,9 +337,7 @@ export function renderKnockoutStage() {
                     const dadosCalculados = mapaMataMataCalculado[j.id] || { home: "A definir", away: "A definir" };
                     const sh = getScoreInput(j.id, 'home');
                     const sa = getScoreInput(j.id, 'away');
-                    const isLocked = hasOfficialResult(j.id);
-                    const lockedAttrs = isLocked ? 'disabled aria-disabled="true"' : '';
-                    const lockedClasses = isLocked ? ' cursor-not-allowed opacity-70' : '';
+                    const { lockedAttrs, lockedClasses } = getMatchLockState(j.id);
                     
                     const isEmpate = (sh !== '' && sa !== '' && parseInt(sh,10) === parseInt(sa,10));
                     const penH = getPenaltiesInput(j.id, 'home');
