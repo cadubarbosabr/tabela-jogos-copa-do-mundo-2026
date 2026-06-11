@@ -4,6 +4,7 @@ import {
     setPenaltiesInput,
     addUpdateListener 
 } from './engine.js';
+import { loadOfficialResults } from './officialResults.js';
 import { 
     renderTablesGrid, 
     renderGroupStage, 
@@ -24,18 +25,21 @@ window.setPenaltiesInput = (id, side, val) => {
     setPenaltiesInput(id, side, val);
 };
 
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
     // 0. Inicializa os alternadores de Idioma e Tema
     initToggles();
 
-    // 1. Roda a engine de cálculo lendo o LocalStorage do navegador
+    // 1. Carrega resultados oficiais versionados; se falhar, segue só com o LocalStorage.
+    await loadOfficialResults();
+
+    // 2. Roda a engine de cálculo lendo resultados oficiais e o LocalStorage do navegador
     recalcularTorneioCompleto();
 
-    // 2. Renderização Inicial do DOM
+    // 3. Renderização Inicial do DOM
     renderTablesGrid();
     renderGroupStage();
 
-    // 3. Escuta atualizações da Engine de Dados e redesenha as tabelas em tempo real
+    // 4. Escuta atualizações da Engine de Dados e redesenha as tabelas em tempo real
     addUpdateListener(() => {
         renderTablesGrid();
         
@@ -46,7 +50,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // 4. Associar cliques nos botões de controle de Abas
+    // 5. Associar cliques nos botões de controle de Abas
     const btnGrupos = document.getElementById('btn-grupos');
     const btnMataMata = document.getElementById('btn-mata-mata');
     
@@ -58,7 +62,7 @@ document.addEventListener('DOMContentLoaded', () => {
         btnMataMata.addEventListener('click', () => switchTab('mata-mata'));
     }
 
-    // 5. Associar evento de mudança no Filtro de Grupos
+    // 6. Associar evento de mudança no Filtro de Grupos
     const filterGrupo = document.getElementById('filter-grupo');
     if (filterGrupo) {
         filterGrupo.addEventListener('change', () => {
@@ -67,7 +71,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // 6. Associar evento de clique ao botão inteligente de doações via PIX
+    // 7. Associar evento de clique ao botão inteligente de doações via PIX
     const btnPix = document.getElementById('btn-pix');
     if (btnPix) {
         btnPix.addEventListener('click', (e) => {

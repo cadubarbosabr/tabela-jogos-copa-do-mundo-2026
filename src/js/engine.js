@@ -1,6 +1,11 @@
 import { equipesIniciais, getFlagTag } from './teams.js';
 import { jogosGrupos, estruturaNosMataMata } from './matches.js';
 import { translateTeam } from './translate.js';
+import {
+    getOfficialScoreInput,
+    getOfficialPenaltiesInput,
+    hasOfficialResult
+} from './officialResults.js';
 
 export let gruposClassificacao = {};
 export let mapaMataMataCalculado = {};
@@ -16,20 +21,30 @@ function notifyUpdate() {
 }
 
 export function getScoreInput(id, side) {
+    const officialScore = getOfficialScoreInput(id, side);
+    if (officialScore !== '') return officialScore;
+
     return localStorage.getItem(`wc2026_score_${id}_${side}`) || '';
 }
 
 export function setScoreInput(id, side, val) {
+    if (hasOfficialResult(id)) return;
+
     localStorage.setItem(`wc2026_score_${id}_${side}`, val);
     recalcularTorneioCompleto();
     notifyUpdate();
 }
 
 export function getPenaltiesInput(id, side) {
+    const officialPenalties = getOfficialPenaltiesInput(id, side);
+    if (officialPenalties !== '') return officialPenalties;
+
     return localStorage.getItem(`wc2026_pen_${id}_${side}`) || '';
 }
 
 export function setPenaltiesInput(id, side, val) {
+    if (hasOfficialResult(id)) return;
+
     localStorage.setItem(`wc2026_pen_${id}_${side}`, val);
     recalcularTorneioCompleto();
     notifyUpdate();

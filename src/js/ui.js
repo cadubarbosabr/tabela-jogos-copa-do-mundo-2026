@@ -4,6 +4,7 @@ import {
     getScoreInput, 
     getPenaltiesInput 
 } from './engine.js';
+import { hasOfficialResult } from './officialResults.js';
 import { getFlagTag } from './teams.js';
 import { jogosGrupos, estruturaNosMataMata } from './matches.js';
 import { translations, translateTeam, translatePlaceholder } from './translate.js';
@@ -11,6 +12,16 @@ import { translations, translateTeam, translatePlaceholder } from './translate.j
 // Estado global de Tema e Idioma
 export let currentLang = localStorage.getItem('wc2026_lang') || 'pt';
 export let currentTheme = localStorage.getItem('wc2026_theme') || 'dark';
+
+function getMatchLockState(matchId) {
+    const isLocked = hasOfficialResult(matchId);
+
+    return {
+        isLocked,
+        lockedAttrs: isLocked ? 'disabled' : '',
+        lockedClasses: isLocked ? ' cursor-not-allowed !bg-slate-100 dark:!bg-slate-900' : ''
+    };
+}
 
 export function initToggles() {
     const btnLang = document.getElementById('btn-lang');
@@ -240,6 +251,7 @@ export function renderGroupStage() {
 
         const sh = getScoreInput(j.id, 'home');
         const sa = getScoreInput(j.id, 'away');
+        const { lockedAttrs, lockedClasses } = getMatchLockState(j.id);
 
         const homeName = translateTeam(j.home, currentLang);
         const awayName = translateTeam(j.away, currentLang);
@@ -275,12 +287,14 @@ export function renderGroupStage() {
                     <input type="number" min="0" placeholder="- " value="${sh}" 
                         oninput="window.setScoreInput(${j.id}, 'home', this.value)"
                         aria-label="${t.tableVs} ${homeName}"
-                        class="w-11 h-9 text-center bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-800 rounded-lg font-black text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-blue-500 shadow-sm transition-all">
+                        ${lockedAttrs}
+                        class="w-11 h-9 text-center bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-800 rounded-lg font-black text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-blue-500 shadow-sm transition-all${lockedClasses}">
                     <span class="text-slate-300 dark:text-slate-700 font-bold text-xs">✕</span>
                     <input type="number" min="0" placeholder="- " value="${sa}" 
                         oninput="window.setScoreInput(${j.id}, 'away', this.value)"
                         aria-label="${t.tableVs} ${awayName}"
-                        class="w-11 h-9 text-center bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-800 rounded-lg font-black text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-blue-500 shadow-sm transition-all">
+                        ${lockedAttrs}
+                        class="w-11 h-9 text-center bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-800 rounded-lg font-black text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-blue-500 shadow-sm transition-all${lockedClasses}">
                     <div class="flex items-center justify-start gap-2 w-44 text-left">
                         ${getFlagTag(j.away)}
                         <span class="font-semibold text-slate-800 dark:text-slate-200 text-sm whitespace-nowrap">${awayName}</span>
@@ -323,6 +337,7 @@ export function renderKnockoutStage() {
                     const dadosCalculados = mapaMataMataCalculado[j.id] || { home: "A definir", away: "A definir" };
                     const sh = getScoreInput(j.id, 'home');
                     const sa = getScoreInput(j.id, 'away');
+                    const { lockedAttrs, lockedClasses } = getMatchLockState(j.id);
                     
                     const isEmpate = (sh !== '' && sa !== '' && parseInt(sh,10) === parseInt(sa,10));
                     const penH = getPenaltiesInput(j.id, 'home');
@@ -352,7 +367,8 @@ export function renderKnockoutStage() {
                                     <input type="number" min="0" placeholder="-" value="${sh}"
                                         oninput="window.setScoreInput(${j.id}, 'home', this.value)"
                                         aria-label="${t.tableVs} ${homeDisplayName}"
-                                        class="w-11 h-9 text-center bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-800 rounded-lg font-black text-sm text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-blue-500 shadow-sm transition-all">
+                                        ${lockedAttrs}
+                                        class="w-11 h-9 text-center bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-800 rounded-lg font-black text-sm text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-blue-500 shadow-sm transition-all${lockedClasses}">
                                 </div>
                                 <!-- Time Fora -->
                                 <div class="flex items-center justify-between">
@@ -363,7 +379,8 @@ export function renderKnockoutStage() {
                                     <input type="number" min="0" placeholder="-" value="${sa}"
                                         oninput="window.setScoreInput(${j.id}, 'away', this.value)"
                                         aria-label="${t.tableVs} ${awayDisplayName}"
-                                        class="w-11 h-9 text-center bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-800 rounded-lg font-black text-sm text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-blue-500 shadow-sm transition-all">
+                                        ${lockedAttrs}
+                                        class="w-11 h-9 text-center bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-800 rounded-lg font-black text-sm text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-blue-500 shadow-sm transition-all${lockedClasses}">
                                 </div>
 
                                 <!-- Sub-painel de Desempate por Pênaltis se houver empate técnico -->
@@ -371,9 +388,9 @@ export function renderKnockoutStage() {
                                     <div class="bg-slate-50 dark:bg-slate-950 p-2 rounded-xl border border-dashed border-slate-200 dark:border-slate-800 flex items-center justify-between mt-2 animate-fade-in">
                                         <span class="text-[10px] font-bold text-amber-600 dark:text-amber-400 uppercase">${t.penalties}</span>
                                         <div class="flex items-center gap-1">
-                                            <input type="number" placeholder="P" value="${penH}" oninput="window.setPenaltiesInput(${j.id}, 'home', this.value)" aria-label="${t.penalties} ${homeDisplayName}" class="w-8 h-6 text-center border dark:border-slate-800 text-xs font-bold rounded bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100">
+                                            <input type="number" placeholder="P" value="${penH}" oninput="window.setPenaltiesInput(${j.id}, 'home', this.value)" aria-label="${t.penalties} ${homeDisplayName}" ${lockedAttrs} class="w-8 h-6 text-center border dark:border-slate-800 text-xs font-bold rounded bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100${lockedClasses}">
                                             <span class="text-[9px] text-slate-400 dark:text-slate-600">x</span>
-                                            <input type="number" placeholder="P" value="${penA}" oninput="window.setPenaltiesInput(${j.id}, 'away', this.value)" aria-label="${t.penalties} ${awayDisplayName}" class="w-8 h-6 text-center border dark:border-slate-800 text-xs font-bold rounded bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100">
+                                            <input type="number" placeholder="P" value="${penA}" oninput="window.setPenaltiesInput(${j.id}, 'away', this.value)" aria-label="${t.penalties} ${awayDisplayName}" ${lockedAttrs} class="w-8 h-6 text-center border dark:border-slate-800 text-xs font-bold rounded bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100${lockedClasses}">
                                         </div>
                                     </div>
                                 ` : ''}
