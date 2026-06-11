@@ -1,6 +1,6 @@
 // Resultados oficiais vivem em arquivo versionado; palpites locais continuam no localStorage.
 let officialResults = {};
-const RESULTS_URL = `${import.meta.env.BASE_URL}results.json`;
+const RESULTS_URL = `${import.meta.env.BASE_URL || '/'}results.json`;
 
 function normalizeScoreValue(value) {
     if (value === undefined || value === null || value === '') return '';

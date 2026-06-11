@@ -18,8 +18,8 @@ function getMatchLockState(matchId) {
 
     return {
         isLocked,
-        lockedAttrs: isLocked ? 'disabled aria-disabled="true"' : '',
-        lockedClasses: isLocked ? ' cursor-not-allowed opacity-70' : ''
+        lockedAttrs: isLocked ? 'disabled' : '',
+        lockedClasses: isLocked ? ' cursor-not-allowed' : ''
     };
 }
 
