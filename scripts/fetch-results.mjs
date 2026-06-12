@@ -361,15 +361,11 @@ async function main() {
         results[String(groupId)] = swapped
           ? { home: awayScore, away: homeScore }
           : { home: homeScore, away: awayScore };
-        const displayHome = swapped ? awayPt : homePt;
-        const displayAway = swapped ? homePt : awayPt;
-        const displayScoreHome = swapped ? awayScore : homeScore;
-        const displayScoreAway = swapped ? homeScore : awayScore;
-        if (isCompleted) {
-          console.log(`  #${groupId} ${displayHome} ${displayScoreHome}–${displayScoreAway} ${displayAway}${swapped ? ' (home/away invertido)' : ''}`);
-        } else {
-          console.log(`  #${groupId} ${displayHome} ${displayScoreHome}–${displayScoreAway} ${displayAway} (em curso)${swapped ? ' (home/away invertido)' : ''}`);
-        }
+        const [dHome, dAway, dScH, dScA] = swapped
+          ? [awayPt, homePt, awayScore, homeScore]
+          : [homePt, awayPt, homeScore, awayScore];
+        const suffix = (isCompleted ? '' : ' (em curso)') + (swapped ? ' (home/away invertido)' : '');
+        console.log(`  #${groupId} ${dHome} ${dScH}–${dScA} ${dAway}${suffix}`);
       } else if (knockoutQueue[knockoutCursor] !== undefined) {
         // Mata-mata: associar positivamente pelo índice cronológico do dia
         const knockoutId = knockoutQueue[knockoutCursor++];
@@ -389,7 +385,8 @@ async function main() {
               result.penAway = pen.penAway;
             }
           }
-          console.log(`  #${knockoutId} ${homePt} ${homeScore}–${awayScore} ${awayPt}${result.penHome !== undefined ? ` (pen ${result.penHome}–${result.penAway})` : ''}`);
+          const penSuffix = result.penHome !== undefined ? ` (pen ${result.penHome}–${result.penAway})` : '';
+          console.log(`  #${knockoutId} ${homePt} ${homeScore}–${awayScore} ${awayPt}${penSuffix}`);
         } else {
           console.log(`  #${knockoutId} ${homePt} ${homeScore}–${awayScore} ${awayPt} (em curso)`);
         }
