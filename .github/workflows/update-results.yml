@@ -3,11 +3,15 @@ name: Atualizar Resultados Copa 2026
 on:
   schedule:
     # Executa a cada 15 minutos durante o período do torneio
-    - cron: '*/15 * * * *'
+    - cron: '5,20,35,50 * * * *'
   workflow_dispatch: # Permite execução manual pelo painel do GitHub Actions
 
 permissions:
   contents: write
+
+concurrency:
+  group: update-results
+  cancel-in-progress: true
 
 jobs:
   update:
@@ -25,6 +29,14 @@ jobs:
 
       - name: Buscar resultados via ESPN API
         run: node scripts/fetch-results.mjs
+
+      - name: Exibir resumo da atualização
+        run: |
+          node -e "const fs=require('node:fs'); const raw=fs.readFileSync('public/results.json','utf8'); const data=JSON.parse(raw||'{}'); const resultKeys=Object.keys(data).filter(k=>k!=='_meta'); console.log('Resultados encontrados:', resultKeys.length); console.log('Meta:', data._meta ?? null);"
+
+      - name: Alertar se vazio após início do torneio
+        run: |
+          node -e "const fs=require('node:fs'); const data=JSON.parse(fs.readFileSync('public/results.json','utf8')||'{}'); const resultCount=Object.keys(data).filter(k=>k!=='_meta').length; const tournamentStartUtc=new Date('2026-06-11T00:00:00Z'); const alertThreshold=new Date(tournamentStartUtc.getTime()+24*60*60*1000); if (new Date() >= alertThreshold && resultCount === 0) { console.error('❌ Nenhum resultado encontrado 24h após o início do torneio.'); process.exit(1); } console.log('✅ Verificação de resultados concluída.');"
 
       - name: Publicar alterações
         run: |

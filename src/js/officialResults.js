@@ -1,7 +1,10 @@
 // Resultados oficiais vivem em arquivo versionado; palpites locais continuam no localStorage.
 let officialResults = {};
 const baseUrl = import.meta.env.BASE_URL || '/';
-const RESULTS_URL = `${baseUrl.endsWith('/') ? baseUrl : `${baseUrl}/`}results.json`;
+
+function getResultsUrl() {
+    return `${baseUrl.endsWith('/') ? baseUrl : `${baseUrl}/`}results.json?t=${Date.now()}`;
+}
 
 function normalizeScoreValue(value) {
     if (value === undefined || value === null || value === '') return '';
@@ -16,7 +19,7 @@ function hasOfficialScore(result) {
 
 export async function loadOfficialResults() {
     try {
-        const response = await fetch(RESULTS_URL);
+        const response = await fetch(getResultsUrl());
 
         if (!response.ok) {
             officialResults = {};
@@ -25,6 +28,7 @@ export async function loadOfficialResults() {
 
         const data = await response.json();
         officialResults = data && typeof data === 'object' && !Array.isArray(data) ? data : {};
+        delete officialResults._meta;
         localStorage.setItem('wc2026_lastUpdate', new Date().toISOString());
     } catch (error) {
         console.warn('Falha ao carregar resultados oficiais.', error);
