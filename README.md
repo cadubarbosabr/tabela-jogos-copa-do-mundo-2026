@@ -11,8 +11,8 @@ Os resultados são atualizados **automaticamente** a cada 15 minutos via **GitHu
 ESPN API pública  →  scripts/fetch-results.mjs  →  public/results.json  →  Vercel (auto-deploy)
 ```
 
-1. O workflow `.github/workflows/update-results.yml` é disparado pelo cron do GitHub Actions (`*/15 * * * *`).
-2. O script `scripts/fetch-results.mjs` busca os placares do dia via `https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard`.
+1. O workflow `.github/workflows/update-results.yml` é disparado pelo cron do GitHub Actions (`5,20,35,50 * * * *`).
+2. O script `scripts/fetch-results.mjs` busca os placares do dia tentando múltiplos slugs da ESPN (`fifa.world`, `fifa.world.2026`, `fifa.worldcup`, `fifa.world.cup`).
 3. Os nomes das seleções são convertidos do inglês (ESPN) para o português utilizado na aplicação.
 4. Se houver alterações, o arquivo `public/results.json` é atualizado e comitado (`[skip ci]`).
 5. O Vercel detecta o novo commit e faz o deploy automático em segundos.
@@ -45,6 +45,7 @@ Os resultados também podem ser publicados **manualmente** editando o arquivo `p
 
 ```json
 {
+  "_meta": { "lastFetch": "2026-06-12T00:00:00Z", "source": "espn", "slug": "fifa.world" },
   "1": { "home": 2, "away": 1 },
   "73": { "home": 1, "away": 1, "penHome": 4, "penAway": 3 }
 }

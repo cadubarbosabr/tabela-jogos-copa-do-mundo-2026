@@ -22,9 +22,12 @@ const RESULTS_PATH = resolve(__dirname, '../public/results.json');
 const TOURNAMENT_START = '20260611';
 const TOURNAMENT_END   = '20260719';
 
-// ESPN API — sem autenticação necessária
-const ESPN_SCOREBOARD_URL =
-  'https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard';
+const ESPN_SLUGS = [
+  'fifa.world',
+  'fifa.world.2026',
+  'fifa.worldcup',
+  'fifa.world.cup',
+];
 
 // ---------------------------------------------------------------------------
 // Mapeamento de nomes em inglês (ESPN) → português (utilizado em matches.js)
@@ -275,23 +278,35 @@ function dateRange(start, end) {
   return dates;
 }
 
-/** Busca o scoreboard da ESPN para uma data específica (YYYYMMDD). */
+function yyyymmddToIso(date) {
+  return `${date.slice(0, 4)}-${date.slice(4, 6)}-${date.slice(6, 8)}T00:00:00Z`;
+}
+
+/** Busca o scoreboard da ESPN para uma data específica (YYYYMMDD), com fallback de slugs. */
 async function fetchScoreboard(date) {
-  const url = `${ESPN_SCOREBOARD_URL}?dates=${date}`;
-  try {
-    const res = await fetch(url, {
-      headers: { 'User-Agent': 'tabela-copa-2026-bot/1.0' },
-      signal: AbortSignal.timeout(15_000),
-    });
-    if (!res.ok) {
-      console.warn(`ESPN API retornou ${res.status} para ${date}`);
-      return null;
+  for (const slug of ESPN_SLUGS) {
+    const url = `https://site.api.espn.com/apis/site/v2/sports/soccer/${slug}/scoreboard?dates=${date}`;
+    try {
+      const res = await fetch(url, {
+        headers: { 'User-Agent': 'tabela-copa-2026-bot/1.0' },
+        signal: AbortSignal.timeout(15_000),
+      });
+      if (!res.ok) {
+        console.warn(`ESPN API retornou ${res.status} para ${date} no slug ${slug}`);
+        continue;
+      }
+      const data = await res.json();
+      if (!data?.events?.length) {
+        console.warn(`Nenhum evento encontrado para ${date} no slug ${slug}`);
+        continue;
+      }
+      return { data, slug };
+    } catch (err) {
+      console.warn(`Falha ao buscar ${date} no slug ${slug}:`, err.message);
     }
-    return await res.json();
-  } catch (err) {
-    console.warn(`Falha ao buscar ${date}:`, err.message);
-    return null;
   }
+
+  return { data: null, slug: null };
 }
 
 /**
@@ -354,6 +369,8 @@ async function main() {
   }
 
   const results = {};
+  let lastSuccessfulSlug = null;
+  let lastSuccessfulDate = null;
 
   // Mapa de busca para fase de grupos: normalizeName("HomePT|AwayPT") → { id, swapped }
   // Usar chaves normalizadas torna a busca tolerante a variações de acentuação,
@@ -369,8 +386,10 @@ async function main() {
   console.log(`Buscando resultados para ${dates.length} data(s)...`);
 
   for (const date of dates) {
-    const data = await fetchScoreboard(date);
+    const { data, slug } = await fetchScoreboard(date);
     if (!data?.events?.length) continue;
+    lastSuccessfulSlug = slug;
+    lastSuccessfulDate = date;
 
     // IDs de mata-mata esperados nesta data (em ordem de horário)
     const knockoutQueue = [...(KNOCKOUT_BY_DATE[date] ?? [])];
@@ -453,6 +472,19 @@ async function main() {
     }
   }
 
+  const resultKeys = Object.keys(results);
+  const resultCount = resultKeys.length;
+  results._meta = {
+    lastFetch: lastSuccessfulDate ? yyyymmddToIso(lastSuccessfulDate) : null,
+    source: 'espn',
+    slug: lastSuccessfulSlug,
+  };
+
+  if (resultCount === 0 && today > TOURNAMENT_START) {
+    console.warn('⚠️ ATENÇÃO: Nenhum resultado encontrado apesar do torneio já ter começado!');
+    console.warn('Possíveis causas: slug da ESPN alterado, API fora do ar, ou jogos ainda não iniciados.');
+  }
+
   const newContent = JSON.stringify(results, null, 2) + '\n';
   if (newContent === previousContent) {
     console.log('Nenhuma alteração nos resultados.');
@@ -460,7 +492,7 @@ async function main() {
   }
 
   writeFileSync(RESULTS_PATH, newContent, 'utf8');
-  console.log(`✅ public/results.json atualizado com ${Object.keys(results).length} resultado(s).`);
+  console.log(`✅ public/results.json atualizado com ${resultCount} resultado(s).`);
 }
 
 main().catch((err) => {

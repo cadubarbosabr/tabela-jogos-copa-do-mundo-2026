@@ -35,27 +35,27 @@
 
     <!-- Header Principal -->
     <header class="bg-gradient-to-r from-blue-950 via-blue-900 to-indigo-950 text-white shadow-xl border-b border-blue-800">
-        <div class="max-w-7xl mx-auto px-4 py-8 flex flex-col md:flex-row justify-between items-center gap-6">
+        <div class="max-w-7xl mx-auto px-4 py-4 md:py-8 flex flex-col md:flex-row justify-between items-center gap-4 md:gap-6">
             <div class="text-center md:text-left">
-                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/88/2026_FIFA_World_Cup_emblem_%28horizontal%2C_with_wordmark%29.svg/960px-2026_FIFA_World_Cup_emblem_%28horizontal%2C_with_wordmark%29.svg.png" alt="Logo Oficial FIFA 2026" class="h-16 w-auto mb-3 object-contain drop-shadow-lg filter brightness-110 select-none mx-auto md:mx-0">
-                <h1 id="title-app" class="text-3xl md:text-4xl font-extrabold tracking-tight mt-2 drop-shadow-md">COPA DO MUNDO FIFA 2026</h1>
-                <p id="subtitle-app" class="text-blue-200/80 text-sm mt-1 font-medium">Digite os placares: as tabelas e o chaveamento se calculam sozinhos</p>
+                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/88/2026_FIFA_World_Cup_emblem_%28horizontal%2C_with_wordmark%29.svg/960px-2026_FIFA_World_Cup_emblem_%28horizontal%2C_with_wordmark%29.svg.png" alt="Logo Oficial FIFA 2026" class="h-12 md:h-16 w-auto mb-2 md:mb-3 object-contain drop-shadow-lg filter brightness-110 select-none mx-auto md:mx-0">
+                <h1 id="title-app" class="text-2xl md:text-4xl font-extrabold tracking-tight mt-1 md:mt-2 drop-shadow-md">COPA DO MUNDO FIFA 2026</h1>
+                <p id="subtitle-app" class="text-blue-200/80 text-xs md:text-sm mt-1 font-medium">Digite os placares: as tabelas e o chaveamento se calculam sozinhos</p>
             </div>
             
             <!-- Controles do Topo (Abas + Toggles de Idioma & Tema) -->
-            <div class="flex flex-col sm:flex-row items-center gap-4">
+            <div class="flex flex-col sm:flex-row items-center gap-3 md:gap-4">
                 <!-- Alternador de Abas -->
-                <div class="flex bg-blue-950/60 p-1.5 rounded-xl border border-blue-800/60 shadow-inner backdrop-blur-sm">
-                    <button id="btn-grupos" class="px-5 py-2.5 rounded-lg text-sm font-bold bg-gradient-to-b from-white to-gray-100 text-blue-950 shadow-md transition-all duration-300 transform scale-105">Classificação & Grupos</button>
-                    <button id="btn-mata-mata" class="px-5 py-2.5 rounded-lg text-sm font-bold text-blue-200 hover:text-white transition-all duration-300">Fase Eliminatória (Live)</button>
+                <div class="flex bg-blue-950/60 p-1 rounded-xl border border-blue-800/60 shadow-inner backdrop-blur-sm">
+                    <button id="btn-grupos" class="px-3 md:px-5 py-2 md:py-2.5 rounded-lg text-xs md:text-sm font-bold bg-gradient-to-b from-white to-gray-100 text-blue-950 shadow-md transition-all duration-300 transform scale-105">Classificação & Grupos</button>
+                    <button id="btn-mata-mata" class="px-3 md:px-5 py-2 md:py-2.5 rounded-lg text-xs md:text-sm font-bold text-blue-200 hover:text-white transition-all duration-300">Fase Eliminatória (Live)</button>
                 </div>
                 
                 <!-- Toggles Rápidos -->
                 <div class="flex gap-2">
-                    <button id="btn-lang" class="bg-blue-950/60 hover:bg-blue-900/60 text-blue-200 hover:text-white px-3 py-2.5 rounded-xl border border-blue-800/60 transition-all text-xs font-bold shadow-md cursor-pointer select-none flex items-center gap-1.5">
+                    <button id="btn-lang" class="bg-blue-950/60 hover:bg-blue-900/60 text-blue-200 hover:text-white px-3 py-2 rounded-xl border border-blue-800/60 transition-all text-xs font-bold shadow-md cursor-pointer select-none flex items-center gap-1.5">
                         🌐 <span id="lbl-btn-lang">English</span>
                     </button>
-                    <button id="btn-theme" class="bg-blue-950/60 hover:bg-blue-900/60 text-blue-200 hover:text-white px-3 py-2.5 rounded-xl border border-blue-800/60 transition-all text-xs font-bold shadow-md cursor-pointer select-none flex items-center gap-1.5">
+                    <button id="btn-theme" class="bg-blue-950/60 hover:bg-blue-900/60 text-blue-200 hover:text-white px-3 py-2 rounded-xl border border-blue-800/60 transition-all text-xs font-bold shadow-md cursor-pointer select-none flex items-center gap-1.5">
                         🌙 <span id="lbl-btn-theme">Modo Claro</span>
                     </button>
                 </div>
@@ -104,7 +104,10 @@
                     <h2 id="lbl-fixtures-title" class="font-extrabold text-slate-800 dark:text-slate-200 tracking-tight">Jogos e Calendário da Fase de Grupos</h2>
                     <span id="lbl-fixtures-count" class="text-xs font-bold text-slate-400 dark:text-slate-500">72 PARTIDAS</span>
                 </div>
-                <div class="overflow-x-auto">
+                <div id="cards-body-grupos" class="md:hidden p-4 space-y-3">
+                    <!-- Renderizado via JS -->
+                </div>
+                <div class="hidden md:block overflow-x-auto">
                     <table class="w-full text-left border-collapse">
                         <thead class="bg-slate-100/50 dark:bg-slate-950/50 text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider border-b border-slate-200 dark:border-slate-800/80">
                             <tr>
@@ -150,7 +153,7 @@
             </div>
             
             <!-- Bloco de Contatos, Redes Sociais e PIX -->
-            <div class="flex flex-wrap justify-center gap-3 text-xs font-semibold">
+            <div class="flex flex-col sm:flex-row sm:flex-wrap justify-center items-center gap-3 text-xs font-semibold">
                 <span id="last-update" class="text-slate-500 self-center"></span>
                 
                 <!-- Botão PIX Inteligente (Clique para Copiar) -->

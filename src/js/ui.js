@@ -160,14 +160,14 @@ export function switchTab(tab) {
     const t = translations[currentLang];
 
     if (tab === 'grupos') {
-        btnGrupos.className = "px-5 py-2.5 rounded-lg text-sm font-bold bg-gradient-to-b from-white to-gray-100 text-blue-950 shadow-md transition-all transform scale-105 select-none";
+        btnGrupos.className = "px-3 md:px-5 py-2 md:py-2.5 rounded-lg text-xs md:text-sm font-bold bg-gradient-to-b from-white to-gray-100 text-blue-950 shadow-md transition-all transform scale-105 select-none";
         btnGrupos.textContent = t.tabGroups;
-        btnMataMata.className = "px-5 py-2.5 rounded-lg text-sm font-bold text-blue-200 hover:text-white transition-all select-none";
+        btnMataMata.className = "px-3 md:px-5 py-2 md:py-2.5 rounded-lg text-xs md:text-sm font-bold text-blue-200 hover:text-white transition-all select-none";
         btnMataMata.textContent = t.tabKnockout;
     } else {
-        btnGrupos.className = "px-5 py-2.5 rounded-lg text-sm font-bold text-blue-200 hover:text-white transition-all select-none";
+        btnGrupos.className = "px-3 md:px-5 py-2 md:py-2.5 rounded-lg text-xs md:text-sm font-bold text-blue-200 hover:text-white transition-all select-none";
         btnGrupos.textContent = t.tabGroups;
-        btnMataMata.className = "px-5 py-2.5 rounded-lg text-sm font-bold bg-gradient-to-b from-white to-gray-100 text-blue-950 shadow-md transition-all transform scale-105 select-none";
+        btnMataMata.className = "px-3 md:px-5 py-2 md:py-2.5 rounded-lg text-xs md:text-sm font-bold bg-gradient-to-b from-white to-gray-100 text-blue-950 shadow-md transition-all transform scale-105 select-none";
         btnMataMata.textContent = t.tabKnockout;
     }
     
@@ -201,10 +201,10 @@ export function renderTablesGrid() {
             const localizedTeamName = translateTeam(teamObj.name, currentLang);
             
             return `
-                <tr class="text-xs ${rowBg} border-b border-slate-100 dark:border-slate-800/50 last:border-0">
+                <tr class="text-sm md:text-xs ${rowBg} border-b border-slate-100 dark:border-slate-800/50 last:border-0">
                     <td class="py-2.5 font-bold text-center w-6">${idx + 1}º</td>
                     <td class="py-2.5 font-semibold flex items-center gap-2">
-                        ${getFlagTag(teamObj.name)} <span class="whitespace-nowrap">${localizedTeamName}</span>
+                        ${getFlagTag(teamObj.name)} <span class="whitespace-nowrap text-sm md:text-xs">${localizedTeamName}</span>
                     </td>
                     <td class="py-2.5 font-bold text-center">${teamObj.P}</td>
                     <td class="py-2.5 text-center text-slate-400 dark:text-slate-500">${teamObj.J}</td>
@@ -215,7 +215,7 @@ export function renderTablesGrid() {
         }).join('');
 
         div.innerHTML = `
-            <h3 class="text-sm font-extrabold text-blue-950 dark:text-blue-200 uppercase tracking-wider mb-3 border-b dark:border-slate-800/80 pb-2 flex justify-between">
+            <h3 class="text-base md:text-sm font-extrabold text-blue-950 dark:text-blue-200 uppercase tracking-wider mb-3 border-b dark:border-slate-800/80 pb-2 flex justify-between">
                 <span>${t.groupTitle} ${g}</span>
                 <span class="text-[10px] text-slate-400 dark:text-slate-500 font-normal">${t.liveClass}</span>
             </h3>
@@ -240,10 +240,15 @@ export function renderTablesGrid() {
 export function renderGroupStage() {
     const filtroEl = document.getElementById('filter-grupo');
     const tbody = document.getElementById('table-body-grupos');
-    if (!filtroEl || !tbody) return;
+    const cardsContainer = document.getElementById('cards-body-grupos');
+    if (!filtroEl || !tbody || !cardsContainer) {
+        console.warn('Elementos de renderização da fase de grupos não encontrados.');
+        return;
+    }
 
     const filtro = filtroEl.value;
     tbody.innerHTML = '';
+    cardsContainer.innerHTML = '';
 
     const jogosFiltrados = filtro === 'Todos' ? jogosGrupos : jogosGrupos.filter(j => j.grupo === filtro);
     const t = translations[currentLang];
@@ -285,30 +290,68 @@ export function renderGroupStage() {
             </td>
             <td class="px-6 py-3.5">
                 <div class="flex items-center justify-center gap-3">
-                    <div class="flex items-center justify-end gap-2 w-44 text-right">
-                        <span class="font-semibold text-slate-800 dark:text-slate-200 text-sm whitespace-nowrap">${homeName}</span>
+                <div class="flex items-center justify-end gap-2 w-36 md:w-44 text-right">
+                    <span class="font-semibold text-slate-800 dark:text-slate-200 text-xs md:text-sm whitespace-nowrap">${homeName}</span>
                         ${getFlagTag(j.home)}
                     </div>
                     <input type="number" min="0" placeholder="- " value="${sh}" 
                         oninput="window.setScoreInput(${j.id}, 'home', this.value)"
                         aria-label="${t.tableVs} ${homeName}"
                         ${lockedAttrs}
-                        class="w-11 h-9 text-center bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-800 rounded-lg font-black text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-blue-500 shadow-sm transition-all${lockedClasses}">
+                    class="w-12 h-11 md:w-11 md:h-9 min-h-[44px] md:min-h-0 text-center bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-800 rounded-lg font-black text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-blue-500 shadow-sm transition-all${lockedClasses}">
                     <span class="text-slate-300 dark:text-slate-700 font-bold text-xs">✕</span>
                     <input type="number" min="0" placeholder="- " value="${sa}" 
                         oninput="window.setScoreInput(${j.id}, 'away', this.value)"
                         aria-label="${t.tableVs} ${awayName}"
                         ${lockedAttrs}
-                        class="w-11 h-9 text-center bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-800 rounded-lg font-black text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-blue-500 shadow-sm transition-all${lockedClasses}">
-                    <div class="flex items-center justify-start gap-2 w-44 text-left">
+                    class="w-12 h-11 md:w-11 md:h-9 min-h-[44px] md:min-h-0 text-center bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-800 rounded-lg font-black text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-blue-500 shadow-sm transition-all${lockedClasses}">
+                <div class="flex items-center justify-start gap-2 w-36 md:w-44 text-left">
                         ${getFlagTag(j.away)}
-                        <span class="font-semibold text-slate-800 dark:text-slate-200 text-sm whitespace-nowrap">${awayName}</span>
+                    <span class="font-semibold text-slate-800 dark:text-slate-200 text-xs md:text-sm whitespace-nowrap">${awayName}</span>
                     </div>
                 </div>
             </td>
             <td class="px-6 py-3.5 text-slate-400 dark:text-slate-500 text-xs max-w-[200px] truncate">${localizedVenue}</td>
         `;
         tbody.appendChild(tr);
+
+        const card = document.createElement('article');
+        card.className = j.destaque
+            ? "bg-amber-50/40 dark:bg-amber-950/10 border border-amber-200/60 dark:border-amber-900/40 rounded-xl p-4 space-y-3"
+            : "bg-slate-50/80 dark:bg-slate-950/40 border border-slate-200/70 dark:border-slate-800/70 rounded-xl p-4 space-y-3";
+
+        card.innerHTML = `
+            <div class="flex items-center justify-between gap-2">
+                <span class="font-bold text-xs text-slate-500 dark:text-slate-400">${localizedDate}</span>
+                <span class="px-2 py-0.5 bg-slate-100 dark:bg-slate-950 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-800 rounded-md text-[11px] font-bold">${t.groupTitle} ${j.grupo}</span>
+            </div>
+            <div class="space-y-2">
+                <div class="flex items-center justify-between gap-2">
+                <div class="flex items-center gap-2 min-w-0">
+                    ${getFlagTag(j.home)}
+                    <span class="font-semibold text-slate-800 dark:text-slate-200 text-sm truncate">${homeName}</span>
+                </div>
+                <input type="number" min="0" placeholder="- " value="${sh}"
+                    oninput="window.setScoreInput(${j.id}, 'home', this.value)"
+                    aria-label="${t.tableVs} ${homeName}"
+                    ${lockedAttrs}
+                    class="w-12 h-11 min-h-[44px] text-center bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-800 rounded-lg font-black text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-blue-500 shadow-sm transition-all${lockedClasses}">
+                </div>
+                <div class="flex items-center justify-between gap-2">
+                <div class="flex items-center gap-2 min-w-0">
+                    ${getFlagTag(j.away)}
+                    <span class="font-semibold text-slate-800 dark:text-slate-200 text-sm truncate">${awayName}</span>
+                </div>
+                <input type="number" min="0" placeholder="- " value="${sa}"
+                    oninput="window.setScoreInput(${j.id}, 'away', this.value)"
+                    aria-label="${t.tableVs} ${awayName}"
+                    ${lockedAttrs}
+                    class="w-12 h-11 min-h-[44px] text-center bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-800 rounded-lg font-black text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-blue-500 shadow-sm transition-all${lockedClasses}">
+                </div>
+            </div>
+            <div class="text-[11px] text-slate-400 dark:text-slate-500 truncate">${localizedVenue}</div>
+        `;
+        cardsContainer.appendChild(card);
     });
 }
 
@@ -365,7 +408,7 @@ export function renderKnockoutStage() {
                             <div class="space-y-3 py-1">
                                 <!-- Time Casa -->
                                 <div class="flex items-center justify-between">
-                                    <div class="flex items-center gap-2 max-w-[75%]">
+                                    <div class="flex items-center gap-2 max-w-[65%] md:max-w-[75%]">
                                         ${getFlagTag(dadosCalculados.home)}
                                         <span class="text-sm font-bold text-slate-700 dark:text-slate-200 whitespace-nowrap truncate">${homeDisplayName}</span>
                                     </div>
@@ -373,11 +416,11 @@ export function renderKnockoutStage() {
                                         oninput="window.setScoreInput(${j.id}, 'home', this.value)"
                                         aria-label="${t.tableVs} ${homeDisplayName}"
                                         ${lockedAttrs}
-                                        class="w-11 h-9 text-center bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-800 rounded-lg font-black text-sm text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-blue-500 shadow-sm transition-all${lockedClasses}">
+                                        class="w-12 h-11 md:w-11 md:h-9 min-h-[44px] md:min-h-0 text-center bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-800 rounded-lg font-black text-sm text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-blue-500 shadow-sm transition-all${lockedClasses}">
                                 </div>
                                 <!-- Time Fora -->
                                 <div class="flex items-center justify-between">
-                                    <div class="flex items-center gap-2 max-w-[75%]">
+                                    <div class="flex items-center gap-2 max-w-[65%] md:max-w-[75%]">
                                         ${getFlagTag(dadosCalculados.away)}
                                         <span class="text-sm font-bold text-slate-700 dark:text-slate-200 whitespace-nowrap truncate">${awayDisplayName}</span>
                                     </div>
@@ -385,7 +428,7 @@ export function renderKnockoutStage() {
                                         oninput="window.setScoreInput(${j.id}, 'away', this.value)"
                                         aria-label="${t.tableVs} ${awayDisplayName}"
                                         ${lockedAttrs}
-                                        class="w-11 h-9 text-center bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-800 rounded-lg font-black text-sm text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-blue-500 shadow-sm transition-all${lockedClasses}">
+                                        class="w-12 h-11 md:w-11 md:h-9 min-h-[44px] md:min-h-0 text-center bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-800 rounded-lg font-black text-sm text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-blue-500 shadow-sm transition-all${lockedClasses}">
                                 </div>
 
                                 <!-- Sub-painel de Desempate por Pênaltis se houver empate técnico -->
