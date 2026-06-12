@@ -398,11 +398,19 @@ export function renderKnockoutStage() {
                         ? "bg-gradient-to-br from-amber-50 via-white to-amber-50/20 dark:from-amber-950/10 dark:via-slate-900 dark:to-amber-950/5 border-amber-300 dark:border-amber-900/50 shadow-lg" 
                         : "bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800/80 shadow-md";
 
+                    let matchDate = j.data;
+                    if (currentLang === 'en') {
+                        matchDate = matchDate
+                            .replace('(Qui)', '(Thu)').replace('(Sex)', '(Fri)').replace('(Sáb)', '(Sat)')
+                            .replace('(Dom)', '(Sun)').replace('(Seg)', '(Mon)').replace('(Ter)', '(Tue)')
+                            .replace('(Qua)', '(Wed)');
+                    }
+
                     return `
                         <div class="p-5 rounded-2xl border ${cardStyle} transition-all flex flex-col justify-between space-y-4 transition-colors duration-300">
                             <div class="flex justify-between items-center text-[10px] font-bold text-slate-400 dark:text-slate-500">
                                 <span>${t.confrontation} #${j.id}</span>
-                                <span class="bg-slate-100 dark:bg-slate-950 px-2 py-0.5 rounded text-slate-500 dark:text-slate-400 border border-slate-200/50 dark:border-slate-800/50">${j.data}</span>
+                                <span class="bg-slate-100 dark:bg-slate-950 px-2 py-0.5 rounded text-slate-500 dark:text-slate-400 border border-slate-200/50 dark:border-slate-800/50">${matchDate} - ${j.hora}</span>
                             </div>
                             
                             <div class="space-y-3 py-1">

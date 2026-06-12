@@ -77,58 +77,58 @@ export const estruturaNosMataMata = [
     {
         fase: "Dezesseis-avos de Final (Rodada de 32)",
         jogos: [
-            { id: 73, data: "28/06", local: "Los Angeles", origHome: { tipo: "grupo", pos: 1, grp: "A" }, origAway: { tipo: "grupo", pos: 2, grp: "B" } },
-            { id: 74, data: "29/06", local: "Boston", origHome: { tipo: "grupo", pos: 1, grp: "E" }, origAway: { tipo: "terceiro", idx: 0, grps: ["A","B","C","D","F"] } },
-            { id: 75, data: "29/06", local: "Monterrey", origHome: { tipo: "grupo", pos: 1, grp: "F" }, origAway: { tipo: "grupo", pos: 2, grp: "C" } },
-            { id: 76, data: "29/06", local: "Houston", origHome: { tipo: "grupo", pos: 1, grp: "C" }, origAway: { tipo: "grupo", pos: 2, grp: "F" } },
-            { id: 77, data: "30/06", local: "Nova York", origHome: { tipo: "grupo", pos: 1, grp: "I" }, origAway: { tipo: "terceiro", idx: 1, grps: ["C","D","F","G","H"] } },
-            { id: 78, data: "30/06", local: "Dallas", origHome: { tipo: "grupo", pos: 2, grp: "E" }, origAway: { tipo: "grupo", pos: 2, grp: "I" } },
-            { id: 79, data: "30/06", local: "Cidade do México", origHome: { tipo: "grupo", pos: 1, grp: "A" }, origAway: { tipo: "terceiro", idx: 2, grps: ["C","E","F","H","I"] } },
-            { id: 80, data: "01/07", local: "Atlanta", origHome: { tipo: "grupo", pos: 1, grp: "L" }, origAway: { tipo: "terceiro", idx: 3, grps: ["E","H","I","J","K"] } },
-            { id: 81, data: "01/07", local: "San Francisco", origHome: { tipo: "grupo", pos: 1, grp: "D" }, origAway: { tipo: "terceiro", idx: 4, grps: ["B","E","F","I","J"] } },
-            { id: 82, data: "01/07", local: "Seattle", origHome: { tipo: "grupo", pos: 1, grp: "G" }, origAway: { tipo: "terceiro", idx: 5, grps: ["A","E","H","I","J"] } },
-            { id: 83, data: "02/07", local: "Toronto", origHome: { tipo: "grupo", pos: 2, grp: "K" }, origAway: { tipo: "grupo", pos: 2, grp: "L" } },
-            { id: 84, data: "02/07", local: "Los Angeles", origHome: { tipo: "grupo", pos: 1, grp: "H" }, origAway: { tipo: "grupo", pos: 2, grp: "J" } },
-            { id: 85, data: "02/07", local: "Vancouver", origHome: { tipo: "grupo", pos: 1, grp: "B" }, origAway: { tipo: "terceiro", idx: 6, grps: ["E","F","G","I","J"] } },
-            { id: 86, data: "03/07", local: "Miami", origHome: { tipo: "grupo", pos: 1, grp: "J" }, origAway: { tipo: "grupo", pos: 2, grp: "H" } },
-            { id: 87, data: "03/07", local: "Kansas City", origHome: { tipo: "grupo", pos: 1, grp: "K" }, origAway: { tipo: "terceiro", idx: 7, grps: ["D","E","I","J","L"] } },
-            { id: 88, data: "03/07", local: "Dallas", origHome: { tipo: "grupo", pos: 2, grp: "D" }, origAway: { tipo: "grupo", pos: 2, grp: "G" } }
+            { id: 73, data: "28/06 (Dom)", hora: "16h00", local: "Los Angeles", origHome: { tipo: "grupo", pos: 1, grp: "A" }, origAway: { tipo: "grupo", pos: 2, grp: "B" } },
+            { id: 74, data: "29/06 (Seg)", hora: "17h00", local: "Boston", origHome: { tipo: "grupo", pos: 1, grp: "E" }, origAway: { tipo: "terceiro", idx: 0, grps: ["A","B","C","D","F"] } },
+            { id: 75, data: "29/06 (Seg)", hora: "22h00", local: "Monterrey", origHome: { tipo: "grupo", pos: 1, grp: "F" }, origAway: { tipo: "grupo", pos: 2, grp: "C" } },
+            { id: 76, data: "29/06 (Seg)", hora: "14h00", local: "Houston", origHome: { tipo: "grupo", pos: 1, grp: "C" }, origAway: { tipo: "grupo", pos: 2, grp: "F" } },
+            { id: 77, data: "30/06 (Ter)", hora: "18h00", local: "Nova York", origHome: { tipo: "grupo", pos: 1, grp: "I" }, origAway: { tipo: "terceiro", idx: 1, grps: ["C","D","F","G","H"] } },
+            { id: 78, data: "30/06 (Ter)", hora: "14h00", local: "Dallas", origHome: { tipo: "grupo", pos: 2, grp: "E" }, origAway: { tipo: "grupo", pos: 2, grp: "I" } },
+            { id: 79, data: "30/06 (Ter)", hora: "22h00", local: "Cidade do México", origHome: { tipo: "grupo", pos: 1, grp: "A" }, origAway: { tipo: "terceiro", idx: 2, grps: ["C","E","F","H","I"] } },
+            { id: 80, data: "01/07 (Qua)", hora: "13h00", local: "Atlanta", origHome: { tipo: "grupo", pos: 1, grp: "L" }, origAway: { tipo: "terceiro", idx: 3, grps: ["E","H","I","J","K"] } },
+            { id: 81, data: "01/07 (Qua)", hora: "21h00", local: "San Francisco", origHome: { tipo: "grupo", pos: 1, grp: "D" }, origAway: { tipo: "terceiro", idx: 4, grps: ["B","E","F","I","J"] } },
+            { id: 82, data: "01/07 (Qua)", hora: "17h00", local: "Seattle", origHome: { tipo: "grupo", pos: 1, grp: "G" }, origAway: { tipo: "terceiro", idx: 5, grps: ["A","E","H","I","J"] } },
+            { id: 83, data: "02/07 (Qui)", hora: "20h00", local: "Toronto", origHome: { tipo: "grupo", pos: 2, grp: "K" }, origAway: { tipo: "grupo", pos: 2, grp: "L" } },
+            { id: 84, data: "02/07 (Qui)", hora: "22h00", local: "Los Angeles", origHome: { tipo: "grupo", pos: 1, grp: "H" }, origAway: { tipo: "grupo", pos: 2, grp: "J" } },
+            { id: 85, data: "02/07 (Qui)", hora: "16h00", local: "Vancouver", origHome: { tipo: "grupo", pos: 1, grp: "B" }, origAway: { tipo: "terceiro", idx: 6, grps: ["E","F","G","I","J"] } },
+            { id: 86, data: "03/07 (Sex)", hora: "18h00", local: "Miami", origHome: { tipo: "grupo", pos: 1, grp: "J" }, origAway: { tipo: "grupo", pos: 2, grp: "H" } },
+            { id: 87, data: "03/07 (Sex)", hora: "21h00", local: "Kansas City", origHome: { tipo: "grupo", pos: 1, grp: "K" }, origAway: { tipo: "terceiro", idx: 7, grps: ["D","E","I","J","L"] } },
+            { id: 88, data: "03/07 (Sex)", hora: "20h00", local: "Dallas", origHome: { tipo: "grupo", pos: 2, grp: "D" }, origAway: { tipo: "grupo", pos: 2, grp: "G" } }
         ]
     },
     {
         fase: "Oitavas de Final",
         jogos: [
-            { id: 89, data: "04/07", local: "Filadélfia", origHome: { tipo: "venc", j: 74 }, origAway: { tipo: "venc", j: 77 } },
-            { id: 90, data: "04/07", local: "Houston", origHome: { tipo: "venc", j: 73 }, origAway: { tipo: "venc", j: 75 } },
-            { id: 91, data: "05/07", local: "Nova York", origHome: { tipo: "venc", j: 76 }, origAway: { tipo: "venc", j: 78 } },
-            { id: 92, data: "05/07", local: "Cidade do México", origHome: { tipo: "venc", j: 79 }, origAway: { tipo: "venc", j: 80 } },
-            { id: 93, data: "06/07", local: "Dallas", origHome: { tipo: "venc", j: 83 }, origAway: { tipo: "venc", j: 84 } },
-            { id: 94, data: "06/07", local: "Seattle", origHome: { tipo: "venc", j: 81 }, origAway: { tipo: "venc", j: 82 } },
-            { id: 95, data: "07/07", local: "Atlanta", origHome: { tipo: "venc", j: 86 }, origAway: { tipo: "venc", j: 88 } },
-            { id: 96, data: "07/07", local: "Vancouver", origHome: { tipo: "venc", j: 85 }, origAway: { tipo: "venc", j: 87 } }
+            { id: 89, data: "04/07 (Sáb)", hora: "17h00", local: "Filadélfia", origHome: { tipo: "venc", j: 74 }, origAway: { tipo: "venc", j: 77 } },
+            { id: 90, data: "04/07 (Sáb)", hora: "14h00", local: "Houston", origHome: { tipo: "venc", j: 73 }, origAway: { tipo: "venc", j: 75 } },
+            { id: 91, data: "05/07 (Dom)", hora: "17h00", local: "Nova York", origHome: { tipo: "venc", j: 76 }, origAway: { tipo: "venc", j: 78 } },
+            { id: 92, data: "05/07 (Dom)", hora: "14h00", local: "Cidade do México", origHome: { tipo: "venc", j: 79 }, origAway: { tipo: "venc", j: 80 } },
+            { id: 93, data: "06/07 (Seg)", hora: "17h00", local: "Dallas", origHome: { tipo: "venc", j: 83 }, origAway: { tipo: "venc", j: 84 } },
+            { id: 94, data: "06/07 (Seg)", hora: "14h00", local: "Seattle", origHome: { tipo: "venc", j: 81 }, origAway: { tipo: "venc", j: 82 } },
+            { id: 95, data: "07/07 (Ter)", hora: "17h00", local: "Atlanta", origHome: { tipo: "venc", j: 86 }, origAway: { tipo: "venc", j: 88 } },
+            { id: 96, data: "07/07 (Ter)", hora: "14h00", local: "Vancouver", origHome: { tipo: "venc", j: 85 }, origAway: { tipo: "venc", j: 87 } }
         ]
     },
     {
         fase: "Quartas de Final",
         jogos: [
-            { id: 97, data: "09/07", local: "Boston", origHome: { tipo: "venc", j: 89 }, origAway: { tipo: "venc", j: 90 } },
-            { id: 98, data: "10/07", local: "Los Angeles", origHome: { tipo: "venc", j: 93 }, origAway: { tipo: "venc", j: 94 } },
-            { id: 99, data: "11/07", local: "Miami", origHome: { tipo: "venc", j: 91 }, origAway: { tipo: "venc", j: 92 } },
-            { id: 100, data: "11/07", local: "Kansas City", origHome: { tipo: "venc", j: 95 }, origAway: { tipo: "venc", j: 96 } }
+            { id: 97, data: "09/07 (Qui)", hora: "17h00", local: "Boston", origHome: { tipo: "venc", j: 89 }, origAway: { tipo: "venc", j: 90 } },
+            { id: 98, data: "10/07 (Sex)", hora: "17h00", local: "Los Angeles", origHome: { tipo: "venc", j: 93 }, origAway: { tipo: "venc", j: 94 } },
+            { id: 99, data: "11/07 (Sáb)", hora: "17h00", local: "Miami", origHome: { tipo: "venc", j: 91 }, origAway: { tipo: "venc", j: 92 } },
+            { id: 100, data: "11/07 (Sáb)", hora: "14h00", local: "Kansas City", origHome: { tipo: "venc", j: 95 }, origAway: { tipo: "venc", j: 96 } }
         ]
     },
     {
         fase: "Semifinais",
         jogos: [
-            { id: 101, data: "14/07", local: "Dallas", origHome: { tipo: "venc", j: 97 }, origAway: { tipo: "venc", j: 99 } },
-            { id: 102, data: "15/07", local: "Atlanta", origHome: { tipo: "venc", j: 98 }, origAway: { tipo: "venc", j: 100 } }
+            { id: 101, data: "14/07 (Ter)", hora: "17h00", local: "Dallas", origHome: { tipo: "venc", j: 97 }, origAway: { tipo: "venc", j: 99 } },
+            { id: 102, data: "15/07 (Qua)", hora: "17h00", local: "Atlanta", origHome: { tipo: "venc", j: 98 }, origAway: { tipo: "venc", j: 100 } }
         ]
     },
     {
         fase: "Finais",
         jogos: [
-            { id: 103, data: "18/07", local: "Miami", origHome: { tipo: "perd", j: 101 }, origAway: { tipo: "perd", j: 102 } },
-            { id: 104, data: "19/07", local: "Nova York", origHome: { tipo: "venc", j: 101 }, origAway: { tipo: "venc", j: 102 }, destaque: true }
+            { id: 103, data: "18/07 (Sáb)", hora: "13h00", local: "Miami", origHome: { tipo: "perd", j: 101 }, origAway: { tipo: "perd", j: 102 } },
+            { id: 104, data: "19/07 (Dom)", hora: "16h00", local: "Nova York", origHome: { tipo: "venc", j: 101 }, origAway: { tipo: "venc", j: 102 }, destaque: true }
         ]
     }
 ];
