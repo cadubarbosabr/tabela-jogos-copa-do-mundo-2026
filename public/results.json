@@ -1,7 +1,15 @@
 {
+  "1": {
+    "home": 2,
+    "away": 0
+  },
+  "2": {
+    "home": 2,
+    "away": 1
+  },
   "_meta": {
-    "lastFetch": null,
+    "lastFetch": "2026-06-12T00:00:00Z",
     "source": "espn",
-    "slug": null
+    "slug": "fifa.world"
   }
 }
