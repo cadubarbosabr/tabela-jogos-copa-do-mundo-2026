@@ -33,10 +33,13 @@ const EN_TO_PT = {
   'Mexico': 'México',
   'South Africa': 'África do Sul',
   'South Korea': 'Coreia do Sul',
+  'Korea Republic': 'Coreia do Sul',  // nome oficial FIFA usado em alguns feeds ESPN
   'Czech Republic': 'República Tcheca',
+  'Czechia': 'República Tcheca',      // nome moderno retornado pela ESPN API
   'Canada': 'Canadá',
   'Bosnia and Herzegovina': 'Bósnia e Herzegovina',
   'Bosnia & Herzegovina': 'Bósnia e Herzegovina',
+  'Bosnia Herzegovina': 'Bósnia e Herzegovina', // variante sem "and"/"&"
   'Qatar': 'Catar',
   'Switzerland': 'Suíça',
   'Brazil': 'Brasil',
@@ -62,11 +65,13 @@ const EN_TO_PT = {
   'Tunisia': 'Tunísia',
   'Spain': 'Espanha',
   'Cape Verde': 'Cabo Verde',
+  'Cabo Verde': 'Cabo Verde',
   'Belgium': 'Bélgica',
   'Egypt': 'Egito',
   'Saudi Arabia': 'Arábia Saudita',
   'Uruguay': 'Uruguai',
   'Iran': 'Irã',
+  'IR Iran': 'Irã',                   // nome oficial FIFA
   'New Zealand': 'Nova Zelândia',
   'France': 'França',
   'Senegal': 'Senegal',
@@ -78,7 +83,9 @@ const EN_TO_PT = {
   'Jordan': 'Jordânia',
   'Portugal': 'Portugal',
   'DR Congo': 'RD Congo',
+  'Congo DR': 'RD Congo',             // variante de ordem usada em alguns feeds
   'Democratic Republic of the Congo': 'RD Congo',
+  'D.R. Congo': 'RD Congo',
   'England': 'Inglaterra',
   'Croatia': 'Croácia',
   'Ghana': 'Gana',
@@ -192,9 +199,14 @@ const KNOCKOUT_BY_DATE = {
 // Utilitários
 // ---------------------------------------------------------------------------
 
+// Mapa auxiliar com chaves em minúsculas para fallback insensível a maiúsculas
+const EN_TO_PT_LOWER = Object.fromEntries(
+  Object.entries(EN_TO_PT).map(([k, v]) => [k.toLowerCase(), v])
+);
+
 /** Converte um nome de seleção do inglês (ESPN) para o português (matches.js). */
 function toPt(enName) {
-  return EN_TO_PT[enName] || enName;
+  return EN_TO_PT[enName] || EN_TO_PT_LOWER[enName.toLowerCase()] || enName;
 }
 
 /** Retorna a data de hoje no formato YYYYMMDD (UTC). */
@@ -294,9 +306,12 @@ async function main() {
 
   const results = {};
 
-  // Mapa de busca rápida para fase de grupos: "HomePT|AwayPT" → match id
+  // Mapa de busca rápida para fase de grupos: "HomePT|AwayPT" → { id, swapped }
   const groupLookup = new Map(
-    GROUP_MATCHES.map(m => [`${m.home}|${m.away}`, m.id])
+    GROUP_MATCHES.flatMap(m => [
+      [`${m.home}|${m.away}`, { id: m.id, swapped: false }],
+      [`${m.away}|${m.home}`, { id: m.id, swapped: true }],
+    ])
   );
 
   const dates = dateRange(TOURNAMENT_START, today);
@@ -338,15 +353,19 @@ async function main() {
       const awayPt = toPt(awayEn);
 
       // Tentar localizar na fase de grupos primeiro
-      const groupId = groupLookup.get(`${homePt}|${awayPt}`);
+      const groupMatch = groupLookup.get(`${homePt}|${awayPt}`);
 
-      if (groupId !== undefined) {
-        results[String(groupId)] = { home: homeScore, away: awayScore };
-        if (isCompleted) {
-          console.log(`  #${groupId} ${homePt} ${homeScore}–${awayScore} ${awayPt}`);
-        } else {
-          console.log(`  #${groupId} ${homePt} ${homeScore}–${awayScore} ${awayPt} (em curso)`);
-        }
+      if (groupMatch !== undefined) {
+        const { id: groupId, swapped } = groupMatch;
+        // Se ESPN retornou home/away invertido vs matches.js, corrigir o placar
+        results[String(groupId)] = swapped
+          ? { home: awayScore, away: homeScore }
+          : { home: homeScore, away: awayScore };
+        const [dHome, dAway, dScH, dScA] = swapped
+          ? [awayPt, homePt, awayScore, homeScore]
+          : [homePt, awayPt, homeScore, awayScore];
+        const suffix = (isCompleted ? '' : ' (em curso)') + (swapped ? ' (home/away invertido)' : '');
+        console.log(`  #${groupId} ${dHome} ${dScH}–${dScA} ${dAway}${suffix}`);
       } else if (knockoutQueue[knockoutCursor] !== undefined) {
         // Mata-mata: associar positivamente pelo índice cronológico do dia
         const knockoutId = knockoutQueue[knockoutCursor++];
@@ -366,7 +385,8 @@ async function main() {
               result.penAway = pen.penAway;
             }
           }
-          console.log(`  #${knockoutId} ${homePt} ${homeScore}–${awayScore} ${awayPt}${result.penHome !== undefined ? ` (pen ${result.penHome}–${result.penAway})` : ''}`);
+          const penSuffix = result.penHome !== undefined ? ` (pen ${result.penHome}–${result.penAway})` : '';
+          console.log(`  #${knockoutId} ${homePt} ${homeScore}–${awayScore} ${awayPt}${penSuffix}`);
         } else {
           console.log(`  #${knockoutId} ${homePt} ${homeScore}–${awayScore} ${awayPt} (em curso)`);
         }
