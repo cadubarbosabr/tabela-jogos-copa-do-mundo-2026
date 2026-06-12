@@ -241,7 +241,10 @@ export function renderGroupStage() {
     const filtroEl = document.getElementById('filter-grupo');
     const tbody = document.getElementById('table-body-grupos');
     const cardsContainer = document.getElementById('cards-body-grupos');
-    if (!filtroEl || !tbody || !cardsContainer) return;
+    if (!filtroEl || !tbody || !cardsContainer) {
+        console.warn('Elementos de renderização da fase de grupos não encontrados.');
+        return;
+    }
 
     const filtro = filtroEl.value;
     tbody.innerHTML = '';
@@ -287,8 +290,8 @@ export function renderGroupStage() {
             </td>
             <td class="px-6 py-3.5">
                 <div class="flex items-center justify-center gap-3">
-                <div class="flex items-center justify-end gap-2 w-36 lg:w-44 text-right">
-                    <span class="font-semibold text-slate-800 dark:text-slate-200 text-xs lg:text-sm whitespace-nowrap">${homeName}</span>
+                <div class="flex items-center justify-end gap-2 w-36 md:w-44 text-right">
+                    <span class="font-semibold text-slate-800 dark:text-slate-200 text-xs md:text-sm whitespace-nowrap">${homeName}</span>
                         ${getFlagTag(j.home)}
                     </div>
                     <input type="number" min="0" placeholder="- " value="${sh}" 
@@ -302,9 +305,9 @@ export function renderGroupStage() {
                         aria-label="${t.tableVs} ${awayName}"
                         ${lockedAttrs}
                     class="w-12 h-11 md:w-11 md:h-9 min-h-[44px] md:min-h-0 text-center bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-800 rounded-lg font-black text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-blue-500 shadow-sm transition-all${lockedClasses}">
-                <div class="flex items-center justify-start gap-2 w-36 lg:w-44 text-left">
+                <div class="flex items-center justify-start gap-2 w-36 md:w-44 text-left">
                         ${getFlagTag(j.away)}
-                    <span class="font-semibold text-slate-800 dark:text-slate-200 text-xs lg:text-sm whitespace-nowrap">${awayName}</span>
+                    <span class="font-semibold text-slate-800 dark:text-slate-200 text-xs md:text-sm whitespace-nowrap">${awayName}</span>
                     </div>
                 </div>
             </td>

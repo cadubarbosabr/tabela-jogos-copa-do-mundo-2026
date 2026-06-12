@@ -493,7 +493,6 @@ async function main() {
 
   writeFileSync(RESULTS_PATH, newContent, 'utf8');
   console.log(`✅ public/results.json atualizado com ${resultCount} resultado(s).`);
-  process.exit(0);
 }
 
 main().catch((err) => {
