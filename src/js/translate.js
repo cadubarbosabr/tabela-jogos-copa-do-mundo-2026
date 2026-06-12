@@ -2,6 +2,7 @@ export const translations = {
     pt: {
         title: "COPA DO MUNDO FIFA 2026",
         subtitle: "Digite os placares: as tabelas e o chaveamento se calculam sozinhos",
+        loadingTable: "Carregando tabela...",
         tabGroups: "Classificação & Grupos",
         tabKnockout: "Fase Eliminatória (Live)",
         filterLabel: "Visualizar Grupo:",
@@ -33,6 +34,9 @@ export const translations = {
         finalTitle: "Final",
         contribPix: "Contribuir via PIX",
         pixCopied: "Chave PIX copiada! Finalize no app do seu banco. Obrigado pelo apoio! 🏆",
+        resetPredictions: "🗑️ Resetar Palpites",
+        resetConfirm: "Tem certeza que deseja resetar todos os palpites salvos?",
+        resetDone: "Palpites resetados com sucesso.",
         round32: "Dezesseis-avos de Final (Rodada de 32)",
         round16: "Oitavas de Final",
         quarterFinals: "Quartas de Final",
@@ -43,6 +47,7 @@ export const translations = {
     en: {
         title: "FIFA WORLD CUP 2026",
         subtitle: "Enter the scores: standings and brackets are calculated automatically",
+        loadingTable: "Loading table...",
         tabGroups: "Standings & Groups",
         tabKnockout: "Knockout Stage (Live)",
         filterLabel: "View Group:",
@@ -79,7 +84,10 @@ export const translations = {
         thirdPlace: "Third Place Play-off",
         final: "Final",
         contribPix: "Support via PIX",
-        pixCopied: "PIX Key copied! Finish in your bank app. Thanks for the support! 🏆"
+        pixCopied: "PIX Key copied! Finish in your bank app. Thanks for the support! 🏆",
+        resetPredictions: "🗑️ Reset Predictions",
+        resetConfirm: "Are you sure you want to reset all saved predictions?",
+        resetDone: "Predictions reset successfully."
     }
 };
 
