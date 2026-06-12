@@ -196,17 +196,66 @@ const KNOCKOUT_BY_DATE = {
 };
 
 // ---------------------------------------------------------------------------
-// Utilitários
+// Utilitários de normalização de nomes
 // ---------------------------------------------------------------------------
 
-// Mapa auxiliar com chaves em minúsculas para fallback insensível a maiúsculas
+/**
+ * Normaliza um nome de seleção para comparação tolerante a variações.
+ *
+ * Aplica (em ordem):
+ *  1. Decomposição Unicode NFD + remoção de marcas diacríticas (acentos).
+ *  2. Conversão para minúsculas.
+ *  3. Substituição de "&" por "and" (ex.: "Bosnia & Herzegovina" → "bosnia and herzegovina").
+ *  4. Remoção de apóstrofos: ASCII (U+0027), aspas simples abertas/fechadas (U+2018/U+2019)
+ *     e modificador de letra (U+02BC). Ex.: "Côte d'Ivoire" → "cote divoire".
+ *  5. Substituição de hífens e pontos por espaço (ex.: "D.R. Congo" → "dr  congo").
+ *  6. Colapso de espaços múltiplos e trim.
+ *
+ * @param {string} str
+ * @returns {string}
+ */
+function normalizeName(str) {
+  return str
+    .normalize('NFD')
+    .replace(/\p{M}/gu, '')
+    .toLowerCase()
+    .replace(/&/g, 'and')
+    .replace(/['\u2018\u2019\u02bc]/g, '')  // apóstrofos: ' (U+0027), ' (U+2018), ' (U+2019), ʼ (U+02BC)
+    .replace(/[.\-]/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+// Mapa auxiliar: chaves em minúsculas → fallback insensível a maiúsculas
 const EN_TO_PT_LOWER = Object.fromEntries(
   Object.entries(EN_TO_PT).map(([k, v]) => [k.toLowerCase(), v])
 );
 
-/** Converte um nome de seleção do inglês (ESPN) para o português (matches.js). */
+// Mapa auxiliar: chaves normalizadas → fallback tolerante a diacríticos/pontuação
+const EN_TO_PT_NORM = Object.fromEntries(
+  Object.entries(EN_TO_PT).map(([k, v]) => [normalizeName(k), v])
+);
+
+/**
+ * Converte um nome de seleção do inglês (ESPN) para o português (matches.js).
+ *
+ * Tenta três estratégias em ordem crescente de tolerância:
+ *  1. Correspondência exata contra EN_TO_PT.
+ *  2. Insensível a maiúsculas/minúsculas (EN_TO_PT_LOWER).
+ *  3. Tolerante a diacríticos, "&"/"and", hífens, apóstrofos e espaços (EN_TO_PT_NORM).
+ *
+ * Se nenhuma estratégia produzir resultado, retorna o nome original sem conversão.
+ *
+ * @param {string} enName - Nome da seleção em inglês (conforme retornado pela ESPN API)
+ * @returns {string} Nome em português ou o próprio enName se não houver mapeamento
+ */
 function toPt(enName) {
-  return EN_TO_PT[enName] || EN_TO_PT_LOWER[enName.toLowerCase()] || enName;
+  return (
+    EN_TO_PT[enName] ||
+    EN_TO_PT_LOWER[enName.toLowerCase()] ||
+    EN_TO_PT_NORM[normalizeName(enName)] ||
+    enName
+  );
 }
 
 /** Retorna a data de hoje no formato YYYYMMDD (UTC). */
@@ -306,11 +355,13 @@ async function main() {
 
   const results = {};
 
-  // Mapa de busca rápida para fase de grupos: "HomePT|AwayPT" → { id, swapped }
+  // Mapa de busca para fase de grupos: normalizeName("HomePT|AwayPT") → { id, swapped }
+  // Usar chaves normalizadas torna a busca tolerante a variações de acentuação,
+  // capitalização e pontuação nos nomes retornados pelo mapeamento EN → PT.
   const groupLookup = new Map(
     GROUP_MATCHES.flatMap(m => [
-      [`${m.home}|${m.away}`, { id: m.id, swapped: false }],
-      [`${m.away}|${m.home}`, { id: m.id, swapped: true }],
+      [normalizeName(`${m.home}|${m.away}`), { id: m.id, swapped: false }],
+      [normalizeName(`${m.away}|${m.home}`), { id: m.id, swapped: true }],
     ])
   );
 
@@ -346,14 +397,14 @@ async function main() {
       const awayScore = parseInt(awayComp.score, 10);
       if (isNaN(homeScore) || isNaN(awayScore)) continue;
 
-      // Converter nomes EN → PT para identificar o jogo
+      // Converter nomes EN → PT e normalizar para identificar o jogo
       const homeEn = homeComp.team?.displayName ?? '';
       const awayEn = awayComp.team?.displayName ?? '';
       const homePt = toPt(homeEn);
       const awayPt = toPt(awayEn);
 
-      // Tentar localizar na fase de grupos primeiro
-      const groupMatch = groupLookup.get(`${homePt}|${awayPt}`);
+      // Tentar localizar na fase de grupos primeiro (busca por chave normalizada)
+      const groupMatch = groupLookup.get(normalizeName(`${homePt}|${awayPt}`));
 
       if (groupMatch !== undefined) {
         const { id: groupId, swapped } = groupMatch;
@@ -393,7 +444,11 @@ async function main() {
 
         results[String(knockoutId)] = result;
       } else {
-        console.warn(`  Jogo não identificado: ${homeEn} vs ${awayEn} (${date})`);
+        console.warn(
+          `  ⚠ Jogo não identificado: "${homeEn}" vs "${awayEn}" (${date})` +
+          `\n    → PT: "${homePt}" vs "${awayPt}"` +
+          `\n    → Normalizado: "${normalizeName(homePt)}" vs "${normalizeName(awayPt)}"`
+        );
       }
     }
   }
