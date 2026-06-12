@@ -20,7 +20,7 @@ export const countryCodes = {
 
 export function getFlagTag(country) {
     const code = countryCodes[country];
-    if (code) return `<img src="https://flagcdn.com/w40/${code}.png" alt="${country}" loading="lazy" class="w-6 h-4 object-cover rounded shadow-sm border border-slate-200 inline-block flex-shrink-0">`;
+    if (code) return `<img src="https://flagcdn.com/w40/${code}.png" alt="${country}" loading="lazy" width="24" height="16" class="w-6 h-4 object-cover rounded shadow-sm border border-slate-200 inline-block flex-shrink-0">`;
     return `<span class="w-6 h-4 bg-slate-200 border border-slate-300 rounded text-[9px] font-bold text-slate-500 inline-flex items-center justify-center flex-shrink-0">FIFA</span>`;
 }
 

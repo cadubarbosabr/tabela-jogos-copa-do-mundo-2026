@@ -1,0 +1,16 @@
+{
+  "name": "Tabela Copa do Mundo FIFA 2026",
+  "short_name": "Copa 2026",
+  "description": "Tabela interativa com classificação e chaveamento automáticos da Copa do Mundo FIFA 2026",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0f172a",
+  "theme_color": "#0f172a",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    }
+  ]
+}

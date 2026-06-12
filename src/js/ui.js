@@ -66,6 +66,7 @@ export function applyTheme() {
 
 export function applyLanguage() {
     const t = translations[currentLang];
+    document.documentElement.lang = currentLang === 'en' ? 'en' : 'pt-BR';
     
     // Header
     const titleApp = document.getElementById('title-app');
@@ -137,11 +138,13 @@ export function applyLanguage() {
     const lblFooterTitle = document.getElementById('lbl-footer-title');
     const lblFooterSub = document.getElementById('lbl-footer-sub');
     const lblBtnPix = document.getElementById('lbl-btn-pix');
+    const lblBtnReset = document.getElementById('lbl-btn-reset');
     if (lblFooterTitle) lblFooterTitle.textContent = `© 2026 ${t.title}`;
     if (lblFooterSub) lblFooterSub.textContent = currentLang === 'pt' 
         ? "Desenvolvido por Cadu Barbosa • Dados Públicos • FIFA World Cup 2026"
         : "Developed by Cadu Barbosa • Public Data • FIFA World Cup 2026";
     if (lblBtnPix) lblBtnPix.textContent = t.contribPix;
+    if (lblBtnReset) lblBtnReset.textContent = t.resetPredictions;
 }
 
 export function switchTab(tab) {

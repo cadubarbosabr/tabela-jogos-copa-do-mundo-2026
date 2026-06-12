@@ -25,6 +25,7 @@ export async function loadOfficialResults() {
 
         const data = await response.json();
         officialResults = data && typeof data === 'object' && !Array.isArray(data) ? data : {};
+        localStorage.setItem('wc2026_lastUpdate', new Date().toISOString());
     } catch (error) {
         console.warn('Falha ao carregar resultados oficiais.', error);
         officialResults = {};

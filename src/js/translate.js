@@ -33,6 +33,9 @@ export const translations = {
         finalTitle: "Final",
         contribPix: "Contribuir via PIX",
         pixCopied: "Chave PIX copiada! Finalize no app do seu banco. Obrigado pelo apoio! 🏆",
+        resetPredictions: "🗑️ Resetar Palpites",
+        resetConfirm: "Tem certeza que deseja resetar todos os palpites salvos?",
+        resetDone: "Palpites resetados com sucesso.",
         round32: "Dezesseis-avos de Final (Rodada de 32)",
         round16: "Oitavas de Final",
         quarterFinals: "Quartas de Final",
@@ -79,7 +82,10 @@ export const translations = {
         thirdPlace: "Third Place Play-off",
         final: "Final",
         contribPix: "Support via PIX",
-        pixCopied: "PIX Key copied! Finish in your bank app. Thanks for the support! 🏆"
+        pixCopied: "PIX Key copied! Finish in your bank app. Thanks for the support! 🏆",
+        resetPredictions: "🗑️ Reset Predictions",
+        resetConfirm: "Are you sure you want to reset all saved predictions?",
+        resetDone: "Predictions reset successfully."
     }
 };
 

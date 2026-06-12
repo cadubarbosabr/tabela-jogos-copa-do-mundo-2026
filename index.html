@@ -4,6 +4,21 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Tabela Copa do Mundo FIFA 2026</title>
+    <meta name="description" content="Tabela interativa da Copa do Mundo FIFA 2026 com classificação em tempo real e chaveamento automático.">
+    <meta name="theme-color" content="#0f172a">
+    <link rel="canonical" href="https://tabela-jogos-copa-do-mundo-2026.vercel.app/">
+    <meta property="og:title" content="Tabela Copa do Mundo FIFA 2026">
+    <meta property="og:description" content="Tabela interativa com classificação e chaveamento automáticos da Copa do Mundo FIFA 2026.">
+    <meta property="og:image" content="https://upload.wikimedia.org/wikipedia/commons/thumb/8/88/2026_FIFA_World_Cup_emblem_%28horizontal%2C_with_wordmark%29.svg/960px-2026_FIFA_World_Cup_emblem_%28horizontal%2C_with_wordmark%29.svg.png">
+    <meta property="og:url" content="https://tabela-jogos-copa-do-mundo-2026.vercel.app/">
+    <meta property="og:type" content="website">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Tabela Copa do Mundo FIFA 2026">
+    <meta name="twitter:description" content="Tabela interativa com classificação e chaveamento automáticos da Copa do Mundo FIFA 2026.">
+    <meta name="twitter:image" content="https://upload.wikimedia.org/wikipedia/commons/thumb/8/88/2026_FIFA_World_Cup_emblem_%28horizontal%2C_with_wordmark%29.svg/960px-2026_FIFA_World_Cup_emblem_%28horizontal%2C_with_wordmark%29.svg.png">
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <link rel="apple-touch-icon" href="/favicon.svg">
+    <link rel="manifest" href="/manifest.json">
     <!-- Folha de estilo compilada em tempo de build (Vite + Tailwind CLI) -->
     <link rel="stylesheet" href="/src/index.css">
     <script>
@@ -50,6 +65,10 @@
 
     <!-- Conteúdo Principal -->
     <main class="flex-grow max-w-7xl w-full mx-auto px-4 py-8">
+        <div id="loading-overlay" class="flex flex-col items-center justify-center py-20 gap-4">
+            <div class="w-10 h-10 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin"></div>
+            <p class="text-sm text-slate-500 dark:text-slate-400 font-medium">Carregando tabela...</p>
+        </div>
         
         <!-- SEÇÃO: FASE DE GRUPOS -->
         <section id="section-grupos" class="space-y-8 transition-all duration-500">
@@ -69,10 +88,13 @@
                 <div id="lbl-group-info" class="text-xs font-semibold bg-blue-50 dark:bg-blue-950/30 text-blue-700 dark:text-blue-300 px-4 py-2 rounded-xl border border-blue-100 dark:border-blue-900/50 shadow-sm transition-colors duration-300">
                     ℹ️ Os 2 melhores de cada grupo + os 8 melhores 3º colocados avançam dinamicamente.
                 </div>
+                <button id="btn-reset-predictions" type="button" class="text-xs font-semibold bg-rose-50 dark:bg-rose-950/30 text-rose-700 dark:text-rose-300 px-4 py-2 rounded-xl border border-rose-100 dark:border-rose-900/50 shadow-sm hover:bg-rose-100 dark:hover:bg-rose-950/50 transition-colors duration-300">
+                    <span id="lbl-btn-reset">🗑️ Resetar Palpites</span>
+                </button>
             </div>
 
             <!-- Grid Dinâmico das Tabelas de Classificação -->
-            <div id="grid-tabelas-classificacao" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div id="grid-tabelas-classificacao" aria-live="polite" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 <!-- Inserido dinamicamente via JS -->
             </div>
 
@@ -111,7 +133,7 @@
                 <p id="lbl-champion-subtitle" class="text-sm font-bold text-amber-950/80 mt-1">VENCEDOR DA COPA DO MUNDO FIFA 2026</p>
             </div>
 
-            <div id="container-mata-mata" class="space-y-10">
+            <div id="container-mata-mata" aria-live="polite" class="space-y-10">
                 <!-- Renderizado via JS -->
             </div>
         </section>
@@ -129,6 +151,7 @@
             
             <!-- Bloco de Contatos, Redes Sociais e PIX -->
             <div class="flex flex-wrap justify-center gap-3 text-xs font-semibold">
+                <span id="last-update" class="text-slate-500 self-center"></span>
                 
                 <!-- Botão PIX Inteligente (Clique para Copiar) -->
                 <button id="btn-pix" 
