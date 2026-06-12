@@ -206,7 +206,8 @@ const KNOCKOUT_BY_DATE = {
  *  1. Decomposição Unicode NFD + remoção de marcas diacríticas (acentos).
  *  2. Conversão para minúsculas.
  *  3. Substituição de "&" por "and" (ex.: "Bosnia & Herzegovina" → "bosnia and herzegovina").
- *  4. Remoção de apóstrofos (ex.: "Côte d'Ivoire" → "cote divoire").
+ *  4. Remoção de apóstrofos: ASCII (U+0027), aspas simples abertas/fechadas (U+2018/U+2019)
+ *     e modificador de letra (U+02BC). Ex.: "Côte d'Ivoire" → "cote divoire".
  *  5. Substituição de hífens e pontos por espaço (ex.: "D.R. Congo" → "dr  congo").
  *  6. Colapso de espaços múltiplos e trim.
  *
@@ -219,7 +220,7 @@ function normalizeName(str) {
     .replace(/\p{M}/gu, '')
     .toLowerCase()
     .replace(/&/g, 'and')
-    .replace(/['\u2018\u2019\u02bc]/g, '')
+    .replace(/['\u2018\u2019\u02bc]/g, '')  // apóstrofos: ' (U+0027), ' (U+2018), ' (U+2019), ʼ (U+02BC)
     .replace(/[.\-]/g, ' ')
     .replace(/\s+/g, ' ')
     .trim();
