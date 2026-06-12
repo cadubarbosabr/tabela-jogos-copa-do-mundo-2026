@@ -71,8 +71,10 @@ export function applyLanguage() {
     // Header
     const titleApp = document.getElementById('title-app');
     const subtitleApp = document.getElementById('subtitle-app');
+    const loadingOverlayText = document.getElementById('loading-overlay-text');
     if (titleApp) titleApp.textContent = t.title;
     if (subtitleApp) subtitleApp.textContent = t.subtitle;
+    if (loadingOverlayText) loadingOverlayText.textContent = t.loadingTable;
 
     // Tabs
     const btnGrupos = document.getElementById('btn-grupos');

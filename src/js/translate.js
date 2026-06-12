@@ -2,6 +2,7 @@ export const translations = {
     pt: {
         title: "COPA DO MUNDO FIFA 2026",
         subtitle: "Digite os placares: as tabelas e o chaveamento se calculam sozinhos",
+        loadingTable: "Carregando tabela...",
         tabGroups: "Classificação & Grupos",
         tabKnockout: "Fase Eliminatória (Live)",
         filterLabel: "Visualizar Grupo:",
@@ -46,6 +47,7 @@ export const translations = {
     en: {
         title: "FIFA WORLD CUP 2026",
         subtitle: "Enter the scores: standings and brackets are calculated automatically",
+        loadingTable: "Loading table...",
         tabGroups: "Standings & Groups",
         tabKnockout: "Knockout Stage (Live)",
         filterLabel: "View Group:",
