@@ -102,10 +102,11 @@ document.addEventListener('DOMContentLoaded', async () => {
             const t = translations[currentLang];
             if (!confirm(t.resetConfirm)) return;
 
-            Object.keys(localStorage).forEach((key) => {
-                if (key.startsWith('wc2026_score_') || key.startsWith('wc2026_pen_')) {
-                    localStorage.removeItem(key);
-                }
+            const predictionKeys = Object.keys(localStorage).filter((key) =>
+                key.startsWith('wc2026_score_') || key.startsWith('wc2026_pen_')
+            );
+            predictionKeys.forEach((key) => {
+                localStorage.removeItem(key);
             });
 
             recalcularTorneioCompleto();
