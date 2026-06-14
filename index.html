@@ -37,7 +37,7 @@
     <header class="bg-gradient-to-r from-blue-950 via-blue-900 to-indigo-950 text-white shadow-xl border-b border-blue-800">
         <div class="max-w-7xl mx-auto px-4 py-4 md:py-8 flex flex-col md:flex-row justify-between items-center gap-4 md:gap-6">
             <div class="text-center md:text-left">
-                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/88/2026_FIFA_World_Cup_emblem_%28horizontal%2C_with_wordmark%29.svg/960px-2026_FIFA_World_Cup_emblem_%28horizontal%2C_with_wordmark%29.svg.png" alt="Logo Oficial FIFA 2026" class="h-12 md:h-16 w-auto mb-2 md:mb-3 object-contain drop-shadow-lg filter brightness-110 select-none mx-auto md:mx-0">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/88/2026_FIFA_World_Cup_emblem_%28horizontal%2C_with_wordmark%29.svg/960px-2026_FIFA_World_Cup_emblem_%28horizontal%2C_with_wordmark%29.svg.png" alt="Logo FIFA World Cup 2026" class="h-10 md:h-14 mx-auto md:mx-0 drop-shadow-lg">
                 <h1 id="title-app" class="text-2xl md:text-4xl font-extrabold tracking-tight mt-1 md:mt-2 drop-shadow-md">COPA DO MUNDO FIFA 2026</h1>
             </div>
             
@@ -46,15 +46,15 @@
                 <!-- Alternador de Abas -->
                 <div class="flex bg-blue-950/60 p-1 rounded-xl border border-blue-800/60 shadow-inner backdrop-blur-sm">
                     <button id="btn-grupos" class="px-3 md:px-5 py-2 md:py-2.5 rounded-lg text-xs md:text-sm font-bold bg-gradient-to-b from-white to-gray-100 text-blue-950 shadow-md transition-all duration-300 transform scale-105">Fase de Grupos</button>
-                    <button id="btn-mata-mata" class="px-3 md:px-5 py-2 md:py-2.5 rounded-lg text-xs md:text-sm font-bold text-blue-200 hover:text-white transition-all duration-300">Fase Eliminatória</button>
+                    <button id="btn-mata-mata" class="px-3 md:px-5 py-2 md:py-2.5 rounded-lg text-xs md:text-sm font-bold text-blue-200 hover:text-white transition-all duration-300">Eliminatórias</button>
                 </div>
                 
                 <!-- Toggles Rápidos -->
                 <div class="flex gap-2">
-                    <button id="btn-lang" class="bg-blue-950/60 hover:bg-blue-900/60 text-blue-200 hover:text-white px-3 py-2 rounded-xl border border-blue-800/60 transition-all text-xs font-bold shadow-md cursor-pointer select-none flex items-center gap-1.5">
+                    <button id="btn-lang" class="bg-blue-950/60 hover:bg-blue-900/60 text-blue-200 hover:text-white px-3 py-2 rounded-xl border border-blue-800/60 transition-all text-xs font-bold backdrop-blur-sm">
                         🌐 <span id="lbl-btn-lang">English</span>
                     </button>
-                    <button id="btn-theme" class="bg-blue-950/60 hover:bg-blue-900/60 text-blue-200 hover:text-white px-3 py-2 rounded-xl border border-blue-800/60 transition-all text-xs font-bold shadow-md cursor-pointer select-none flex items-center gap-1.5">
+                    <button id="btn-theme" class="bg-blue-950/60 hover:bg-blue-900/60 text-blue-200 hover:text-white px-3 py-2 rounded-xl border border-blue-800/60 transition-all text-xs font-bold backdrop-blur-sm">
                         🌙 <span id="lbl-btn-theme">Modo Claro</span>
                     </button>
                 </div>
@@ -76,7 +76,7 @@
             <div class="bg-white dark:bg-slate-900 p-5 rounded-2xl shadow-md border border-slate-200/80 dark:border-slate-800/80 flex flex-col md:flex-row gap-4 items-center justify-between transition-colors duration-300">
                 <div class="flex items-center gap-3">
                     <label id="lbl-filter-grupo" for="filter-grupo" class="text-sm font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Visualizar Grupo:</label>
-                    <select id="filter-grupo" class="bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-800 text-slate-800 dark:text-slate-200 text-sm rounded-xl font-semibold focus:ring-2 focus:ring-blue-500 p-2.5 shadow-sm cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-900 transition-colors">
+                    <select id="filter-grupo" class="bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-800 text-slate-800 dark:text-slate-200 text-sm rounded-xl font-semibold px-4 py-2 focus:ring-2 focus:ring-blue-500 transition-colors duration-300">
                         <option id="opt-all-groups" value="Todos">Todos os Grupos (A ao L)</option>
                         <option value="A">Grupo A</option><option value="B">Grupo B</option><option value="C">Grupo C</option>
                         <option value="D">Grupo D</option><option value="E">Grupo E</option><option value="F">Grupo F</option>
@@ -108,7 +108,7 @@
                 </div>
                 <div class="hidden md:block overflow-x-auto">
                     <table class="w-full text-left border-collapse">
-                        <thead class="bg-slate-100/50 dark:bg-slate-950/50 text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider border-b border-slate-200 dark:border-slate-800/80">
+                        <thead class="bg-slate-100/50 dark:bg-slate-950/50 text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider border-b border-slate-200 dark:border-slate-800">
                             <tr>
                                 <th id="th-match" class="px-6 py-4">Jogo</th>
                                 <th id="th-datetime" class="px-6 py-4">Data / Hora (BRT)</th>
@@ -158,21 +158,21 @@
                 <!-- Botão PIX Inteligente (Clique para Copiar) -->
                 <button id="btn-pix" 
                         title="Chave: sicwnb@outlook.com"
-                        class="flex items-center gap-2 bg-emerald-950/40 border border-emerald-900/50 text-emerald-400 px-4 py-2 rounded-xl hover:bg-emerald-900/40 hover:text-emerald-300 hover:border-emerald-700 transition-all shadow-sm cursor-pointer">
+                        class="flex items-center gap-2 bg-emerald-950/40 border border-emerald-900/50 text-emerald-400 px-4 py-2 rounded-xl hover:bg-emerald-900/40 hover:text-emerald-300 hover:border-emerald-700 transition-all duration-300">
                     <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
                     <span id="lbl-btn-pix">Contribuir via PIX</span>
                 </button>
 
                 <!-- Link X (Twitter) -->
                 <a href="https://x.com/CaduBarbosaBR" target="_blank" 
-                   class="flex items-center gap-2 bg-slate-900 border border-slate-800 text-slate-300 px-4 py-2 rounded-xl hover:bg-slate-800 hover:text-white hover:border-slate-700 transition-all shadow-sm">
+                   class="flex items-center gap-2 bg-slate-900 border border-slate-800 text-slate-300 px-4 py-2 rounded-xl hover:bg-slate-800 hover:text-white hover:border-slate-700 transition-all duration-300">
                     <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
                     X (Twitter)
                 </a>
 
                 <!-- Link LinkedIn -->
                 <a href="https://linkedin.com/in/cbarbosa9" target="_blank" 
-                   class="flex items-center gap-2 bg-slate-900 border border-slate-800 text-slate-300 px-4 py-2 rounded-xl hover:bg-slate-800 hover:text-white hover:border-slate-700 transition-all shadow-sm">
+                   class="flex items-center gap-2 bg-slate-900 border border-slate-800 text-slate-300 px-4 py-2 rounded-xl hover:bg-slate-800 hover:text-white hover:border-slate-700 transition-all duration-300">
                     <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24"><path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/></svg>
                     LinkedIn
                 </a>
