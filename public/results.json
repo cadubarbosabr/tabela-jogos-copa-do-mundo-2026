@@ -27,6 +27,10 @@
     "home": 0,
     "away": 1
   },
+  "9": {
+    "home": 2,
+    "away": 1
+  },
   "_meta": {
     "lastFetch": "2026-06-14T00:00:00Z",
     "source": "espn",
