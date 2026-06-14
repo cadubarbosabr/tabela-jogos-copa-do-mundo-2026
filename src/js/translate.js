@@ -4,7 +4,7 @@ export const translations = {
         subtitle: "Digite os placares: as tabelas e o chaveamento são calculados automaticamente",
         loadingTable: "Carregando tabela...",
         tabGroups: "Fase de Grupos",
-        tabKnockout: "Fase Eliminatória",
+        tabKnockout: "Eliminatórias",
         filterLabel: "Visualizar Grupo:",
         filterAll: "Todos os Grupos (A ao L)",
         groupInfo: "ℹ️ Os 2 melhores de cada grupo + os 8 melhores 3º colocados avançam dinamicamente.",
