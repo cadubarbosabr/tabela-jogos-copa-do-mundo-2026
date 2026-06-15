@@ -185,5 +185,11 @@
 
     <!-- Script de Entrada Principal compilado via Vite -->
     <script type="module" src="/src/js/main.js"></script>
+    
+    <!-- Vercel Web Analytics -->
+    <script type="module">
+        import { inject } from '@vercel/analytics';
+        inject();
+    </script>
 </body>
 </html>
