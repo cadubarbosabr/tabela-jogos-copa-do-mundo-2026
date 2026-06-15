@@ -28,17 +28,17 @@ jobs:
           node-version: '20'
 
       - name: Buscar resultados via ESPN API
+        id: fetch
         run: node scripts/fetch-results.mjs
+        continue-on-error: true
 
       - name: Exibir resumo da atualização
+        if: always()
         run: |
           node -e "const fs=require('node:fs'); const raw=fs.readFileSync('public/results.json','utf8'); const data=JSON.parse(raw||'{}'); const resultKeys=Object.keys(data).filter(k=>k!=='_meta'); console.log('Resultados encontrados:', resultKeys.length); console.log('Meta:', data._meta ?? null);"
 
-      - name: Alertar se vazio após início do torneio
-        run: |
-          node -e "const fs=require('node:fs'); const data=JSON.parse(fs.readFileSync('public/results.json','utf8')||'{}'); const resultCount=Object.keys(data).filter(k=>k!=='_meta').length; const tournamentStartUtc=new Date('2026-06-11T00:00:00Z'); const alertThreshold=new Date(tournamentStartUtc.getTime()+24*60*60*1000); if (new Date() >= alertThreshold && resultCount === 0) { console.error('❌ Nenhum resultado encontrado 24h após o início do torneio.'); process.exit(1); } console.log('✅ Verificação de resultados concluída.');"
-
       - name: Publicar alterações
+        if: always()
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
@@ -54,3 +54,11 @@ jobs:
             fi
             echo "✅ Resultados atualizados e publicados."
           fi
+
+      - name: Falhar se lacunas detectadas
+        if: steps.fetch.outcome == 'failure'
+        run: |
+          echo "❌ O script de busca encerrou com erro (exit code não-zero)."
+          echo "   Causas possíveis: lacunas de cobertura detectadas OU falha inesperada."
+          echo "   Consulte os logs do passo 'Buscar resultados via ESPN API' acima para o diagnóstico completo."
+          exit 1
