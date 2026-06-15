@@ -54,6 +54,7 @@ const EN_TO_PT = {
   'Paraguay': 'Paraguai',
   'Australia': 'Austrália',
   'Turkey': 'Turquia',
+  'Türkiye': 'Turquia',         // nome oficial adotado internacionalmente desde 2022
   'Germany': 'Alemanha',
   'Curaçao': 'Curaçao',
   'Curacao': 'Curaçao', // alias sem cedilha — usado por alguns feeds ESPN
@@ -372,6 +373,10 @@ async function main() {
   let lastSuccessfulSlug = null;
   let lastSuccessfulDate = null;
 
+  // Eventos retornados pela ESPN que não foram associados a nenhum jogo cadastrado
+  /** @type {Array<{date: string, homeEn: string, awayEn: string, homePt: string, awayPt: string, statusName: string}>} */
+  const unmatchedEvents = [];
+
   // Mapa de busca para fase de grupos: normalizeName("HomePT|AwayPT") → { id, swapped }
   // Usar chaves normalizadas torna a busca tolerante a variações de acentuação,
   // capitalização e pontuação nos nomes retornados pelo mapeamento EN → PT.
@@ -468,6 +473,14 @@ async function main() {
           `\n    → PT: "${homePt}" vs "${awayPt}"` +
           `\n    → Normalizado: "${normalizeName(homePt)}" vs "${normalizeName(awayPt)}"`
         );
+        unmatchedEvents.push({
+          date,
+          homeEn,
+          awayEn,
+          homePt,
+          awayPt,
+          statusName: String(status?.name ?? status?.state ?? ''),
+        });
       }
     }
   }
@@ -480,19 +493,47 @@ async function main() {
     slug: lastSuccessfulSlug,
   };
 
-  if (resultCount === 0 && today > TOURNAMENT_START) {
-    console.warn('⚠️ ATENÇÃO: Nenhum resultado encontrado apesar do torneio já ter começado!');
-    console.warn('Possíveis causas: slug da ESPN alterado, API fora do ar, ou jogos ainda não iniciados.');
-  }
-
   const newContent = JSON.stringify(results, null, 2) + '\n';
   if (newContent === previousContent) {
     console.log('Nenhuma alteração nos resultados.');
-    return;
+  } else {
+    writeFileSync(RESULTS_PATH, newContent, 'utf8');
+    console.log(`✅ public/results.json atualizado com ${resultCount} resultado(s).`);
   }
 
-  writeFileSync(RESULTS_PATH, newContent, 'utf8');
-  console.log(`✅ public/results.json atualizado com ${resultCount} resultado(s).`);
+  // ---------------------------------------------------------------------------
+  // Verificação de consistência: detectar jogos da fase de grupos de datas já
+  // passadas que não receberam resultado (falha parcial silenciosa).
+  // Apenas datas estritamente anteriores a hoje são verificadas, evitando
+  // falsos positivos para jogos de hoje ainda não iniciados.
+  // ---------------------------------------------------------------------------
+  const pastGroupGapsIds = GROUP_MATCHES
+    .filter(m => m.date < today && results[String(m.id)] === undefined)
+    .map(m => m.id);
+
+  if (pastGroupGapsIds.length > 0) {
+    const missing = GROUP_MATCHES.filter(m => pastGroupGapsIds.includes(m.id));
+    console.error(`\n❌ ${missing.length} jogo(s) da fase de grupos sem resultado (datas já encerradas):`);
+    for (const m of missing) {
+      console.error(`  #${m.id} ${m.home} × ${m.away} [${m.date}]`);
+    }
+
+    if (unmatchedEvents.length > 0) {
+      console.error('\n  Eventos não identificados retornados pela ESPN:');
+      for (const e of unmatchedEvents) {
+        console.error(
+          `    "${e.homeEn}" vs "${e.awayEn}" (${e.date})` +
+          ` → PT: "${e.homePt}" vs "${e.awayPt}"` +
+          ` [status: ${e.statusName || 'desconhecido'}]`
+        );
+      }
+    } else {
+      console.error('\n  Nenhum evento não identificado — jogo pode não ter sido retornado pela ESPN como concluído.');
+    }
+
+    console.error('\nVerifique os logs acima e, se necessário, ajuste o mapeamento de nomes em EN_TO_PT.');
+    process.exit(1);
+  }
 }
 
 main().catch((err) => {
