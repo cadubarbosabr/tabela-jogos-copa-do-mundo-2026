@@ -58,5 +58,7 @@ jobs:
       - name: Falhar se lacunas detectadas
         if: steps.fetch.outcome == 'failure'
         run: |
-          echo "❌ O script reportou lacunas ou erros nos resultados. Verifique os logs do passo 'Buscar resultados via ESPN API' acima."
+          echo "❌ O script de busca encerrou com erro (exit code não-zero)."
+          echo "   Causas possíveis: lacunas de cobertura detectadas OU falha inesperada."
+          echo "   Consulte os logs do passo 'Buscar resultados via ESPN API' acima para o diagnóstico completo."
           exit 1
