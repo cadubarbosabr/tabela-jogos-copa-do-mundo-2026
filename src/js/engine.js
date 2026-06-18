@@ -1,5 +1,6 @@
-import { equipesIniciais, getFlagTag } from './teams.js';
+import { getFlagTag } from './teams.js';
 import { jogosGrupos, estruturaNosMataMata } from './matches.js';
+import { calculateStandings, isGroupStarted, sortThirdPlacedTeams } from './standings.js';
 import { translateTeam } from './translate.js';
 import {
     getOfficialScoreInput,
@@ -51,74 +52,32 @@ export function setPenaltiesInput(id, side, val) {
 }
 
 export function recalcularTorneioCompleto() {
-    // 1. Resetar Estatísticas de cada time
-    let statsTimes = {};
-    equipesIniciais.forEach(t => {
-        statsTimes[t.name] = { name: t.name, group: t.group, P: 0, J: 0, V: 0, E: 0, D: 0, GP: 0, GC: 0, SG: 0 };
+    const resultadosFaseDeGrupos = {};
+
+    jogosGrupos.forEach(jogo => {
+        const golsHome = getScoreInput(jogo.id, 'home');
+        const golsAway = getScoreInput(jogo.id, 'away');
+
+        if (golsHome === '' || golsAway === '') return;
+
+        resultadosFaseDeGrupos[String(jogo.id)] = {
+            home: golsHome,
+            away: golsAway
+        };
     });
 
-    // 2. Processar os 72 jogos da fase de grupos
-    jogosGrupos.forEach(j => {
-        const golsHome = getScoreInput(j.id, 'home');
-        const golsAway = getScoreInput(j.id, 'away');
-
-        if (golsHome !== '' && golsAway !== '') {
-            const gh = parseInt(golsHome, 10);
-            const ga = parseInt(golsAway, 10);
-
-            statsTimes[j.home].J += 1;
-            statsTimes[j.away].J += 1;
-            statsTimes[j.home].GP += gh;
-            statsTimes[j.home].GC += ga;
-            statsTimes[j.away].GP += ga;
-            statsTimes[j.away].GC += gh;
-
-            if (gh > ga) {
-                statsTimes[j.home].P += 3;
-                statsTimes[j.home].V += 1;
-                statsTimes[j.away].D += 1;
-            } else if (ga > gh) {
-                statsTimes[j.away].P += 3;
-                statsTimes[j.away].V += 1;
-                statsTimes[j.home].D += 1;
-            } else {
-                statsTimes[j.home].P += 1;
-                statsTimes[j.away].P += 1;
-                statsTimes[j.home].E += 1;
-                statsTimes[j.away].E += 1;
-            }
-        }
-    });
-
-    // Recalcular Saldo de Gols de todos
-    Object.keys(statsTimes).forEach(k => {
-        statsTimes[k].SG = statsTimes[k].GP - statsTimes[k].GC;
-    });
-
-    // 3. Organizar os times dentro de cada um dos 12 Grupos (A-L)
-    const letrasGrupos = ["A","B","C","D","E","F","G","H","I","J","K","L"];
-    gruposClassificacao = {};
-    let todosTerceiros = [];
-
-    letrasGrupos.forEach(g => {
-        let timesDoGrupo = Object.values(statsTimes).filter(t => t.group === g);
-        // Ordenação oficial: Pontos > Saldo de Gols > Gols Pró > Alfabético
-        timesDoGrupo.sort((a, b) => b.P - a.P || b.SG - a.SG || b.GP - a.GP || a.name.localeCompare(b.name));
-        gruposClassificacao[g] = timesDoGrupo;
-
-        // Guardar o 3º colocado para a repescagem das vagas extras
-        todosTerceiros.push(timesDoGrupo[2]);
-    });
+    const { gruposClassificacao: classificacaoPorGrupo, terceirosColocados } = calculateStandings(resultadosFaseDeGrupos);
+    gruposClassificacao = classificacaoPorGrupo;
 
     // Helper para verificar se um grupo foi iniciado (se tem pelo menos 1 jogo com placar)
     const isGrupoIniciado = (grp) => {
-        return jogosGrupos.some(jg => jg.grupo === grp && getScoreInput(jg.id, 'home') !== '' && getScoreInput(jg.id, 'away') !== '');
+        return isGroupStarted(grp, resultadosFaseDeGrupos);
     };
 
     // 4. Calcular os 8 Melhores 3º Colocados Gerais (apenas considerando grupos já iniciados)
-    let terceirosQualificados = todosTerceiros
-        .filter(t => isGrupoIniciado(t.group))
-        .sort((a, b) => b.P - a.P || b.SG - a.SG || b.GP - a.GP || a.name.localeCompare(b.name))
+    let terceirosQualificados = sortThirdPlacedTeams(
+        terceirosColocados.filter(t => isGrupoIniciado(t.group))
+    )
         .slice(0, 8);
 
     // 5. Resolver Chaveamento Dinâmico do Mata-Mata jogo por jogo
