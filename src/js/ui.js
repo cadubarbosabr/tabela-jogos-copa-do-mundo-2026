@@ -8,6 +8,7 @@ import { hasOfficialResult } from './officialResults.js';
 import { getFlagTag } from './teams.js';
 import { jogosGrupos, estruturaNosMataMata } from './matches.js';
 import { translations, translateTeam, translatePlaceholder } from './translate.js';
+import { sortThirdPlacedTeams } from './standings.js';
 
 // Estado global de Tema e Idioma
 export let currentLang = localStorage.getItem('wc2026_lang') || 'pt';
@@ -35,6 +36,7 @@ export function initToggles() {
             renderTablesGrid();
             renderGroupStage();
             renderKnockoutStage();
+            renderStatistics();
         });
     }
 
@@ -79,23 +81,11 @@ export function applyLanguage() {
     // Tabs
     const btnGrupos = document.getElementById('btn-grupos');
     const btnMataMata = document.getElementById('btn-mata-mata');
+    const btnEstatisticas = document.getElementById('btn-estatisticas');
     
-    // Atualiza apenas se não estiverem com classes ativas que dependem do switchTab
-    if (btnGrupos && !btnGrupos.classList.contains('bg-gradient-to-b')) btnGrupos.textContent = t.tabGroups;
-    if (btnMataMata && !btnMataMata.classList.contains('bg-gradient-to-b')) btnMataMata.textContent = t.tabKnockout;
-    
-    // Para manter a consistência da aba ativa:
-    const sectionGrupos = document.getElementById('section-grupos');
-    if (sectionGrupos) {
-        const isMataMataAtivo = sectionGrupos.classList.contains('hidden');
-        if (isMataMataAtivo) {
-            if (btnGrupos) btnGrupos.textContent = t.tabGroups;
-            if (btnMataMata) btnMataMata.textContent = t.tabKnockout;
-        } else {
-            if (btnGrupos) btnGrupos.textContent = t.tabGroups;
-            if (btnMataMata) btnMataMata.textContent = t.tabKnockout;
-        }
-    }
+    if (btnGrupos) btnGrupos.textContent = t.tabGroups;
+    if (btnMataMata) btnMataMata.textContent = t.tabKnockout;
+    if (btnEstatisticas) btnEstatisticas.textContent = t.tabStats;
 
     // Botão de idioma
     const lblBtnLang = document.getElementById('lbl-btn-lang');
@@ -152,10 +142,12 @@ export function applyLanguage() {
 export function switchTab(tab) {
     const btnGrupos = document.getElementById('btn-grupos');
     const btnMataMata = document.getElementById('btn-mata-mata');
+    const btnEstatisticas = document.getElementById('btn-estatisticas');
     const sectionGrupos = document.getElementById('section-grupos');
     const sectionMataMata = document.getElementById('section-mata-mata');
+    const sectionEstatisticas = document.getElementById('section-estatisticas');
 
-    if (!btnGrupos || !btnMataMata || !sectionGrupos || !sectionMataMata) return;
+    if (!btnGrupos || !btnMataMata || !btnEstatisticas || !sectionGrupos || !sectionMataMata || !sectionEstatisticas) return;
 
     const t = translations[currentLang];
 
@@ -164,18 +156,40 @@ export function switchTab(tab) {
         btnGrupos.textContent = t.tabGroups;
         btnMataMata.className = "px-3 md:px-5 py-2 md:py-2.5 rounded-lg text-xs md:text-sm font-bold text-blue-200 hover:text-white transition-all select-none";
         btnMataMata.textContent = t.tabKnockout;
-    } else {
+        btnEstatisticas.className = "px-3 md:px-5 py-2 md:py-2.5 rounded-lg text-xs md:text-sm font-bold text-blue-200 hover:text-white transition-all select-none";
+        btnEstatisticas.textContent = t.tabStats;
+    } else if (tab === 'mata-mata') {
         btnGrupos.className = "px-3 md:px-5 py-2 md:py-2.5 rounded-lg text-xs md:text-sm font-bold text-blue-200 hover:text-white transition-all select-none";
         btnGrupos.textContent = t.tabGroups;
         btnMataMata.className = "px-3 md:px-5 py-2 md:py-2.5 rounded-lg text-xs md:text-sm font-bold bg-gradient-to-b from-white to-gray-100 text-blue-950 shadow-md transition-all transform scale-105 select-none";
         btnMataMata.textContent = t.tabKnockout;
+        btnEstatisticas.className = "px-3 md:px-5 py-2 md:py-2.5 rounded-lg text-xs md:text-sm font-bold text-blue-200 hover:text-white transition-all select-none";
+        btnEstatisticas.textContent = t.tabStats;
+    } else if (tab === 'estatisticas') {
+        btnGrupos.className = "px-3 md:px-5 py-2 md:py-2.5 rounded-lg text-xs md:text-sm font-bold text-blue-200 hover:text-white transition-all select-none";
+        btnGrupos.textContent = t.tabGroups;
+        btnMataMata.className = "px-3 md:px-5 py-2 md:py-2.5 rounded-lg text-xs md:text-sm font-bold text-blue-200 hover:text-white transition-all select-none";
+        btnMataMata.textContent = t.tabKnockout;
+        btnEstatisticas.className = "px-3 md:px-5 py-2 md:py-2.5 rounded-lg text-xs md:text-sm font-bold bg-gradient-to-b from-white to-gray-100 text-blue-950 shadow-md transition-all transform scale-105 select-none";
+        btnEstatisticas.textContent = t.tabStats;
+    } else {
+        btnGrupos.className = "px-3 md:px-5 py-2 md:py-2.5 rounded-lg text-xs md:text-sm font-bold bg-gradient-to-b from-white to-gray-100 text-blue-950 shadow-md transition-all transform scale-105 select-none";
+        btnGrupos.textContent = t.tabGroups;
+        btnMataMata.className = "px-3 md:px-5 py-2 md:py-2.5 rounded-lg text-xs md:text-sm font-bold text-blue-200 hover:text-white transition-all select-none";
+        btnMataMata.textContent = t.tabKnockout;
+        btnEstatisticas.className = "px-3 md:px-5 py-2 md:py-2.5 rounded-lg text-xs md:text-sm font-bold text-blue-200 hover:text-white transition-all select-none";
+        btnEstatisticas.textContent = t.tabStats;
+        tab = 'grupos';
     }
     
     sectionGrupos.classList.toggle('hidden', tab !== 'grupos');
     sectionMataMata.classList.toggle('hidden', tab !== 'mata-mata');
+    sectionEstatisticas.classList.toggle('hidden', tab !== 'estatisticas');
     
     if (tab === 'mata-mata') {
         renderKnockoutStage();
+    } else if (tab === 'estatisticas') {
+        renderStatistics();
     }
 }
 
@@ -460,6 +474,143 @@ export function renderKnockoutStage() {
         `;
         container.appendChild(divFase);
     });
+}
+
+function getStatsPhaseLabel(fase, t) {
+    if (fase.includes('Dezesseis-avos')) return t.statsRound32;
+    if (fase.includes('Oitavas')) return t.statsRound16;
+    if (fase.includes('Quartas')) return t.statsQuarters;
+    if (fase.includes('Semifinais')) return t.statsSemis;
+    return t.tabKnockout;
+}
+
+function isResolvedTeamName(teamName) {
+    return teamName &&
+        !teamName.includes('Vencedor #') &&
+        !teamName.includes('Winner #') &&
+        !teamName.includes('Perdedor #') &&
+        !teamName.includes('Loser #') &&
+        !teamName.includes('Grupo ') &&
+        teamName !== 'A definir' &&
+        teamName !== 'TBD';
+}
+
+export function renderStatistics() {
+    const container = document.getElementById('section-estatisticas');
+    if (!container) return;
+    container.innerHTML = '';
+
+    const t = translations[currentLang];
+    const gruposIniciados = Object.keys(gruposClassificacao).filter((grupo) =>
+        jogosGrupos.some((jogo) =>
+            jogo.grupo === grupo &&
+            getScoreInput(jogo.id, 'home') !== '' &&
+            getScoreInput(jogo.id, 'away') !== ''
+        )
+    );
+
+    if (gruposIniciados.length === 0) {
+        container.innerHTML = `<p class="text-sm font-semibold text-slate-500 dark:text-slate-400">${t.statsNoData}</p>`;
+        return;
+    }
+
+    const classificados = [];
+    const eliminadosPorNome = new Map();
+    const terceiros = [];
+
+    gruposIniciados.forEach((grupo) => {
+        const classificacao = gruposClassificacao[grupo] || [];
+        if (classificacao[0]) classificados.push({ name: classificacao[0].name, source: `1º Grupo ${grupo}` });
+        if (classificacao[1]) classificados.push({ name: classificacao[1].name, source: `2º Grupo ${grupo}` });
+        if (classificacao[2]) terceiros.push(classificacao[2]);
+        if (classificacao[3]) eliminadosPorNome.set(classificacao[3].name, { name: classificacao[3].name, phase: t.statsGroupStage });
+    });
+
+    const terceirosOrdenados = sortThirdPlacedTeams(terceiros);
+    const terceirosClassificados = terceirosOrdenados.slice(0, 8);
+    const terceirosEliminados = terceirosOrdenados.slice(8);
+
+    terceirosClassificados.forEach((team) => {
+        classificados.push({ name: team.name, source: `3º Grupo ${team.group}` });
+    });
+    terceirosEliminados.forEach((team) => {
+        eliminadosPorNome.set(team.name, { name: team.name, phase: t.statsGroupStage });
+    });
+
+    estruturaNosMataMata.forEach((fase) => {
+        fase.jogos.forEach((jogo) => {
+            const sh = getScoreInput(jogo.id, 'home');
+            const sa = getScoreInput(jogo.id, 'away');
+            if (sh === '' || sa === '') return;
+
+            const gh = parseInt(sh, 10);
+            const ga = parseInt(sa, 10);
+            if (Number.isNaN(gh) || Number.isNaN(ga)) return;
+
+            const dados = mapaMataMataCalculado[jogo.id] || {};
+            const home = dados.home;
+            const away = dados.away;
+
+            if (!isResolvedTeamName(home) || !isResolvedTeamName(away)) return;
+
+            let perdedor = null;
+            if (gh > ga) perdedor = away;
+            else if (ga > gh) perdedor = home;
+            else {
+                const penH = getPenaltiesInput(jogo.id, 'home');
+                const penA = getPenaltiesInput(jogo.id, 'away');
+                if (penH === '' || penA === '') return;
+                const ph = parseInt(penH, 10);
+                const pa = parseInt(penA, 10);
+                if (Number.isNaN(ph) || Number.isNaN(pa) || ph === pa) return;
+                perdedor = ph > pa ? away : home;
+            }
+
+            if (!perdedor) return;
+            eliminadosPorNome.set(perdedor, {
+                name: perdedor,
+                phase: getStatsPhaseLabel(fase.fase, t)
+            });
+        });
+    });
+
+    const classificadosHtml = classificados.map((team) => {
+        const nome = translateTeam(team.name, currentLang);
+        const origem = translatePlaceholder(team.source, currentLang);
+        return `
+            <div class="bg-white/70 dark:bg-slate-900/70 border border-emerald-200/70 dark:border-emerald-900/40 rounded-xl p-4">
+                <div class="flex items-center gap-2 text-sm font-bold text-slate-800 dark:text-slate-200">
+                    ${getFlagTag(team.name)}
+                    <span>${nome}</span>
+                </div>
+                <p class="mt-2 text-xs font-semibold text-emerald-700 dark:text-emerald-300">${t.statsQualifiedFrom}: ${origem}</p>
+            </div>
+        `;
+    }).join('');
+
+    const eliminadosHtml = Array.from(eliminadosPorNome.values()).map((team) => {
+        const nome = translateTeam(team.name, currentLang);
+        return `
+            <div class="bg-white/70 dark:bg-slate-900/70 border border-rose-200/70 dark:border-rose-900/40 rounded-xl p-4">
+                <div class="flex items-center gap-2 text-sm font-bold text-slate-800 dark:text-slate-200">
+                    ${getFlagTag(team.name)}
+                    <span>${nome}</span>
+                </div>
+                <p class="mt-2 text-xs font-semibold text-rose-700 dark:text-rose-300">${t.statsEliminatedIn}: ${team.phase}</p>
+            </div>
+        `;
+    }).join('');
+
+    container.innerHTML = `
+        <section class="bg-emerald-50/40 dark:bg-emerald-950/20 border border-emerald-100 dark:border-emerald-900/40 rounded-2xl p-5 md:p-6 space-y-4">
+            <h3 class="text-lg font-extrabold text-emerald-900 dark:text-emerald-300">${t.statsQualified}</h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">${classificadosHtml}</div>
+        </section>
+        <section class="bg-rose-50/40 dark:bg-rose-950/20 border border-rose-100 dark:border-rose-900/40 rounded-2xl p-5 md:p-6 space-y-4">
+            <h3 class="text-lg font-extrabold text-rose-900 dark:text-rose-300">${t.statsEliminated}</h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">${eliminadosHtml}</div>
+        </section>
+    `;
 }
 
 export function showToast(message) {
