@@ -201,14 +201,22 @@
   },
   "51": {
     "home": 0,
-    "away": 1
+    "away": 3
   },
   "52": {
-    "home": 1,
+    "home": 4,
     "away": 2
   },
+  "53": {
+    "home": 0,
+    "away": 0
+  },
+  "54": {
+    "home": 0,
+    "away": 0
+  },
   "_meta": {
-    "lastFetch": "2026-06-24T00:00:00Z",
+    "lastFetch": "2026-06-25T00:00:00Z",
     "source": "espn",
     "slug": "fifa.world"
   }
