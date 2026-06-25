@@ -5,6 +5,7 @@ export const translations = {
         loadingTable: "Carregando tabela...",
         tabGroups: "Fase de Grupos",
         tabKnockout: "Eliminatórias",
+        tabStats: "Estatísticas",
         filterLabel: "Visualizar Grupo:",
         filterAll: "Todos os Grupos (A ao L)",
         groupInfo: "ℹ️ Os 2 melhores de cada grupo + os 8 melhores 3º colocados avançam dinamicamente.",
@@ -43,6 +44,17 @@ export const translations = {
         semiFinals: "Semifinais",
         thirdPlace: "Disputa do 3º Lugar",
         final: "Final"
+        ,
+        statsQualified: "Seleções Classificadas",
+        statsEliminated: "Seleções Eliminadas",
+        statsQualifiedFrom: "Classificado como",
+        statsEliminatedIn: "Eliminado na",
+        statsGroupStage: "Fase de Grupos",
+        statsRound32: "32-avos",
+        statsRound16: "Oitavas",
+        statsQuarters: "Quartas",
+        statsSemis: "Semifinal",
+        statsNoData: "Preencha os placares para ver as estatísticas."
     },
     en: {
         title: "FIFA WORLD CUP 2026",
@@ -50,6 +62,7 @@ export const translations = {
         loadingTable: "Loading table...",
         tabGroups: "Standings",
         tabKnockout: "Knockout Bracket",
+        tabStats: "Statistics",
         filterLabel: "View Group:",
         filterAll: "All Groups (A to L)",
         groupInfo: "ℹ️ The top 2 of each group + the 8 best 3rd placed teams advance dynamically.",
@@ -88,6 +101,17 @@ export const translations = {
         resetPredictions: "🗑️ Reset Predictions",
         resetConfirm: "Are you sure you want to reset all saved predictions?",
         resetDone: "Predictions reset successfully."
+        ,
+        statsQualified: "Qualified Teams",
+        statsEliminated: "Eliminated Teams",
+        statsQualifiedFrom: "Qualified as",
+        statsEliminatedIn: "Eliminated in",
+        statsGroupStage: "Group Stage",
+        statsRound32: "Round of 32",
+        statsRound16: "Round of 16",
+        statsQuarters: "Quarter-finals",
+        statsSemis: "Semi-finals",
+        statsNoData: "Fill in scores to view statistics."
     }
 };
 

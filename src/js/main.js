@@ -9,6 +9,7 @@ import {
     renderTablesGrid, 
     renderGroupStage, 
     renderKnockoutStage,
+    renderStatistics,
     switchTab,
     showToast,
     initToggles,
@@ -75,11 +76,17 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (sectionMataMata && !sectionMataMata.classList.contains('hidden')) {
             renderKnockoutStage();
         }
+
+        const sectionEstatisticas = document.getElementById('section-estatisticas');
+        if (sectionEstatisticas && !sectionEstatisticas.classList.contains('hidden')) {
+            renderStatistics();
+        }
     });
 
     // 5. Associar cliques nos botões de controle de Abas
     const btnGrupos = document.getElementById('btn-grupos');
     const btnMataMata = document.getElementById('btn-mata-mata');
+    const btnEstatisticas = document.getElementById('btn-estatisticas');
     const btnLang = document.getElementById('btn-lang');
     const btnResetPredictions = document.getElementById('btn-reset-predictions');
     
@@ -89,6 +96,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     
     if (btnMataMata) {
         btnMataMata.addEventListener('click', () => switchTab('mata-mata'));
+    }
+
+    if (btnEstatisticas) {
+        btnEstatisticas.addEventListener('click', () => switchTab('estatisticas'));
     }
 
     if (btnLang) {
@@ -116,6 +127,11 @@ document.addEventListener('DOMContentLoaded', async () => {
             const sectionMataMata = document.getElementById('section-mata-mata');
             if (sectionMataMata && !sectionMataMata.classList.contains('hidden')) {
                 renderKnockoutStage();
+            }
+
+            const sectionEstatisticas = document.getElementById('section-estatisticas');
+            if (sectionEstatisticas && !sectionEstatisticas.classList.contains('hidden')) {
+                renderStatistics();
             }
 
             showToast(t.resetDone);
