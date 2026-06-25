@@ -43,8 +43,7 @@ export const translations = {
         quarterFinals: "Quartas de Final",
         semiFinals: "Semifinais",
         thirdPlace: "Disputa do 3º Lugar",
-        final: "Final"
-        ,
+        final: "Final",
         statsQualified: "Seleções Classificadas",
         statsEliminated: "Seleções Eliminadas",
         statsQualifiedFrom: "Classificado como",
@@ -100,8 +99,7 @@ export const translations = {
         pixCopied: "PIX Key copied! Finish in your bank app. Thanks for the support! 🏆",
         resetPredictions: "🗑️ Reset Predictions",
         resetConfirm: "Are you sure you want to reset all saved predictions?",
-        resetDone: "Predictions reset successfully."
-        ,
+        resetDone: "Predictions reset successfully.",
         statsQualified: "Qualified Teams",
         statsEliminated: "Eliminated Teams",
         statsQualifiedFrom: "Qualified as",

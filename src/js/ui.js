@@ -83,25 +83,9 @@ export function applyLanguage() {
     const btnMataMata = document.getElementById('btn-mata-mata');
     const btnEstatisticas = document.getElementById('btn-estatisticas');
     
-    // Atualiza apenas se não estiverem com classes ativas que dependem do switchTab
-    if (btnGrupos && !btnGrupos.classList.contains('bg-gradient-to-b')) btnGrupos.textContent = t.tabGroups;
-    if (btnMataMata && !btnMataMata.classList.contains('bg-gradient-to-b')) btnMataMata.textContent = t.tabKnockout;
-    if (btnEstatisticas && !btnEstatisticas.classList.contains('bg-gradient-to-b')) btnEstatisticas.textContent = t.tabStats;
-    
-    // Para manter a consistência da aba ativa:
-    const sectionGrupos = document.getElementById('section-grupos');
-    if (sectionGrupos) {
-        const isMataMataAtivo = sectionGrupos.classList.contains('hidden');
-        if (isMataMataAtivo) {
-            if (btnGrupos) btnGrupos.textContent = t.tabGroups;
-            if (btnMataMata) btnMataMata.textContent = t.tabKnockout;
-            if (btnEstatisticas) btnEstatisticas.textContent = t.tabStats;
-        } else {
-            if (btnGrupos) btnGrupos.textContent = t.tabGroups;
-            if (btnMataMata) btnMataMata.textContent = t.tabKnockout;
-            if (btnEstatisticas) btnEstatisticas.textContent = t.tabStats;
-        }
-    }
+    if (btnGrupos) btnGrupos.textContent = t.tabGroups;
+    if (btnMataMata) btnMataMata.textContent = t.tabKnockout;
+    if (btnEstatisticas) btnEstatisticas.textContent = t.tabStats;
 
     // Botão de idioma
     const lblBtnLang = document.getElementById('lbl-btn-lang');
@@ -181,13 +165,21 @@ export function switchTab(tab) {
         btnMataMata.textContent = t.tabKnockout;
         btnEstatisticas.className = "px-3 md:px-5 py-2 md:py-2.5 rounded-lg text-xs md:text-sm font-bold text-blue-200 hover:text-white transition-all select-none";
         btnEstatisticas.textContent = t.tabStats;
-    } else {
+    } else if (tab === 'estatisticas') {
         btnGrupos.className = "px-3 md:px-5 py-2 md:py-2.5 rounded-lg text-xs md:text-sm font-bold text-blue-200 hover:text-white transition-all select-none";
         btnGrupos.textContent = t.tabGroups;
         btnMataMata.className = "px-3 md:px-5 py-2 md:py-2.5 rounded-lg text-xs md:text-sm font-bold text-blue-200 hover:text-white transition-all select-none";
         btnMataMata.textContent = t.tabKnockout;
         btnEstatisticas.className = "px-3 md:px-5 py-2 md:py-2.5 rounded-lg text-xs md:text-sm font-bold bg-gradient-to-b from-white to-gray-100 text-blue-950 shadow-md transition-all transform scale-105 select-none";
         btnEstatisticas.textContent = t.tabStats;
+    } else {
+        btnGrupos.className = "px-3 md:px-5 py-2 md:py-2.5 rounded-lg text-xs md:text-sm font-bold bg-gradient-to-b from-white to-gray-100 text-blue-950 shadow-md transition-all transform scale-105 select-none";
+        btnGrupos.textContent = t.tabGroups;
+        btnMataMata.className = "px-3 md:px-5 py-2 md:py-2.5 rounded-lg text-xs md:text-sm font-bold text-blue-200 hover:text-white transition-all select-none";
+        btnMataMata.textContent = t.tabKnockout;
+        btnEstatisticas.className = "px-3 md:px-5 py-2 md:py-2.5 rounded-lg text-xs md:text-sm font-bold text-blue-200 hover:text-white transition-all select-none";
+        btnEstatisticas.textContent = t.tabStats;
+        tab = 'grupos';
     }
     
     sectionGrupos.classList.toggle('hidden', tab !== 'grupos');
