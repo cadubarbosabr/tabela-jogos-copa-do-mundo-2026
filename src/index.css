@@ -4,10 +4,127 @@
 
 @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght=400;500;600;700;800&display=swap');
 
-body { font-family: 'Plus Jakarta Sans', sans-serif; }
+body {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  /* Subtle radial gradient pattern layered over Tailwind bg */
+  background-image:
+    radial-gradient(ellipse at 20% 0%, rgb(59 130 246 / 0.04) 0%, transparent 60%),
+    radial-gradient(ellipse at 80% 100%, rgb(99 102 241 / 0.04) 0%, transparent 60%);
+  background-attachment: fixed;
+}
+
+.dark body {
+  background-image:
+    radial-gradient(ellipse at 20% 0%, rgb(59 130 246 / 0.06) 0%, transparent 60%),
+    radial-gradient(ellipse at 80% 100%, rgb(99 102 241 / 0.06) 0%, transparent 60%);
+}
+
 input::-webkit-outer-spin-button,
 input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
 input[type=number] { -moz-appearance: textfield; }
+
+/* =========================================================
+   HEADER
+   ========================================================= */
+.site-header {
+  background: linear-gradient(135deg, rgb(7 11 40) 0%, rgb(15 23 80) 30%, rgb(30 27 115) 60%, rgb(49 16 95) 85%, rgb(30 10 60) 100%);
+  position: relative;
+  overflow: hidden;
+}
+
+.site-header::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at 60% 50%, rgb(245 158 11 / 0.08) 0%, transparent 60%);
+  pointer-events: none;
+}
+
+.header-title {
+  background: linear-gradient(90deg, #fff 0%, rgb(253 230 138) 50%, #fff 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.tab-switcher {
+  background: rgb(15 23 80 / 0.65);
+  border: 1px solid rgb(99 102 241 / 0.35);
+}
+
+.header-btn {
+  background: rgb(15 23 80 / 0.6);
+  border: 1px solid rgb(99 102 241 / 0.3);
+}
+
+.header-btn:hover {
+  background: rgb(49 16 95 / 0.7);
+  border-color: rgb(167 139 250 / 0.5);
+}
+
+.header-border-bottom {
+  height: 3px;
+  background: linear-gradient(90deg, rgb(59 130 246) 0%, rgb(99 102 241) 35%, rgb(245 158 11) 65%, rgb(251 191 36) 100%);
+}
+
+/* =========================================================
+   FOOTER
+   ========================================================= */
+.site-footer {
+  background: linear-gradient(180deg, rgb(2 6 23) 0%, rgb(7 11 40) 100%);
+  border-top: 1px solid rgb(30 41 59);
+  box-shadow: 0 -4px 24px rgb(0 0 0 / 0.3);
+}
+
+.footer-social-link {
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.footer-social-link::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgb(99 102 241 / 0.08), rgb(59 130 246 / 0.08));
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.footer-social-link:hover::after {
+  opacity: 1;
+}
+
+/* =========================================================
+   SCROLL TO TOP BUTTON
+   ========================================================= */
+.scroll-top-btn {
+  background: linear-gradient(135deg, rgb(59 130 246), rgb(99 102 241));
+  color: white;
+  border: 1px solid rgb(99 102 241 / 0.5);
+  transform: translateY(8px);
+}
+
+.scroll-top-btn:hover {
+  background: linear-gradient(135deg, rgb(37 99 235), rgb(79 70 229));
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgb(59 130 246 / 0.4);
+}
+
+.scroll-top-btn.visible {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateY(0);
+}
+
+.dark .scroll-top-btn {
+  border-color: rgb(99 102 241 / 0.6);
+  box-shadow: 0 4px 16px rgb(59 130 246 / 0.25);
+}
+
+.dark .scroll-top-btn:hover {
+  box-shadow: 0 8px 28px rgb(59 130 246 / 0.5);
+}
 
 .knockout-controls {
   display: flex;

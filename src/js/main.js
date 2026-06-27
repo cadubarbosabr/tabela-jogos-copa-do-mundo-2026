@@ -156,4 +156,20 @@ document.addEventListener('DOMContentLoaded', async () => {
             showToast(translations[currentLang].pixCopied);
         });
     }
+
+    // 8. Botão Scroll to Top
+    const btnScrollTop = document.getElementById('btn-scroll-top');
+    if (btnScrollTop) {
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 300) {
+                btnScrollTop.classList.add('visible');
+            } else {
+                btnScrollTop.classList.remove('visible');
+            }
+        }, { passive: true });
+
+        btnScrollTop.addEventListener('click', () => {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+    }
 });
