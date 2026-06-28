@@ -393,9 +393,9 @@ const knockoutBracketDefinition = [
     { key: 'semiFinals', phaseClass: 'phase-semifinals', sideA: [101], sideB: [102] },
     { key: 'final', phaseClass: 'phase-final', sideA: [104], sideB: [], thirdPlace: [103] }
 ];
+const fifaWorldCupTrophyImageUrl = 'https://upload.wikimedia.org/wikipedia/commons/thumb/6/6c/FIFA_World_Cup_Trophy_2014_%28adjusted%29.png/220px-FIFA_World_Cup_Trophy_2014_%28adjusted%29.png';
 
 let knockoutViewMode = localStorage.getItem('wc2026_knockout_view');
-let knockoutActivePhase = localStorage.getItem('wc2026_knockout_active_phase') || 'round32';
 
 function getKnockoutPhaseKey(faseNome) {
     if (faseNome.includes('Dezesseis-avos')) return 'round32';
@@ -602,6 +602,7 @@ function renderKnockoutListView() {
 
 function renderKnockoutBracketView() {
     const t = translations[currentLang];
+    const semiFinalsKey = 'semiFinals';
     const allMatchesById = new Map(estruturaNosMataMata.flatMap((fase) => fase.jogos.map((jogo) => [jogo.id, jogo])));
 
     const phaseMeta = knockoutBracketDefinition.map((phase) => {
@@ -618,65 +619,68 @@ function renderKnockoutBracketView() {
         };
     });
 
-    if (!phaseMeta.some((phase) => phase.key === knockoutActivePhase)) {
-        knockoutActivePhase = phaseMeta[0]?.key || 'round32';
-    }
+    const phaseByKey = Object.fromEntries(phaseMeta.map((phase) => [phase.key, phase]));
+    const sideAPhases = ['round32', 'round16', 'quarterFinals', semiFinalsKey]
+        .map((key) => phaseByKey[key])
+        .filter(Boolean);
+    const sideBPhases = [semiFinalsKey, 'quarterFinals', 'round16', 'round32']
+        .map((key) => phaseByKey[key])
+        .filter(Boolean);
+    const finalPhase = phaseByKey.final;
 
-    return `
-        <div class="knockout-stepper-wrap">
-            <div class="knockout-stepper" role="tablist" aria-label="${t.tabKnockout}">
-                ${phaseMeta.map((phase, index) => `
-                    <button class="knockout-step ${phase.completed ? 'is-complete' : ''} ${phase.key === knockoutActivePhase ? 'is-active' : ''}" data-phase-nav="${phase.key}" role="tab" aria-selected="${phase.key === knockoutActivePhase ? 'true' : 'false'}">
-                        <span class="knockout-step-dot"></span>
-                        <span>${phase.label}</span>
-                    </button>
-                    ${index < phaseMeta.length - 1 ? '<span class="knockout-step-arrow">→</span>' : ''}
-                `).join('')}
-            </div>
-        </div>
-
-        <div class="knockout-bracket-scroll" id="knockout-bracket-scroll">
-            <div class="knockout-bracket-track">
-                ${phaseMeta.map((phase, phaseIndex) => {
-                    const isFinalPhase = phase.key === 'final';
+    const renderPhaseColumn = (phase, side) => `
+        <section class="knockout-phase-column ${phase.phaseClass}" data-phase-key="${phase.key}">
+            <h3 class="knockout-phase-title">${phase.label}</h3>
+            <div class="knockout-half-stack">
+                ${(side === 'A' ? phase.matchesA : phase.matchesB).map((match, index, list) => {
+                    const hasConnector = phase.key !== semiFinalsKey;
+                    const connectorClass = hasConnector && list.length > 1
+                        ? (index % 2 === 0 ? 'connector-down' : 'connector-up')
+                        : '';
+                    const winnerInfo = getWinnerInfo(match, mapaMataMataCalculado[match.id] || { home: 'A definir', away: 'A definir' });
+                    const resolvedClass = winnerInfo.winner ? 'is-resolved' : '';
                     return `
-                        <section class="knockout-phase-column ${phase.phaseClass}" data-phase-key="${phase.key}">
-                            <h3 class="knockout-phase-title">${phase.label}</h3>
-
-                            ${isFinalPhase ? `
-                                <div class="knockout-final-column">
-                                    ${phase.matchesA.map((match) => buildKnockoutMatchCard(match, { phaseKey: phase.key, side: 'final', compact: true })).join('')}
-                                    ${phase.thirdPlace.length ? `
-                                        <div class="knockout-third-place-wrap">
-                                            <p class="knockout-third-place-label">${t.thirdPlace}</p>
-                                            ${phase.thirdPlace.map((match) => buildKnockoutMatchCard(match, { phaseKey: 'thirdPlace', side: 'final', compact: true })).join('')}
-                                        </div>
-                                    ` : ''}
-                                </div>
-                            ` : `
-                                <div class="knockout-half-title tone-a">${t.knockoutUpperBracket}</div>
-                                <div class="knockout-half-stack">
-                                    ${phase.matchesA.map((match, index) => {
-                                        const connectorClass = phaseIndex < phaseMeta.length - 2
-                                            ? (phase.matchesA.length > 1 ? (index % 2 === 0 ? 'connector-down' : 'connector-up') : '')
-                                            : '';
-                                        return buildKnockoutMatchCard(match, { phaseKey: phase.key, side: 'A', compact: true, showConnector: phaseIndex < phaseMeta.length - 2, connectorClass });
-                                    }).join('')}
-                                </div>
-
-                                <div class="knockout-half-title tone-b">${t.knockoutLowerBracket}</div>
-                                <div class="knockout-half-stack">
-                                    ${phase.matchesB.map((match, index) => {
-                                        const connectorClass = phaseIndex < phaseMeta.length - 2
-                                            ? (phase.matchesB.length > 1 ? (index % 2 === 0 ? 'connector-down' : 'connector-up') : '')
-                                            : '';
-                                        return buildKnockoutMatchCard(match, { phaseKey: phase.key, side: 'B', compact: true, showConnector: phaseIndex < phaseMeta.length - 2, connectorClass });
-                                    }).join('')}
-                                </div>
-                            `}
-                        </section>
+                        <div class="knockout-node knockout-node-${side === 'A' ? 'left' : 'right'} ${hasConnector ? 'knockout-node-branch' : 'knockout-node-final-link'} ${connectorClass} ${resolvedClass}">
+                            ${buildKnockoutMatchCard(match, { phaseKey: phase.key, side, compact: true })}
+                        </div>
                     `;
                 }).join('')}
+            </div>
+        </section>
+    `;
+
+    return `
+        <div class="knockout-bracket-scroll knockout-bracket-scroll-bilateral" id="knockout-bracket-scroll">
+            <div class="knockout-bilateral-track">
+                <div class="knockout-side knockout-side-a">
+                    ${sideAPhases.map((phase) => renderPhaseColumn(phase, 'A')).join('')}
+                </div>
+
+                <div class="knockout-center-column">
+                    <div class="knockout-trophy-wrap">
+                        <img class="knockout-trophy-image" src="${fifaWorldCupTrophyImageUrl}" alt="FIFA World Cup Trophy">
+                        <p class="knockout-trophy-label">FIFA World Cup 2026</p>
+                    </div>
+
+                    ${finalPhase ? `
+                        <section class="knockout-phase-column phase-final" data-phase-key="final">
+                            <h3 class="knockout-phase-title">${finalPhase.label}</h3>
+                            <div class="knockout-final-column">
+                                ${finalPhase.matchesA.map((match) => buildKnockoutMatchCard(match, { phaseKey: finalPhase.key, side: 'final', compact: true })).join('')}
+                                ${finalPhase.thirdPlace.length ? `
+                                    <div class="knockout-third-place-wrap">
+                                        <p class="knockout-third-place-label">${t.thirdPlace}</p>
+                                        ${finalPhase.thirdPlace.map((match) => buildKnockoutMatchCard(match, { phaseKey: 'thirdPlace', side: 'final', compact: true })).join('')}
+                                    </div>
+                                ` : ''}
+                            </div>
+                        </section>
+                    ` : ''}
+                </div>
+
+                <div class="knockout-side knockout-side-b">
+                    ${sideBPhases.map((phase) => renderPhaseColumn(phase, 'B')).join('')}
+                </div>
             </div>
         </div>
     `;
@@ -709,23 +713,6 @@ export function renderKnockoutStage() {
         });
     });
 
-    container.querySelectorAll('[data-phase-nav]').forEach((btn) => {
-        btn.addEventListener('click', () => {
-            const phase = btn.getAttribute('data-phase-nav');
-            if (!phase) return;
-            knockoutActivePhase = phase;
-            localStorage.setItem('wc2026_knockout_active_phase', knockoutActivePhase);
-            container.querySelectorAll('[data-phase-nav]').forEach((stepBtn) => {
-                const isActive = stepBtn.getAttribute('data-phase-nav') === phase;
-                stepBtn.classList.toggle('is-active', isActive);
-                stepBtn.setAttribute('aria-selected', isActive ? 'true' : 'false');
-            });
-            const target = container.querySelector(`[data-phase-key="${phase}"]`);
-            if (target) {
-                target.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'start' });
-            }
-        });
-    });
 }
 
 function getStatsPhaseLabel(fase, t) {
