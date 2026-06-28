@@ -1122,7 +1122,7 @@ input[type=number] { -moz-appearance: textfield; }
   width: 90px;
   margin: 0 auto;
   display: block;
-  filter: drop-shadow(0 6px 14px rgb(0 0 0 / 0.4)) drop-shadow(0 0 10px rgba(212, 175, 55, 0.5));
+  filter: drop-shadow(0 6px 14px rgb(0 0 0 / 0.4)) drop-shadow(0 0 10px rgba(var(--kob-gold-rgb), 0.5));
 }
 
 .kob-trophy-label {
