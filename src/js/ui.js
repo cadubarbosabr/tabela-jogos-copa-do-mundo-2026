@@ -82,10 +82,16 @@ export function applyLanguage() {
     const btnGrupos = document.getElementById('btn-grupos');
     const btnMataMata = document.getElementById('btn-mata-mata');
     const btnEstatisticas = document.getElementById('btn-estatisticas');
+    const lblBtnGruposMobile = document.getElementById('lbl-btn-grupos-mobile');
+    const lblBtnMataMataMobile = document.getElementById('lbl-btn-mata-mata-mobile');
+    const lblBtnEstatisticasMobile = document.getElementById('lbl-btn-estatisticas-mobile');
     
     if (btnGrupos) btnGrupos.textContent = t.tabGroups;
     if (btnMataMata) btnMataMata.textContent = t.tabKnockout;
     if (btnEstatisticas) btnEstatisticas.textContent = t.tabStats;
+    if (lblBtnGruposMobile) lblBtnGruposMobile.textContent = t.tabGroups;
+    if (lblBtnMataMataMobile) lblBtnMataMataMobile.textContent = t.tabKnockout;
+    if (lblBtnEstatisticasMobile) lblBtnEstatisticasMobile.textContent = t.tabStats;
 
     // Botão de idioma
     const lblBtnLang = document.getElementById('lbl-btn-lang');
@@ -185,11 +191,22 @@ export function switchTab(tab) {
     sectionGrupos.classList.toggle('hidden', tab !== 'grupos');
     sectionMataMata.classList.toggle('hidden', tab !== 'mata-mata');
     sectionEstatisticas.classList.toggle('hidden', tab !== 'estatisticas');
+
+    document.querySelectorAll('.mobile-tab-btn').forEach((btn) => {
+        const isActive = btn.getAttribute('data-tab') === tab;
+        btn.classList.toggle('is-active', isActive);
+        btn.setAttribute('aria-current', isActive ? 'page' : 'false');
+    });
     
     if (tab === 'mata-mata') {
         renderKnockoutStage();
     } else if (tab === 'estatisticas') {
         renderStatistics();
+    }
+
+    const mainContent = document.getElementById('main-content');
+    if (mainContent) {
+        mainContent.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
 }
 
