@@ -653,10 +653,10 @@ function renderKnockoutBracketView() {
         ids.map((id) => getMatch(id)).filter(Boolean)
             .map((m) => buildMiniMatchCard(m, { phaseKey, side })).join('');
 
-    const r32Short = 'R32';
-    const r16Short = 'R16';
-    const qfShort  = 'QF';
-    const sfShort  = 'SF';
+    const r32Short = t.bracketR32;
+    const r16Short = t.bracketR16;
+    const qfShort  = t.bracketQF;
+    const sfShort  = t.bracketSF;
 
     const finalMatch      = getMatch(104);
     const thirdPlaceMatch = getMatch(103);
@@ -727,7 +727,8 @@ function renderKnockoutBracketView() {
                         ${renderMiniCards([93, 94], 'round16', 'B')}
                     </div>
                     <div class="kob-cell kob-right-r32-upper kob-conn-left" data-phase="round32">
-                        ${renderMiniCards([83, 84, 85], 'round32', 'B')}
+                        ${/* Right-side has 3 R32 games per half (vs 5 on left), matching the 48-team bracket spec */
+                        renderMiniCards([83, 84, 85], 'round32', 'B')}
                     </div>
 
                     <div class="kob-cell kob-right-qf-lower kob-conn-left" data-phase="quarterFinals">

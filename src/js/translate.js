@@ -58,7 +58,11 @@ export const translations = {
         statsRound16: "Oitavas",
         statsQuarters: "Quartas",
         statsSemis: "Semifinal",
-        statsNoData: "Preencha os placares para ver as estatísticas."
+        statsNoData: "Preencha os placares para ver as estatísticas.",
+        bracketR32: "R32",
+        bracketR16: "R16",
+        bracketQF: "QF",
+        bracketSF: "SF"
     },
     en: {
         title: "FIFA WORLD CUP 2026",
@@ -119,7 +123,11 @@ export const translations = {
         statsRound16: "Round of 16",
         statsQuarters: "Quarter-finals",
         statsSemis: "Semi-finals",
-        statsNoData: "Fill in scores to view statistics."
+        statsNoData: "Fill in scores to view statistics.",
+        bracketR32: "R32",
+        bracketR16: "R16",
+        bracketQF: "QF",
+        bracketSF: "SF"
     }
 };
 
