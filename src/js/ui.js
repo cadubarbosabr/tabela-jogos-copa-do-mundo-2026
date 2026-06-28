@@ -386,7 +386,7 @@ export function renderGroupStage() {
     });
 }
 
-const fifaWorldCupTrophyImageUrl = 'https://upload.wikimedia.org/wikipedia/commons/thumb/6/6c/FIFA_World_Cup_Trophy_2014_%28adjusted%29.png/220px-FIFA_World_Cup_Trophy_2014_%28adjusted%29.png';
+const fifaWorldCupTrophyImageUrl = 'https://png.pngtree.com/png-vector/20250618/ourlarge/pngtree-fifa-2026-world-cup-trophy-with-glowing-accents-on-clean-background-png-image_16548100.png';
 
 let knockoutViewMode = localStorage.getItem('wc2026_knockout_view');
 
