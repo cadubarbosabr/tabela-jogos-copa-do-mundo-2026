@@ -386,7 +386,7 @@ export function renderGroupStage() {
     });
 }
 
-const fifaWorldCupTrophyImageUrl = 'https://png.pngtree.com/png-vector/20250618/ourlarge/pngtree-fifa-2026-world-cup-trophy-with-glowing-accents-on-clean-background-png-image_16548100.png';
+const fifaWorldCupTrophyImageUrl = 'https://www.edigitalagency.com.au/wp-content/uploads/new-FIFA-World-Cup-2026-logo-white-PNG-small-size.png';
 
 let knockoutViewMode = localStorage.getItem('wc2026_knockout_view');
 
