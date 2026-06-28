@@ -699,7 +699,7 @@ function renderKnockoutBracketView() {
                 <!-- CENTER: Trophy + Final + 3rd Place -->
                 <div class="kob-center">
                     <div class="kob-trophy-wrap">
-                        <img class="kob-trophy-img" src="${fifaWorldCupTrophyImageUrl}" alt="FIFA World Cup Trophy" loading="lazy">
+                        <img class="kob-trophy-img" src="${fifaWorldCupTrophyImageUrl}" alt="FIFA World Cup Trophy" loading="eager">
                         <p class="kob-trophy-label">FIFA World Cup 2026</p>
                     </div>
                     <div class="kob-center-games">
@@ -711,6 +711,7 @@ function renderKnockoutBracketView() {
                 </div>
 
                 <!-- RIGHT SIDE: SF | QF | R16 | R32 (columns 1-4, flows center→right) -->
+                <!-- Note: right side has 3 R32 games per half (vs 5 on left), per the 48-team bracket spec -->
                 <div class="kob-side kob-side-right">
                     <div class="kob-label">${sfShort}</div>
                     <div class="kob-label">${qfShort}</div>
@@ -727,8 +728,7 @@ function renderKnockoutBracketView() {
                         ${renderMiniCards([93, 94], 'round16', 'B')}
                     </div>
                     <div class="kob-cell kob-right-r32-upper kob-conn-left" data-phase="round32">
-                        ${/* Right-side has 3 R32 games per half (vs 5 on left), matching the 48-team bracket spec */
-                        renderMiniCards([83, 84, 85], 'round32', 'B')}
+                        ${renderMiniCards([83, 84, 85], 'round32', 'B')}
                     </div>
 
                     <div class="kob-cell kob-right-qf-lower kob-conn-left" data-phase="quarterFinals">
