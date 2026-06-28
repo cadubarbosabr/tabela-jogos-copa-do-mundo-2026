@@ -87,6 +87,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     const btnGrupos = document.getElementById('btn-grupos');
     const btnMataMata = document.getElementById('btn-mata-mata');
     const btnEstatisticas = document.getElementById('btn-estatisticas');
+    const btnGruposMobile = document.getElementById('btn-grupos-mobile');
+    const btnMataMataMobile = document.getElementById('btn-mata-mata-mobile');
+    const btnEstatisticasMobile = document.getElementById('btn-estatisticas-mobile');
     const btnLang = document.getElementById('btn-lang');
     const btnResetPredictions = document.getElementById('btn-reset-predictions');
     
@@ -100,6 +103,18 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     if (btnEstatisticas) {
         btnEstatisticas.addEventListener('click', () => switchTab('estatisticas'));
+    }
+
+    if (btnGruposMobile) {
+        btnGruposMobile.addEventListener('click', () => switchTab('grupos'));
+    }
+
+    if (btnMataMataMobile) {
+        btnMataMataMobile.addEventListener('click', () => switchTab('mata-mata'));
+    }
+
+    if (btnEstatisticasMobile) {
+        btnEstatisticasMobile.addEventListener('click', () => switchTab('estatisticas'));
     }
 
     if (btnLang) {
@@ -140,11 +155,32 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // 6. Associar evento de mudança no Filtro de Grupos
     const filterGrupo = document.getElementById('filter-grupo');
+    const btnPrevGroup = document.getElementById('btn-prev-group');
+    const btnNextGroup = document.getElementById('btn-next-group');
     if (filterGrupo) {
         filterGrupo.addEventListener('change', () => {
             renderTablesGrid();
             renderGroupStage();
         });
+
+        const gruposEmOrdem = ['Todos', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L'];
+        const navegarGrupo = (direcao) => {
+            const atual = filterGrupo.value;
+            const idxAtual = gruposEmOrdem.indexOf(atual);
+            const idxBase = idxAtual === -1 ? 0 : idxAtual;
+            const proximoIdx = (idxBase + direcao + gruposEmOrdem.length) % gruposEmOrdem.length;
+            filterGrupo.value = gruposEmOrdem[proximoIdx];
+            renderTablesGrid();
+            renderGroupStage();
+        };
+
+        if (btnPrevGroup) {
+            btnPrevGroup.addEventListener('click', () => navegarGrupo(-1));
+        }
+
+        if (btnNextGroup) {
+            btnNextGroup.addEventListener('click', () => navegarGrupo(1));
+        }
     }
 
     // 7. Associar evento de clique ao botão inteligente de doações via PIX

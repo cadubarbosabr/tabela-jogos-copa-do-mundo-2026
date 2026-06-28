@@ -35,7 +35,7 @@
 
     <!-- Header Principal -->
     <header class="site-header text-white shadow-2xl">
-        <div class="max-w-7xl mx-auto px-4 py-4 md:py-8 flex flex-col md:flex-row justify-between items-center gap-4 md:gap-6">
+        <div class="max-w-7xl mx-auto px-4 py-3 md:py-8 flex flex-col md:flex-row justify-between items-center gap-4 md:gap-6">
             <div class="text-center md:text-left">
                 <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/88/2026_FIFA_World_Cup_emblem_%28horizontal%2C_with_wordmark%29.svg/960px-2026_FIFA_World_Cup_emblem_%28horizontal%2C_with_wordmark%29.svg.png" alt="Logo FIFA World Cup 2026" class="h-10 md:h-14 mx-auto md:mx-0 drop-shadow-lg">
                 <h1 id="title-app" class="text-2xl md:text-4xl font-extrabold tracking-tight mt-1 md:mt-2 drop-shadow-md header-title">COPA DO MUNDO FIFA 2026</h1>
@@ -66,7 +66,7 @@
     </header>
 
     <!-- Conteúdo Principal -->
-    <main class="flex-grow max-w-7xl w-full mx-auto px-4 py-8">
+    <main id="main-content" class="flex-grow max-w-7xl w-full mx-auto px-4 py-8">
         <div id="loading-overlay" class="flex flex-col items-center justify-center py-20 gap-4">
             <div class="w-10 h-10 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin"></div>
             <p id="loading-overlay-text" class="text-sm text-slate-500 dark:text-slate-400 font-medium"></p>
@@ -79,13 +79,17 @@
             <div class="bg-white dark:bg-slate-900 p-5 rounded-2xl shadow-md border border-slate-200/80 dark:border-slate-800/80 flex flex-col md:flex-row gap-4 items-center justify-between transition-colors duration-300">
                 <div class="flex items-center gap-3">
                     <label id="lbl-filter-grupo" for="filter-grupo" class="text-sm font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Visualizar Grupo:</label>
-                    <select id="filter-grupo" class="bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-800 text-slate-800 dark:text-slate-200 text-sm rounded-xl font-semibold px-4 py-2 focus:ring-2 focus:ring-blue-500 transition-colors duration-300">
-                        <option id="opt-all-groups" value="Todos">Todos os Grupos (A ao L)</option>
-                        <option value="A">Grupo A</option><option value="B">Grupo B</option><option value="C">Grupo C</option>
-                        <option value="D">Grupo D</option><option value="E">Grupo E</option><option value="F">Grupo F</option>
-                        <option value="G">Grupo G</option><option value="H">Grupo H</option><option value="I">Grupo I</option>
-                        <option value="J">Grupo J</option><option value="K">Grupo K</option><option value="L">Grupo L</option>
-                    </select>
+                    <div class="flex items-center gap-2">
+                        <button id="btn-prev-group" type="button" class="group-nav-btn md:hidden h-9 w-9 rounded-xl border border-slate-300 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 text-slate-700 dark:text-slate-200 font-black text-lg leading-none" aria-label="Grupo anterior">‹</button>
+                        <select id="filter-grupo" class="bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-800 text-slate-800 dark:text-slate-200 text-sm rounded-xl font-semibold px-4 py-2 focus:ring-2 focus:ring-blue-500 transition-colors duration-300">
+                            <option id="opt-all-groups" value="Todos">Todos os Grupos (A ao L)</option>
+                            <option value="A">Grupo A</option><option value="B">Grupo B</option><option value="C">Grupo C</option>
+                            <option value="D">Grupo D</option><option value="E">Grupo E</option><option value="F">Grupo F</option>
+                            <option value="G">Grupo G</option><option value="H">Grupo H</option><option value="I">Grupo I</option>
+                            <option value="J">Grupo J</option><option value="K">Grupo K</option><option value="L">Grupo L</option>
+                        </select>
+                        <button id="btn-next-group" type="button" class="group-nav-btn md:hidden h-9 w-9 rounded-xl border border-slate-300 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 text-slate-700 dark:text-slate-200 font-black text-lg leading-none" aria-label="Próximo grupo">›</button>
+                    </div>
                 </div>
                 <div id="lbl-group-info" class="text-xs font-semibold bg-blue-50 dark:bg-blue-950/30 text-blue-700 dark:text-blue-300 px-4 py-2 rounded-xl border border-blue-100 dark:border-blue-900/50 shadow-sm transition-colors duration-300">
                     ℹ️ Os 2 melhores de cada grupo + os 8 melhores 3º colocados avançam dinamicamente.
@@ -187,6 +191,24 @@
             </div>
         </div>
     </footer>
+
+    <!-- Bottom Navigation Mobile -->
+    <nav class="mobile-bottom-nav md:hidden fixed bottom-0 inset-x-0 z-40 px-3 py-2 border-t border-slate-200/70 dark:border-slate-800/80" aria-label="Navegação principal">
+        <div class="max-w-7xl mx-auto grid grid-cols-3 gap-2">
+            <button id="btn-grupos-mobile" class="mobile-tab-btn is-active" data-tab="grupos">
+                <span aria-hidden="true">🏟️</span>
+                <span id="lbl-btn-grupos-mobile">Fase de Grupos</span>
+            </button>
+            <button id="btn-mata-mata-mobile" class="mobile-tab-btn" data-tab="mata-mata">
+                <span aria-hidden="true">🏆</span>
+                <span id="lbl-btn-mata-mata-mobile">Eliminatórias</span>
+            </button>
+            <button id="btn-estatisticas-mobile" class="mobile-tab-btn" data-tab="estatisticas">
+                <span aria-hidden="true">📊</span>
+                <span id="lbl-btn-estatisticas-mobile">Estatísticas</span>
+            </button>
+        </div>
+    </nav>
 
     <!-- Botão Scroll to Top -->
     <button id="btn-scroll-top" 
