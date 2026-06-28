@@ -589,9 +589,14 @@ function buildMiniMatchCard(match, options = {}) {
         ? `<div class="kob-mini-pen">${t.penalties.replace(':', '')} <input type="number" placeholder="P" value="${penH}" oninput="window.setPenaltiesInput(${match.id}, 'home', this.value)" aria-label="${t.penalties} ${homeDisplayName}" ${lockedAttrs} class="kob-mini-pen-input${lockedClasses}">-<input type="number" placeholder="P" value="${penA}" oninput="window.setPenaltiesInput(${match.id}, 'away', this.value)" aria-label="${t.penalties} ${awayDisplayName}" ${lockedAttrs} class="kob-mini-pen-input${lockedClasses}"></div>`
         : '';
 
+    const matchShortDate = match.data ? match.data.slice(0, 5) + '/26' : '';
+
     return `
         <article class="kob-mini-card${resolvedClass}${phaseAccentClass}${sideClass}">
-            <div class="kob-mini-header">#${match.id} · ${match.hora}</div>
+            <div class="kob-mini-header">
+                <span>${matchShortDate} · ${match.hora}</span>
+                <span class="kob-mini-local">${match.local || ''}</span>
+            </div>
             <div class="kob-mini-team ${homeWinner ? 'kob-mini-winner' : ''}">
                 ${getFlagTag(dadosCalculados.home)}
                 <span class="kob-mini-name">${homeDisplayName}</span>

@@ -986,14 +986,21 @@ input[type=number] { -moz-appearance: textfield; }
   font-size: 9px;
   font-weight: 700;
   color: rgb(148 163 184);
-  white-space: nowrap;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
   overflow: hidden;
-  text-overflow: ellipsis;
   margin-bottom: 3px;
 }
 
 .dark .kob-mini-header {
   color: rgb(71 85 105);
+}
+
+.kob-mini-local {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .kob-mini-team {
