@@ -653,10 +653,10 @@ function renderKnockoutBracketView() {
         ids.map((id) => getMatch(id)).filter(Boolean)
             .map((m) => buildMiniMatchCard(m, { phaseKey, side })).join('');
 
-    const r32Short = currentLang === 'en' ? 'R32' : 'R32';
-    const r16Short = currentLang === 'en' ? 'R16' : 'R16';
-    const qfShort  = currentLang === 'en' ? 'QF'  : 'QF';
-    const sfShort  = currentLang === 'en' ? 'SF'  : 'SF';
+    const r32Short = 'R32';
+    const r16Short = 'R16';
+    const qfShort  = 'QF';
+    const sfShort  = 'SF';
 
     const finalMatch      = getMatch(104);
     const thirdPlaceMatch = getMatch(103);
