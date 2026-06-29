@@ -373,13 +373,13 @@ function sortGroupTeams(teams, groupMatches, results) {
         const hg = parseInt(r.home, 10);
         const ag = parseInt(r.away, 10);
         if (isNaN(hg) || isNaN(ag)) continue;
-        const hs = h2h[m.home];
+        const homeStats = h2h[m.home];
         const awayStats = h2h[m.away];
-        hs.J++; awayStats.J++;
-        hs.GP += hg; hs.GC += ag; awayStats.GP += ag; awayStats.GC += hg;
-        if (hg > ag) { hs.P += 3; hs.V++; awayStats.D++; }
-        else if (ag > hg) { awayStats.P += 3; awayStats.V++; hs.D++; }
-        else { hs.P++; awayStats.P++; hs.E++; awayStats.E++; }
+        homeStats.J++; awayStats.J++;
+        homeStats.GP += hg; homeStats.GC += ag; awayStats.GP += ag; awayStats.GC += hg;
+        if (hg > ag) { homeStats.P += 3; homeStats.V++; awayStats.D++; }
+        else if (ag > hg) { awayStats.P += 3; awayStats.V++; homeStats.D++; }
+        else { homeStats.P++; awayStats.P++; homeStats.E++; awayStats.E++; }
       }
       for (const s of Object.values(h2h)) s.SG = s.GP - s.GC;
 
@@ -423,13 +423,13 @@ function computeGroupStandings(results) {
     const ag = parseInt(r.away, 10);
     if (isNaN(hg) || isNaN(ag)) continue;
 
-    const hs = stats[m.home];
+    const homeStats = stats[m.home];
     const awayStats = stats[m.away];
-    hs.J++; awayStats.J++;
-    hs.GP += hg; hs.GC += ag; awayStats.GP += ag; awayStats.GC += hg;
-    if (hg > ag) { hs.P += 3; hs.V++; awayStats.D++; }
-    else if (ag > hg) { awayStats.P += 3; awayStats.V++; hs.D++; }
-    else { hs.P++; awayStats.P++; hs.E++; awayStats.E++; }
+    homeStats.J++; awayStats.J++;
+    homeStats.GP += hg; homeStats.GC += ag; awayStats.GP += ag; awayStats.GC += hg;
+    if (hg > ag) { homeStats.P += 3; homeStats.V++; awayStats.D++; }
+    else if (ag > hg) { awayStats.P += 3; awayStats.V++; homeStats.D++; }
+    else { homeStats.P++; awayStats.P++; homeStats.E++; awayStats.E++; }
   }
   for (const s of Object.values(stats)) s.SG = s.GP - s.GC;
 
@@ -467,11 +467,11 @@ function resolveKnockoutTeam(orig, gruposClassificacao, terceirosQualificados, r
   }
 
   if (orig.tipo === 'terceiro') {
-    const elegiveis = terceirosQualificados.filter(t => orig.grps.includes(t.group));
-    if (elegiveis[orig.idx]) return elegiveis[orig.idx].name;
+    const eligible = terceirosQualificados.filter(t => orig.grps.includes(t.group));
+    if (eligible[orig.idx]) return eligible[orig.idx].name;
     // Fallback: pegar o próximo 3º ainda não alocado
-    const sobrou = terceirosQualificados.find(t => !allocated.has(t.name));
-    return sobrou?.name ?? null;
+    const remaining = terceirosQualificados.find(t => !allocated.has(t.name));
+    return remaining?.name ?? null;
   }
 
   if (orig.tipo === 'venc' || orig.tipo === 'perd') {
