@@ -200,6 +200,79 @@ const KNOCKOUT_BY_DATE = {
 };
 
 // ---------------------------------------------------------------------------
+// Dados dos grupos — espelho de src/js/teams.js (equipesIniciais)
+// ---------------------------------------------------------------------------
+const TEAMS_BY_GROUP = {
+  A: ['México', 'África do Sul', 'Coreia do Sul', 'República Tcheca'],
+  B: ['Canadá', 'Bósnia e Herzegovina', 'Catar', 'Suíça'],
+  C: ['Brasil', 'Marrocos', 'Haiti', 'Escócia'],
+  D: ['Estados Unidos', 'Paraguai', 'Austrália', 'Turquia'],
+  E: ['Alemanha', 'Curaçao', 'Costa do Marfim', 'Equador'],
+  F: ['Holanda', 'Japão', 'Suécia', 'Tunísia'],
+  G: ['Bélgica', 'Egito', 'Irã', 'Nova Zelândia'],
+  H: ['Espanha', 'Cabo Verde', 'Arábia Saudita', 'Uruguai'],
+  I: ['França', 'Senegal', 'Iraque', 'Noruega'],
+  J: ['Argentina', 'Argélia', 'Áustria', 'Jordânia'],
+  K: ['Portugal', 'RD Congo', 'Uzbequistão', 'Colômbia'],
+  L: ['Inglaterra', 'Croácia', 'Gana', 'Panamá'],
+};
+
+/** Mapeamento time → grupo (derivado de TEAMS_BY_GROUP) */
+const TEAM_TO_GROUP = {};
+for (const [grp, teams] of Object.entries(TEAMS_BY_GROUP)) {
+  for (const name of teams) {
+    TEAM_TO_GROUP[name] = grp;
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Descritores de origem dos times em cada jogo do mata-mata
+// Espelho de estruturaNosMataMata (src/js/matches.js)
+// ---------------------------------------------------------------------------
+const KNOCKOUT_MATCHES = [
+  // Dezesseis-avos de Final (Rodada de 32)
+  { id: 73,  origHome: { tipo: 'grupo',    pos: 2, grp: 'A' },            origAway: { tipo: 'grupo',    pos: 2, grp: 'B' } },
+  { id: 74,  origHome: { tipo: 'grupo',    pos: 1, grp: 'E' },            origAway: { tipo: 'terceiro', idx: 0, grps: ['A','B','C','D','F'] } },
+  { id: 75,  origHome: { tipo: 'grupo',    pos: 1, grp: 'F' },            origAway: { tipo: 'grupo',    pos: 2, grp: 'C' } },
+  { id: 76,  origHome: { tipo: 'grupo',    pos: 1, grp: 'C' },            origAway: { tipo: 'grupo',    pos: 2, grp: 'F' } },
+  { id: 77,  origHome: { tipo: 'grupo',    pos: 1, grp: 'I' },            origAway: { tipo: 'terceiro', idx: 1, grps: ['C','D','F','G','H'] } },
+  { id: 78,  origHome: { tipo: 'grupo',    pos: 2, grp: 'E' },            origAway: { tipo: 'grupo',    pos: 2, grp: 'I' } },
+  { id: 79,  origHome: { tipo: 'grupo',    pos: 1, grp: 'A' },            origAway: { tipo: 'terceiro', idx: 2, grps: ['C','E','F','H','I'] } },
+  { id: 80,  origHome: { tipo: 'grupo',    pos: 1, grp: 'L' },            origAway: { tipo: 'terceiro', idx: 3, grps: ['E','H','I','J','K'] } },
+  { id: 81,  origHome: { tipo: 'grupo',    pos: 1, grp: 'D' },            origAway: { tipo: 'terceiro', idx: 4, grps: ['B','E','F','I','J'] } },
+  { id: 82,  origHome: { tipo: 'grupo',    pos: 1, grp: 'G' },            origAway: { tipo: 'terceiro', idx: 5, grps: ['A','E','H','I','J'] } },
+  { id: 83,  origHome: { tipo: 'grupo',    pos: 2, grp: 'K' },            origAway: { tipo: 'grupo',    pos: 2, grp: 'L' } },
+  { id: 84,  origHome: { tipo: 'grupo',    pos: 1, grp: 'H' },            origAway: { tipo: 'grupo',    pos: 2, grp: 'J' } },
+  { id: 85,  origHome: { tipo: 'grupo',    pos: 1, grp: 'B' },            origAway: { tipo: 'terceiro', idx: 6, grps: ['E','F','G','I','J'] } },
+  { id: 86,  origHome: { tipo: 'grupo',    pos: 1, grp: 'J' },            origAway: { tipo: 'grupo',    pos: 2, grp: 'H' } },
+  { id: 87,  origHome: { tipo: 'grupo',    pos: 1, grp: 'K' },            origAway: { tipo: 'terceiro', idx: 7, grps: ['D','E','I','J','L'] } },
+  { id: 88,  origHome: { tipo: 'grupo',    pos: 2, grp: 'D' },            origAway: { tipo: 'grupo',    pos: 2, grp: 'G' } },
+  // Oitavas de Final
+  { id: 89,  origHome: { tipo: 'venc', j: 73 },  origAway: { tipo: 'venc', j: 75 } },
+  { id: 90,  origHome: { tipo: 'venc', j: 74 },  origAway: { tipo: 'venc', j: 77 } },
+  { id: 91,  origHome: { tipo: 'venc', j: 76 },  origAway: { tipo: 'venc', j: 78 } },
+  { id: 92,  origHome: { tipo: 'venc', j: 79 },  origAway: { tipo: 'venc', j: 80 } },
+  { id: 93,  origHome: { tipo: 'venc', j: 81 },  origAway: { tipo: 'venc', j: 82 } },
+  { id: 94,  origHome: { tipo: 'venc', j: 83 },  origAway: { tipo: 'venc', j: 84 } },
+  { id: 95,  origHome: { tipo: 'venc', j: 85 },  origAway: { tipo: 'venc', j: 87 } },
+  { id: 96,  origHome: { tipo: 'venc', j: 86 },  origAway: { tipo: 'venc', j: 88 } },
+  // Quartas de Final
+  { id: 97,  origHome: { tipo: 'venc', j: 89 },  origAway: { tipo: 'venc', j: 90 } },
+  { id: 98,  origHome: { tipo: 'venc', j: 91 },  origAway: { tipo: 'venc', j: 92 } },
+  { id: 99,  origHome: { tipo: 'venc', j: 93 },  origAway: { tipo: 'venc', j: 94 } },
+  { id: 100, origHome: { tipo: 'venc', j: 95 },  origAway: { tipo: 'venc', j: 96 } },
+  // Semifinais
+  { id: 101, origHome: { tipo: 'venc', j: 97 },  origAway: { tipo: 'venc', j: 99 } },
+  { id: 102, origHome: { tipo: 'venc', j: 98 },  origAway: { tipo: 'venc', j: 100 } },
+  // Finais
+  { id: 103, origHome: { tipo: 'perd', j: 101 }, origAway: { tipo: 'perd', j: 102 } },
+  { id: 104, origHome: { tipo: 'venc', j: 101 }, origAway: { tipo: 'venc', j: 102 } },
+];
+
+/** Mapa id → descritor do jogo do mata-mata */
+const KNOCKOUT_BY_ID = new Map(KNOCKOUT_MATCHES.map(m => [m.id, m]));
+
+// ---------------------------------------------------------------------------
 // Utilitários de normalização de nomes
 // ---------------------------------------------------------------------------
 
@@ -265,6 +338,214 @@ function toPt(enName) {
 /** Retorna a data de hoje no formato YYYYMMDD (UTC). */
 function todayUtc() {
   return new Date().toISOString().slice(0, 10).replace(/-/g, '');
+}
+
+// ---------------------------------------------------------------------------
+// Funções de classificação dos grupos (espelho de src/js/standings.js)
+// Usadas para resolver os times esperados em cada jogo do mata-mata.
+// ---------------------------------------------------------------------------
+
+/**
+ * Ordena os times de um grupo considerando desempate por confronto direto (head-to-head).
+ * Espelho de sortGroupTeams em src/js/standings.js.
+ */
+function sortGroupTeams(teams, groupMatches, results) {
+  const byPoints = new Map();
+  for (const t of teams) {
+    if (!byPoints.has(t.P)) byPoints.set(t.P, []);
+    byPoints.get(t.P).push(t);
+  }
+
+  return [...byPoints.entries()]
+    .sort((a, b) => b[0] - a[0])
+    .flatMap(([, tied]) => {
+      if (tied.length < 2) return tied;
+
+      // Calcular estatísticas do confronto direto (head-to-head) entre os empatados
+      const h2h = Object.fromEntries(
+        tied.map(t => [t.name, { name: t.name, P: 0, J: 0, V: 0, E: 0, D: 0, GP: 0, GC: 0, SG: 0 }])
+      );
+      const tiedNames = new Set(tied.map(t => t.name));
+      for (const m of groupMatches) {
+        if (!tiedNames.has(m.home) || !tiedNames.has(m.away)) continue;
+        const r = results[String(m.id)];
+        if (!r || r.home == null || r.away == null) continue;
+        const hg = parseInt(r.home, 10);
+        const ag = parseInt(r.away, 10);
+        if (isNaN(hg) || isNaN(ag)) continue;
+        const hs = h2h[m.home];
+        const awayStats = h2h[m.away];
+        hs.J++; awayStats.J++;
+        hs.GP += hg; hs.GC += ag; awayStats.GP += ag; awayStats.GC += hg;
+        if (hg > ag) { hs.P += 3; hs.V++; awayStats.D++; }
+        else if (ag > hg) { awayStats.P += 3; awayStats.V++; hs.D++; }
+        else { hs.P++; awayStats.P++; hs.E++; awayStats.E++; }
+      }
+      for (const s of Object.values(h2h)) s.SG = s.GP - s.GC;
+
+      return [...tied].sort((a, b) => {
+        const ha = h2h[a.name];
+        const hb = h2h[b.name];
+        return (hb.P - ha.P) || (hb.SG - ha.SG) || (hb.GP - ha.GP) ||
+               (b.SG - a.SG) || (b.GP - a.GP) || (b.V - a.V) ||
+               a.name.localeCompare(b.name);
+      });
+    });
+}
+
+/**
+ * Ordena os 3ºs colocados dos grupos pelo critério de desempate global.
+ * Espelho de sortThirdPlacedTeams em src/js/standings.js.
+ */
+function sortThirdPlacedTeams(teams) {
+  return [...teams].sort((a, b) =>
+    b.P - a.P || b.SG - a.SG || b.GP - a.GP || b.V - a.V || a.name.localeCompare(b.name)
+  );
+}
+
+/**
+ * Calcula a classificação de todos os grupos a partir dos resultados já processados.
+ * Espelho simplificado de calculateStandings em src/js/standings.js.
+ * Retorna { gruposClassificacao, terceirosColocados }.
+ */
+function computeGroupStandings(results) {
+  const stats = {};
+  for (const [grp, teams] of Object.entries(TEAMS_BY_GROUP)) {
+    for (const name of teams) {
+      stats[name] = { name, group: grp, P: 0, J: 0, V: 0, E: 0, D: 0, GP: 0, GC: 0, SG: 0 };
+    }
+  }
+
+  for (const m of GROUP_MATCHES) {
+    const r = results[String(m.id)];
+    if (!r || r.home == null || r.away == null) continue;
+    const hg = parseInt(r.home, 10);
+    const ag = parseInt(r.away, 10);
+    if (isNaN(hg) || isNaN(ag)) continue;
+
+    const hs = stats[m.home];
+    const awayStats = stats[m.away];
+    hs.J++; awayStats.J++;
+    hs.GP += hg; hs.GC += ag; awayStats.GP += ag; awayStats.GC += hg;
+    if (hg > ag) { hs.P += 3; hs.V++; awayStats.D++; }
+    else if (ag > hg) { awayStats.P += 3; awayStats.V++; hs.D++; }
+    else { hs.P++; awayStats.P++; hs.E++; awayStats.E++; }
+  }
+  for (const s of Object.values(stats)) s.SG = s.GP - s.GC;
+
+  const gruposClassificacao = {};
+  const terceirosColocados = [];
+
+  for (const grp of Object.keys(TEAMS_BY_GROUP)) {
+    const groupMatchesForGrp = GROUP_MATCHES.filter(m => TEAM_TO_GROUP[m.home] === grp);
+    const teams = Object.values(stats).filter(t => t.group === grp);
+    const sorted = sortGroupTeams(teams, groupMatchesForGrp, results);
+    gruposClassificacao[grp] = sorted;
+    if (sorted[2]) terceirosColocados.push(sorted[2]);
+  }
+
+  return { gruposClassificacao, terceirosColocados };
+}
+
+/**
+ * Resolve o nome do time esperado para um lado de um jogo do mata-mata.
+ * Retorna null se não for possível resolver (dados insuficientes).
+ * Espelho de recalcularTorneioCompleto em src/js/engine.js.
+ *
+ * @param {object} orig - Descritor de origem (tipo, pos, grp, idx, grps, j)
+ * @param {object} gruposClassificacao - Classificação dos grupos calculada
+ * @param {Array}  terceirosQualificados - 8 melhores 3ºs colocados já ordenados
+ * @param {object} results - Resultados dos jogos já processados
+ * @param {Set}    allocated - Nomes de times já alocados a vagas de 3ºs colocados
+ * @returns {string|null}
+ */
+function resolveKnockoutTeam(orig, gruposClassificacao, terceirosQualificados, results, allocated) {
+  if (orig.tipo === 'grupo') {
+    const sorted = gruposClassificacao[orig.grp];
+    if (!sorted) return null;
+    return sorted[orig.pos - 1]?.name ?? null;
+  }
+
+  if (orig.tipo === 'terceiro') {
+    const elegiveis = terceirosQualificados.filter(t => orig.grps.includes(t.group));
+    if (elegiveis[orig.idx]) return elegiveis[orig.idx].name;
+    // Fallback: pegar o próximo 3º ainda não alocado
+    const sobrou = terceirosQualificados.find(t => !allocated.has(t.name));
+    return sobrou?.name ?? null;
+  }
+
+  if (orig.tipo === 'venc' || orig.tipo === 'perd') {
+    const r = results[String(orig.j)];
+    if (!r || r.home == null || r.away == null) return null;
+    const ko = KNOCKOUT_BY_ID.get(orig.j);
+    if (!ko) return null;
+    const homeTeam = resolveKnockoutTeam(ko.origHome, gruposClassificacao, terceirosQualificados, results, allocated);
+    const awayTeam = resolveKnockoutTeam(ko.origAway, gruposClassificacao, terceirosQualificados, results, allocated);
+    if (!homeTeam || !awayTeam) return null;
+    const h = parseInt(r.home, 10);
+    const a = parseInt(r.away, 10);
+    let homeWins;
+    if (!isNaN(h) && !isNaN(a) && h !== a) {
+      homeWins = h > a;
+    } else if (r.penHome != null && r.penAway != null) {
+      homeWins = r.penHome > r.penAway;
+    } else {
+      return null;
+    }
+    if (orig.tipo === 'venc') return homeWins ? homeTeam : awayTeam;
+    return homeWins ? awayTeam : homeTeam;
+  }
+
+  return null;
+}
+
+/**
+ * Constrói um mapa de busca dos jogos do mata-mata por nomes dos times esperados.
+ * Usa os resultados da fase de grupos já processados para resolver os times.
+ *
+ * Chave: normalizeName("HomePt|AwayPt") → { id, swapped }
+ * Apenas inclui jogos onde ambos os times conseguem ser resolvidos.
+ *
+ * @param {number[]} knockoutIds - IDs dos jogos do mata-mata neste dia
+ * @param {object}   results     - Resultados já processados (fase de grupos + mata-mata anteriores)
+ * @returns {Map}
+ */
+function buildKnockoutLookup(knockoutIds, results) {
+  const lookup = new Map();
+  const allocated = new Set();
+
+  const { gruposClassificacao, terceirosColocados } = computeGroupStandings(results);
+
+  // Determinar grupos já iniciados (para filtrar 3ºs colocados parciais)
+  const startedGroups = new Set();
+  for (const m of GROUP_MATCHES) {
+    const r = results[String(m.id)];
+    if (r && r.home != null && r.away != null) {
+      startedGroups.add(TEAM_TO_GROUP[m.home]);
+    }
+  }
+  const terceirosQualificados = sortThirdPlacedTeams(
+    terceirosColocados.filter(t => t && startedGroups.has(t.group))
+  ).slice(0, 8);
+
+  for (const id of knockoutIds) {
+    const ko = KNOCKOUT_BY_ID.get(id);
+    if (!ko) continue;
+
+    const homeTeam = resolveKnockoutTeam(ko.origHome, gruposClassificacao, terceirosQualificados, results, allocated);
+    const awayTeam = resolveKnockoutTeam(ko.origAway, gruposClassificacao, terceirosQualificados, results, allocated);
+    if (!homeTeam || !awayTeam) continue;
+
+    // Registrar times de terceiro como alocados para evitar duplicações no fallback
+    if (ko.origHome.tipo === 'terceiro') allocated.add(homeTeam);
+    if (ko.origAway.tipo === 'terceiro') allocated.add(awayTeam);
+
+    // Inserir as duas orientações para tolerar home/away invertido pela ESPN
+    lookup.set(normalizeName(`${homeTeam}|${awayTeam}`), { id, swapped: false });
+    lookup.set(normalizeName(`${awayTeam}|${homeTeam}`), { id, swapped: true });
+  }
+
+  return lookup;
 }
 
 /** Gera todas as datas YYYYMMDD entre start e end (inclusive). */
@@ -400,6 +681,12 @@ async function main() {
     const knockoutQueue = [...(KNOCKOUT_BY_DATE[date] ?? [])];
     let knockoutCursor = 0;
 
+    // Lookup por nomes dos times para jogos do mata-mata (mais confiável que cursor cronológico)
+    // É construído APÓS a fase de grupos já ter sido processada para as datas anteriores.
+    const knockoutLookup = knockoutQueue.length > 0
+      ? buildKnockoutLookup(knockoutQueue, results)
+      : new Map();
+
     for (const event of data.events) {
       const competition = event.competitions?.[0];
       if (!competition) continue;
@@ -441,46 +728,74 @@ async function main() {
           : [homePt, awayPt, homeScore, awayScore];
         const suffix = (isCompleted ? '' : ' (em curso)') + (swapped ? ' (home/away invertido)' : '');
         console.log(`  #${groupId} ${dHome} ${dScH}–${dScA} ${dAway}${suffix}`);
-      } else if (knockoutQueue[knockoutCursor] !== undefined) {
-        // Mata-mata: associar positivamente pelo índice cronológico do dia
-        const knockoutId = knockoutQueue[knockoutCursor++];
-        const result = { home: homeScore, away: awayScore };
+      } else {
+        // Mata-mata: tentar associar por nome dos times (mais confiável que ordem cronológica)
+        const knockoutNameMatch = knockoutLookup.get(normalizeName(`${homePt}|${awayPt}`));
+        let knockoutId;
+        let swappedKnockout = false;
 
-        if (isCompleted) {
-          const statusName = String(status?.name ?? '');
-          const wentToPenalties =
-            statusName.includes('PEN') ||
-            statusName.includes('PENALTY') ||
-            statusName.includes('SHOOTOUT');
-
-          if (wentToPenalties) {
-            const pen = extractPenalties(competition);
-            if (pen) {
-              result.penHome = pen.penHome;
-              result.penAway = pen.penAway;
-            }
-          }
-          const penSuffix = result.penHome !== undefined ? ` (pen ${result.penHome}–${result.penAway})` : '';
-          console.log(`  #${knockoutId} ${homePt} ${homeScore}–${awayScore} ${awayPt}${penSuffix}`);
+        if (knockoutNameMatch !== undefined) {
+          // Correspondência por times esperados — remover do queue para não reutilizar no fallback
+          knockoutId = knockoutNameMatch.id;
+          swappedKnockout = knockoutNameMatch.swapped;
+          const qi = knockoutQueue.indexOf(knockoutId);
+          if (qi !== -1) knockoutQueue.splice(qi, 1);
+        } else if (knockoutQueue[knockoutCursor] !== undefined) {
+          // Fallback cronológico — pode ser impreciso se ESPN retornar fora de ordem
+          knockoutId = knockoutQueue[knockoutCursor++];
+          console.warn(
+            `  ⚠ Mata-mata #${knockoutId}: associado por ordem cronológica` +
+            ` (times não resolvidos para "${homePt}" vs "${awayPt}"). Verificar.`
+          );
         } else {
-          console.log(`  #${knockoutId} ${homePt} ${homeScore}–${awayScore} ${awayPt} (em curso)`);
+          console.warn(
+            `  ⚠ Jogo não identificado: "${homeEn}" vs "${awayEn}" (${date})` +
+            `\n    → PT: "${homePt}" vs "${awayPt}"` +
+            `\n    → Normalizado: "${normalizeName(homePt)}" vs "${normalizeName(awayPt)}"`
+          );
+          unmatchedEvents.push({
+            date,
+            homeEn,
+            awayEn,
+            homePt,
+            awayPt,
+            statusName: String(status?.name ?? status?.state ?? ''),
+          });
         }
 
-        results[String(knockoutId)] = result;
-      } else {
-        console.warn(
-          `  ⚠ Jogo não identificado: "${homeEn}" vs "${awayEn}" (${date})` +
-          `\n    → PT: "${homePt}" vs "${awayPt}"` +
-          `\n    → Normalizado: "${normalizeName(homePt)}" vs "${normalizeName(awayPt)}"`
-        );
-        unmatchedEvents.push({
-          date,
-          homeEn,
-          awayEn,
-          homePt,
-          awayPt,
-          statusName: String(status?.name ?? status?.state ?? ''),
-        });
+        if (knockoutId !== undefined) {
+          // Se ESPN retornou home/away invertido vs matches.js, corrigir o placar
+          const result = swappedKnockout
+            ? { home: awayScore, away: homeScore }
+            : { home: homeScore, away: awayScore };
+          const [dHome, dAway, dScH, dScA] = swappedKnockout
+            ? [awayPt, homePt, awayScore, homeScore]
+            : [homePt, awayPt, homeScore, awayScore];
+
+          if (isCompleted) {
+            const statusName = String(status?.name ?? '');
+            const wentToPenalties =
+              statusName.includes('PEN') ||
+              statusName.includes('PENALTY') ||
+              statusName.includes('SHOOTOUT');
+
+            if (wentToPenalties) {
+              const pen = extractPenalties(competition);
+              if (pen) {
+                result.penHome = swappedKnockout ? pen.penAway : pen.penHome;
+                result.penAway = swappedKnockout ? pen.penHome : pen.penAway;
+              }
+            }
+            const penSuffix = result.penHome !== undefined ? ` (pen ${result.penHome}–${result.penAway})` : '';
+            const swapSuffix = swappedKnockout ? ' (home/away invertido)' : '';
+            console.log(`  #${knockoutId} ${dHome} ${dScH}–${dScA} ${dAway}${penSuffix}${swapSuffix}`);
+          } else {
+            const swapSuffix = swappedKnockout ? ' (home/away invertido)' : '';
+            console.log(`  #${knockoutId} ${dHome} ${dScH}–${dScA} ${dAway} (em curso)${swapSuffix}`);
+          }
+
+          results[String(knockoutId)] = result;
+        }
       }
     }
   }
