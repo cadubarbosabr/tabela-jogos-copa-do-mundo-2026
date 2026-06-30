@@ -14,6 +14,7 @@
 import { writeFileSync, readFileSync } from 'node:fs';
 import { resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { getThirdPlaceAssignments } from '../src/js/thirdPlaceTable.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const RESULTS_PATH = resolve(__dirname, '../public/results.json');
@@ -453,13 +454,15 @@ function computeGroupStandings(results) {
  * Espelho de recalcularTorneioCompleto em src/js/engine.js.
  *
  * @param {object} orig - Descritor de origem (tipo, pos, grp, idx, grps, j)
+ * @param {number} currentMatchId - ID do jogo que está sendo resolvido
  * @param {object} gruposClassificacao - Classificação dos grupos calculada
  * @param {Array}  terceirosQualificados - 8 melhores 3ºs colocados já ordenados
+ * @param {Map|null} thirdPlaceAssignments - Mapeamento oficial da FIFA para os terceiros
  * @param {object} results - Resultados dos jogos já processados
  * @param {Set}    allocated - Nomes de times já alocados a vagas de 3ºs colocados
  * @returns {string|null}
  */
-function resolveKnockoutTeam(orig, gruposClassificacao, terceirosQualificados, results, allocated) {
+function resolveKnockoutTeam(orig, currentMatchId, gruposClassificacao, terceirosQualificados, thirdPlaceAssignments, results, allocated) {
   if (orig.tipo === 'grupo') {
     const sorted = gruposClassificacao[orig.grp];
     if (!sorted) return null;
@@ -467,6 +470,9 @@ function resolveKnockoutTeam(orig, gruposClassificacao, terceirosQualificados, r
   }
 
   if (orig.tipo === 'terceiro') {
+    const assignedThird = thirdPlaceAssignments?.get(currentMatchId);
+    if (assignedThird) return assignedThird.name;
+
     const eligible = terceirosQualificados.filter(t => orig.grps.includes(t.group));
     if (eligible[orig.idx]) return eligible[orig.idx].name;
     // Fallback: pegar o próximo 3º ainda não alocado
@@ -479,8 +485,8 @@ function resolveKnockoutTeam(orig, gruposClassificacao, terceirosQualificados, r
     if (!r || r.home == null || r.away == null) return null;
     const ko = KNOCKOUT_BY_ID.get(orig.j);
     if (!ko) return null;
-    const homeTeam = resolveKnockoutTeam(ko.origHome, gruposClassificacao, terceirosQualificados, results, allocated);
-    const awayTeam = resolveKnockoutTeam(ko.origAway, gruposClassificacao, terceirosQualificados, results, allocated);
+    const homeTeam = resolveKnockoutTeam(ko.origHome, ko.id, gruposClassificacao, terceirosQualificados, thirdPlaceAssignments, results, allocated);
+    const awayTeam = resolveKnockoutTeam(ko.origAway, ko.id, gruposClassificacao, terceirosQualificados, thirdPlaceAssignments, results, allocated);
     if (!homeTeam || !awayTeam) return null;
     const h = parseInt(r.home, 10);
     const a = parseInt(r.away, 10);
@@ -527,13 +533,14 @@ function buildKnockoutLookup(knockoutIds, results) {
   const terceirosQualificados = sortThirdPlacedTeams(
     terceirosColocados.filter(t => t && startedGroups.has(t.group))
   ).slice(0, 8);
+  const thirdPlaceAssignments = getThirdPlaceAssignments(terceirosQualificados);
 
   for (const id of knockoutIds) {
     const ko = KNOCKOUT_BY_ID.get(id);
     if (!ko) continue;
 
-    const homeTeam = resolveKnockoutTeam(ko.origHome, gruposClassificacao, terceirosQualificados, results, allocated);
-    const awayTeam = resolveKnockoutTeam(ko.origAway, gruposClassificacao, terceirosQualificados, results, allocated);
+    const homeTeam = resolveKnockoutTeam(ko.origHome, ko.id, gruposClassificacao, terceirosQualificados, thirdPlaceAssignments, results, allocated);
+    const awayTeam = resolveKnockoutTeam(ko.origAway, ko.id, gruposClassificacao, terceirosQualificados, thirdPlaceAssignments, results, allocated);
     if (!homeTeam || !awayTeam) continue;
 
     // Registrar times de terceiro como alocados para evitar duplicações no fallback

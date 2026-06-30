@@ -1,6 +1,7 @@
 import { getFlagTag } from './teams.js';
 import { jogosGrupos, estruturaNosMataMata } from './matches.js';
 import { calculateStandings, isGroupStarted, sortThirdPlacedTeams } from './standings.js';
+import { getThirdPlaceAssignments } from './thirdPlaceTable.js';
 import { translateTeam } from './translate.js';
 import {
     getOfficialScoreInput,
@@ -79,6 +80,7 @@ export function recalcularTorneioCompleto() {
         terceirosColocados.filter(t => isGrupoIniciado(t.group))
     )
         .slice(0, 8);
+    const thirdPlaceAssignments = getThirdPlaceAssignments(terceirosQualificados);
 
     // 5. Resolver Chaveamento Dinâmico do Mata-Mata jogo por jogo
     mapaMataMataCalculado = {};
@@ -113,14 +115,18 @@ export function recalcularTorneioCompleto() {
                     timeAway = `${pos}º Grupo ${grp}`;
                 }
             } else if (j.origAway.tipo === "terceiro") {
-                // Filtra quais dos 8 terceiros qualificados pertencem aos grupos permitidos nesta vaga
-                let elegiveis = terceirosQualificados.filter(t => j.origAway.grps.includes(t.group));
-                if (elegiveis[j.origAway.idx]) {
-                    timeAway = elegiveis[j.origAway.idx].name;
+                const assignedThird = thirdPlaceAssignments?.get(j.id);
+                if (assignedThird) {
+                    timeAway = assignedThird.name;
                 } else {
-                    // Fallback caso não haja dados preenchidos suficientes
-                    let sobrou = terceirosQualificados.find(t => !Object.values(mapaMataMataCalculado).some(m => m.home === t.name || m.away === t.name));
-                    timeAway = sobrou ? sobrou.name : `3º Grupo ${j.origAway.grps[0]}`;
+                    // Fallback provisório enquanto os 8 melhores terceiros ainda não estão definidos.
+                    let elegiveis = terceirosQualificados.filter(t => j.origAway.grps.includes(t.group));
+                    if (elegiveis[j.origAway.idx]) {
+                        timeAway = elegiveis[j.origAway.idx].name;
+                    } else {
+                        let sobrou = terceirosQualificados.find(t => !Object.values(mapaMataMataCalculado).some(m => m.home === t.name || m.away === t.name));
+                        timeAway = sobrou ? sobrou.name : `3º Grupo ${j.origAway.grps[0]}`;
+                    }
                 }
             } else if (j.origAway.tipo === "venc") {
                 timeAway = calcularVencedorMataMata(j.origAway.j);
