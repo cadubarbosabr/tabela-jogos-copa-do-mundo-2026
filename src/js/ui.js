@@ -775,23 +775,21 @@ export function renderKnockoutStage() {
 
     const t = translations.pt;
     container.innerHTML = `
-        <div class="knockout-shell">
-            <div class="knockout-header-copy">
-                <div>
-                    <p class="knockout-kicker">Mata-Mata · Copa do Mundo FIFA 2026</p>
-                    <h3 class="knockout-headline">Chave eliminatória</h3>
-                    <p class="knockout-subheadline">Acompanhe todos os confrontos oficiais, progresso de fases, pênaltis e o caminho até a grande final.</p>
-                </div>
-                <div class="knockout-controls">
-                    <div class="knockout-view-toggle" role="tablist" aria-label="${t.knockoutViewLabel}">
-                        <button class="knockout-view-btn ${knockoutViewMode === 'bracket' ? 'is-active' : ''}" data-knockout-view="bracket">🏆 ${t.knockoutBracketMode}</button>
-                        <button class="knockout-view-btn ${knockoutViewMode === 'list' ? 'is-active' : ''}" data-knockout-view="list">📋 ${t.knockoutListMode}</button>
-                    </div>
+        <div class="knockout-header-copy">
+            <div>
+                <p class="knockout-kicker">Mata-Mata · Copa do Mundo FIFA 2026</p>
+                <h3 class="knockout-headline">Chave eliminatória</h3>
+                <p class="knockout-subheadline">Acompanhe todos os confrontos oficiais, progresso de fases, pênaltis e o caminho até a grande final.</p>
+            </div>
+            <div class="knockout-controls">
+                <div class="knockout-view-toggle" role="tablist" aria-label="${t.knockoutViewLabel}">
+                    <button class="knockout-view-btn ${knockoutViewMode === 'bracket' ? 'is-active' : ''}" data-knockout-view="bracket">🏆 ${t.knockoutBracketMode}</button>
+                    <button class="knockout-view-btn ${knockoutViewMode === 'list' ? 'is-active' : ''}" data-knockout-view="list">📋 ${t.knockoutListMode}</button>
                 </div>
             </div>
-            <div class="knockout-content">
-                ${knockoutViewMode === 'bracket' ? renderKnockoutBracketView() : renderKnockoutListView()}
-            </div>
+        </div>
+        <div class="knockout-content">
+            ${knockoutViewMode === 'bracket' ? renderKnockoutBracketView() : renderKnockoutListView()}
         </div>
     `;
 
