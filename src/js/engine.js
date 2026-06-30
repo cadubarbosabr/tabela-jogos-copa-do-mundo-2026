@@ -2,6 +2,7 @@ import { getFlagTag } from './teams.js';
 import { jogosGrupos, estruturaNosMataMata } from './matches.js';
 import { calculateStandings, isGroupStarted, sortThirdPlacedTeams } from './standings.js';
 import { translateTeam } from './translate.js';
+import { ANNEX_C } from './annexC.js';
 import {
     getOfficialScoreInput,
     getOfficialPenaltiesInput,
@@ -116,23 +117,41 @@ export function recalcularTorneioCompleto() {
                     timeAway = `${pos}º Grupo ${grp}`;
                 }
             } else if (j.origAway.tipo === "terceiro") {
-                // Alocação gulosa: melhor 3º elegível (dentro dos grupos permitidos)
-                // ainda não alocado a outro confronto desta fase.
-                const elegiveis = terceirosQualificados.filter(t =>
-                    j.origAway.grps.includes(t.group) && !terceirosAlocados.has(t.name)
-                );
-                if (elegiveis.length > 0) {
-                    timeAway = elegiveis[0].name;
-                    terceirosAlocados.add(elegiveis[0].name);
-                } else {
-                    // Fallback último recurso: qualquer 3º ainda não alocado,
-                    // sem restrição de grupo, para não deixar a vaga vazia.
-                    const sobrou = terceirosQualificados.find(t => !terceirosAlocados.has(t.name));
-                    if (sobrou) {
-                        timeAway = sobrou.name;
-                        terceirosAlocados.add(sobrou.name);
+                if (terceirosQualificados.length === 8) {
+                    // Usar tabela oficial do Anexo C da FIFA para garantir
+                    // que o 3º do grupo correto seja pareado com cada líder.
+                    const key = terceirosQualificados.map(t => t.group).sort().join('');
+                    const slot = `1${j.origHome.grp}`;
+                    const assignedGroup = ANNEX_C[key]?.[slot];
+                    if (assignedGroup) {
+                        const team = terceirosQualificados.find(t => t.group === assignedGroup);
+                        timeAway = team ? team.name : `3º Grupo ${assignedGroup}`;
                     } else {
-                        timeAway = `3º Grupo ${j.origAway.grps[0]}`;
+                        // Fallback: qualquer 3º ainda não alocado
+                        const sobrou = terceirosQualificados.find(t => !terceirosAlocados.has(t.name));
+                        if (sobrou) {
+                            timeAway = sobrou.name;
+                            terceirosAlocados.add(sobrou.name);
+                        } else {
+                            timeAway = `3º Grupo ${j.origAway.grps[0]}`;
+                        }
+                    }
+                } else {
+                    // Grupos ainda não finalizados – alocação gulosa com restrição de grupo
+                    const elegiveis = terceirosQualificados.filter(t =>
+                        j.origAway.grps.includes(t.group) && !terceirosAlocados.has(t.name)
+                    );
+                    if (elegiveis.length > 0) {
+                        timeAway = elegiveis[0].name;
+                        terceirosAlocados.add(elegiveis[0].name);
+                    } else {
+                        const sobrou = terceirosQualificados.find(t => !terceirosAlocados.has(t.name));
+                        if (sobrou) {
+                            timeAway = sobrou.name;
+                            terceirosAlocados.add(sobrou.name);
+                        } else {
+                            timeAway = `3º Grupo ${j.origAway.grps[0]}`;
+                        }
                     }
                 }
             } else if (j.origAway.tipo === "venc") {

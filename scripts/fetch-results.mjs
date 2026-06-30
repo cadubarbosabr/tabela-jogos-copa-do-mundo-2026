@@ -14,6 +14,7 @@
 import { writeFileSync, readFileSync } from 'node:fs';
 import { resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { ANNEX_C } from '../src/js/annexC.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const RESULTS_PATH = resolve(__dirname, '../public/results.json');
@@ -452,14 +453,17 @@ function computeGroupStandings(results) {
  * Retorna null se não for possível resolver (dados insuficientes).
  * Espelho de recalcularTorneioCompleto em src/js/engine.js.
  *
- * @param {object} orig - Descritor de origem (tipo, pos, grp, idx, grps, j)
- * @param {object} gruposClassificacao - Classificação dos grupos calculada
- * @param {Array}  terceirosQualificados - 8 melhores 3ºs colocados já ordenados
- * @param {object} results - Resultados dos jogos já processados
- * @param {Set}    allocated - Nomes de times já alocados a vagas de 3ºs colocados
+ * @param {object}      orig                  - Descritor de origem (tipo, pos, grp, idx, grps, j)
+ * @param {object}      gruposClassificacao   - Classificação dos grupos calculada
+ * @param {Array}       terceirosQualificados - 8 melhores 3ºs colocados já ordenados
+ * @param {object}      results               - Resultados dos jogos já processados
+ * @param {Set}         allocated             - Nomes de times já alocados a vagas de 3ºs colocados
+ * @param {string|null} [winnerGrp]           - Grupo do vencedor deste confronto (ex: 'E' para '1E');
+ *                                              fornecido apenas para vagas de 3º colocado a fim de
+ *                                              usar a tabela oficial do Anexo C da FIFA.
  * @returns {string|null}
  */
-function resolveKnockoutTeam(orig, gruposClassificacao, terceirosQualificados, results, allocated) {
+function resolveKnockoutTeam(orig, gruposClassificacao, terceirosQualificados, results, allocated, winnerGrp = null) {
   if (orig.tipo === 'grupo') {
     const sorted = gruposClassificacao[orig.grp];
     if (!sorted) return null;
@@ -467,7 +471,17 @@ function resolveKnockoutTeam(orig, gruposClassificacao, terceirosQualificados, r
   }
 
   if (orig.tipo === 'terceiro') {
-    // Alocação gulosa: melhor 3º elegível ainda não alocado a outro jogo
+    if (terceirosQualificados.length === 8 && winnerGrp) {
+      // Usar tabela oficial do Anexo C da FIFA para garantir o pareamento correto
+      const key = terceirosQualificados.map(t => t.group).sort().join('');
+      const slot = `1${winnerGrp}`;
+      const assignedGroup = ANNEX_C[key]?.[slot];
+      if (assignedGroup) {
+        const team = terceirosQualificados.find(t => t.group === assignedGroup);
+        return team?.name ?? null;
+      }
+    }
+    // Fallback: alocação gulosa com restrição de grupo
     const eligible = terceirosQualificados.filter(t => orig.grps.includes(t.group) && !allocated.has(t.name));
     if (eligible.length > 0) return eligible[0].name;
     const remaining = terceirosQualificados.find(t => !allocated.has(t.name));
@@ -532,8 +546,13 @@ function buildKnockoutLookup(knockoutIds, results) {
     const ko = KNOCKOUT_BY_ID.get(id);
     if (!ko) continue;
 
+    // Para vagas de 3º colocado, derivar o grupo vencedor do descritor origHome
+    // e passá-lo como contexto para a consulta ao Anexo C da FIFA.
+    const homeWinnerGrp = ko.origHome.tipo === 'grupo' ? ko.origHome.grp : null;
+    const awayWinnerGrp = ko.origAway.tipo === 'terceiro' ? homeWinnerGrp : null;
+
     const homeTeam = resolveKnockoutTeam(ko.origHome, gruposClassificacao, terceirosQualificados, results, allocated);
-    const awayTeam = resolveKnockoutTeam(ko.origAway, gruposClassificacao, terceirosQualificados, results, allocated);
+    const awayTeam = resolveKnockoutTeam(ko.origAway, gruposClassificacao, terceirosQualificados, results, allocated, awayWinnerGrp);
     if (!homeTeam || !awayTeam) continue;
 
     // Registrar times de terceiro como alocados para evitar duplicações no fallback
