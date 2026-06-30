@@ -465,7 +465,7 @@ input[type=number] { -moz-appearance: textfield; }
   gap: 5px;
   flex: 1;
   min-width: 0;
-  overflow: hidden;
+  overflow: visible;
 }
 
 .kob-mini-team-info img {
@@ -480,10 +480,9 @@ input[type=number] { -moz-appearance: textfield; }
   font-size: 11px;
   font-weight: 700;
   letter-spacing: 0.01em;
-  /* Remova o min-width: 0 se estiver causando conflitos de layout */
-  overflow: visible;         /* Permite que o texto não seja cortado */
-  text-overflow: clip;       /* Remove a reticência */
-  white-space: nowrap;       /* Garante que não pule linha */
+  white-space: nowrap;
+  overflow: visible;
+  text-overflow: clip;
   color: rgb(30 41 59);
 }
 
