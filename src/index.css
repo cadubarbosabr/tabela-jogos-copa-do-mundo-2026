@@ -1097,23 +1097,6 @@ input[type=number] { -moz-appearance: textfield; }
    KNOCKOUT SHELL & HEADER
    ============================================================ */
 
-.knockout-shell {
-  display: grid;
-  gap: 1.5rem;
-  padding: 1.5rem;
-  border-radius: 1.75rem;
-  background: rgb(255 255 255 / 0.84);
-  border: 1px solid rgb(226 232 240 / 0.9);
-  box-shadow: 0 20px 50px rgb(15 23 42 / 0.08);
-  backdrop-filter: blur(18px);
-  -webkit-backdrop-filter: blur(18px);
-}
-
-.dark .knockout-shell {
-  background: rgb(15 23 42 / 0.85);
-  border-color: rgb(51 65 85 / 0.85);
-}
-
 .knockout-header-copy {
   display: flex;
   flex-wrap: wrap;
