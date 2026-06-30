@@ -38,39 +38,34 @@
 <body class="bg-slate-50 text-slate-900 dark:bg-slate-950 dark:text-slate-100 antialiased min-h-screen flex flex-col transition-colors duration-300">
 
     <!-- Header Principal -->
-    <header class="site-header text-white shadow-2xl">
-        <div class="max-w-7xl mx-auto px-4 py-5 md:py-9 flex flex-col xl:flex-row justify-between items-start gap-6 md:gap-8">
-            <div class="hero-copy text-center xl:text-left w-full xl:max-w-3xl">
-                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/88/2026_FIFA_World_Cup_emblem_%28horizontal%2C_with_wordmark%29.svg/960px-2026_FIFA_World_Cup_emblem_%28horizontal%2C_with_wordmark%29.svg.png" alt="Logo da Copa do Mundo FIFA 2026" class="h-10 md:h-14 mx-auto xl:mx-0 drop-shadow-lg">
+    <header class="site-header text-white shadow-2xl relative">
+        <div class="max-w-7xl mx-auto px-4 py-5 md:py-8 flex flex-col items-center gap-2">
+            <div class="hero-copy text-center w-full">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/88/2026_FIFA_World_Cup_emblem_%28horizontal%2C_with_wordmark%29.svg/960px-2026_FIFA_World_Cup_emblem_%28horizontal%2C_with_wordmark%29.svg.png" alt="Logo da Copa do Mundo FIFA 2026" class="h-10 md:h-14 mx-auto drop-shadow-lg">
                 <h1 id="title-app" class="text-3xl md:text-5xl font-extrabold tracking-tight mt-2 drop-shadow-md header-title">COPA DO MUNDO FIFA 2026</h1>
-                <div class="hero-highlights mt-4">
-                    <span class="hero-pill">Português-BR</span>
-                    <span class="hero-pill">Atualização segura</span>
-                    <span class="hero-pill">Bracket responsivo</span>
-                </div>
             </div>
-            
-            <!-- Controles do Topo -->
-            <div class="flex flex-col items-stretch gap-4 w-full xl:w-auto xl:min-w-[22rem]">
-                <!-- Alternador de Abas -->
-                <div class="flex tab-switcher p-1.5 rounded-2xl shadow-inner backdrop-blur-sm w-full">
-                    <button id="btn-grupos" class="header-tab-btn is-active">Fase de Grupos</button>
-                    <button id="btn-mata-mata" class="header-tab-btn">Mata-mata</button>
-                </div>
-                
-                <div class="flex justify-end">
-                    <button id="btn-theme" class="header-btn text-blue-200 hover:text-white px-4 py-3 rounded-2xl transition-all duration-300 text-xs font-bold backdrop-blur-sm min-h-[48px]">
-                        🌙 <span id="lbl-btn-theme">Modo Claro</span>
-                    </button>
-                </div>
-            </div>
+        </div>
+        <!-- Botão de tema (canto superior direito) -->
+        <div class="absolute top-3 right-4 md:top-4 md:right-6">
+            <button id="btn-theme" class="header-btn text-blue-200 hover:text-white px-4 py-2.5 rounded-2xl transition-all duration-300 text-xs font-bold backdrop-blur-sm min-h-[44px]">
+                🌙 <span id="lbl-btn-theme">Modo Claro</span>
+            </button>
         </div>
         <!-- Borda decorativa inferior com gradiente das cores da Copa -->
         <div class="header-border-bottom"></div>
     </header>
 
     <!-- Conteúdo Principal -->
-    <main id="main-content" class="flex-grow max-w-[1680px] w-full mx-auto px-4 xl:px-8 2xl:px-12 py-8 md:py-10">
+    <main id="main-content" class="flex-grow max-w-[1680px] w-full mx-auto px-4 xl:px-8 2xl:px-12 py-6 md:py-8">
+        
+        <!-- Alternador de Abas - Centralizado -->
+        <div class="flex justify-center mb-6">
+            <div class="flex tab-switcher p-1.5 rounded-2xl shadow-inner backdrop-blur-sm">
+                <button id="btn-grupos" class="header-tab-btn is-active">Fase de Grupos</button>
+                <button id="btn-mata-mata" class="header-tab-btn">Mata-mata</button>
+            </div>
+        </div>
+
         <div id="loading-overlay" class="flex flex-col items-center justify-center py-20 gap-4">
             <div class="w-10 h-10 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin"></div>
             <p id="loading-overlay-text" class="text-sm text-slate-500 dark:text-slate-400 font-medium"></p>
