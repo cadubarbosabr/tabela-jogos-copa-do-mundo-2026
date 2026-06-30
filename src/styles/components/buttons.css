@@ -1,0 +1,12 @@
+.knockout-controls {
+  align-items: center;
+}
+
+.knockout-view-toggle {
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.knockout-view-btn {
+  white-space: nowrap;
+}

@@ -1,0 +1,10 @@
+:root {
+  --card-width: clamp(11.25rem, 16vw, 13.75rem);
+  --card-width-max: 13.75rem;
+  --card-radius: 0.625rem;
+  --team-font-size: 0.6875rem;
+  --bracket-gap: 0.35rem;
+  --bracket-column-min: 9.25rem;
+  --score-input-size: 1.5rem;
+  --knockout-score-size: 2.1rem;
+}
