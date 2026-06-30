@@ -629,78 +629,140 @@ function renderKnockoutListView() {
 function renderKnockoutBracketView() {
     const t = translations.pt;
     const allMatchesById = new Map(estruturaNosMataMata.flatMap((fase) => fase.jogos.map((jogo) => [jogo.id, jogo])));
-    const getMatch = (id) => allMatchesById.get(id);
+    const m = (id) => allMatchesById.get(id);
+    const card = (id, phaseKey, side) => {
+        const match = m(id);
+        return match ? buildMiniMatchCard(match, { phaseKey, side }) : '';
+    };
 
-    const phases = [
-        {
-            key: 'round32',
-            label: t.round32,
-            short: '16 avos',
-            accent: 'rgb(59 130 246)',
-            cols: 4,
-            matchIds: [73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88]
-        },
-        {
-            key: 'round16',
-            label: t.round16,
-            short: 'Oitavas',
-            accent: 'rgb(139 92 246)',
-            cols: 4,
-            matchIds: [89, 90, 91, 92, 93, 94, 95, 96]
-        },
-        {
-            key: 'quarterFinals',
-            label: t.quarterFinals,
-            short: 'Quartas',
-            accent: 'rgb(236 72 153)',
-            cols: 4,
-            matchIds: [97, 98, 99, 100]
-        },
-        {
-            key: 'semiFinals',
-            label: t.semiFinals,
-            short: 'Semi',
-            accent: 'rgb(245 158 11)',
-            cols: 2,
-            matchIds: [101, 102]
-        },
-        {
-            key: 'final',
-            label: t.final,
-            short: 'Final',
-            accent: 'rgb(212 175 55)',
-            cols: 1,
-            matchIds: [104]
-        },
-        {
-            key: 'thirdPlace',
-            label: t.thirdPlace,
-            short: '3º Lugar',
-            accent: 'rgb(100 116 139)',
-            cols: 1,
-            matchIds: [103]
-        },
-    ];
+    // Left bracket (→ SF 101)
+    // R32 pairs feeding R16: (73,75)→89, (74,77)→90, (81,82)→93, (83,84)→94
+    // R16 pairs feeding QF: (89,90)→97, (93,94)→99
+    // QF pair feeding SF: (97,99)→101
+
+    // Right bracket (→ SF 102)
+    // R32 pairs feeding R16: (76,78)→91, (79,80)→92, (85,87)→95, (86,88)→96
+    // R16 pairs feeding QF: (91,92)→98, (95,96)→100
+    // QF pair feeding SF: (98,100)→102
 
     return `
-        <div class="bk-cascade">
-            ${phases.map(phase => {
-                const matches = phase.matchIds.map(id => getMatch(id)).filter(Boolean);
-                if (matches.length === 0) return '';
-                const cardSide = (phase.key === 'final' || phase.key === 'thirdPlace') ? 'final' : 'A';
-                return `
-                    <div class="bk-phase" data-phase="${phase.key}" style="--bk-accent: ${phase.accent}">
-                        <div class="bk-phase-header">
-                            <span class="bk-phase-badge">${phase.short}</span>
-                            <h4 class="bk-phase-title">${phase.label}</h4>
-                            <span class="bk-phase-count">${matches.length} jogo${matches.length > 1 ? 's' : ''}</span>
-                        </div>
-                        <div class="bk-phase-grid" style="--bk-cols: ${Math.min(matches.length, phase.cols)}">
-                            ${matches.map(m => buildMiniMatchCard(m, { phaseKey: phase.key, side: cardSide })).join('')}
-                        </div>
+        <div class="wcb-scroll">
+            <div class="wcb-phase-bar">
+                <span class="wcb-phase-label">${t.round32}</span>
+                <span class="wcb-phase-label">${t.round16}</span>
+                <span class="wcb-phase-label">${t.quarterFinals}</span>
+                <span class="wcb-phase-label">${t.semiFinals}</span>
+                <span class="wcb-phase-label wcb-phase-label-center">🏆 ${t.final}</span>
+                <span class="wcb-phase-label">${t.semiFinals}</span>
+                <span class="wcb-phase-label">${t.quarterFinals}</span>
+                <span class="wcb-phase-label">${t.round16}</span>
+                <span class="wcb-phase-label">${t.round32}</span>
+            </div>
+            <div class="wcb-bracket">
+
+                <!-- LEFT: Round of 32 (8 matches in 4 pairs) -->
+                <div class="wcb-col" data-side="left" data-phase="round32">
+                    <div class="wcb-bracket-pair">
+                        <div class="wcb-slot">${card(73, 'round32', 'A')}</div>
+                        <div class="wcb-slot">${card(75, 'round32', 'A')}</div>
                     </div>
-                `;
-            }).join('')}
+                    <div class="wcb-bracket-pair">
+                        <div class="wcb-slot">${card(74, 'round32', 'A')}</div>
+                        <div class="wcb-slot">${card(77, 'round32', 'A')}</div>
+                    </div>
+                    <div class="wcb-bracket-pair">
+                        <div class="wcb-slot">${card(81, 'round32', 'A')}</div>
+                        <div class="wcb-slot">${card(82, 'round32', 'A')}</div>
+                    </div>
+                    <div class="wcb-bracket-pair">
+                        <div class="wcb-slot">${card(83, 'round32', 'A')}</div>
+                        <div class="wcb-slot">${card(84, 'round32', 'A')}</div>
+                    </div>
+                </div>
+
+                <!-- LEFT: Round of 16 (4 matches in 2 pairs) -->
+                <div class="wcb-col" data-side="left" data-phase="round16">
+                    <div class="wcb-bracket-pair">
+                        <div class="wcb-slot">${card(89, 'round16', 'A')}</div>
+                        <div class="wcb-slot">${card(90, 'round16', 'A')}</div>
+                    </div>
+                    <div class="wcb-bracket-pair">
+                        <div class="wcb-slot">${card(93, 'round16', 'A')}</div>
+                        <div class="wcb-slot">${card(94, 'round16', 'A')}</div>
+                    </div>
+                </div>
+
+                <!-- LEFT: Quarter-finals (2 matches as a pair) -->
+                <div class="wcb-col" data-side="left" data-phase="quarterFinals">
+                    <div class="wcb-bracket-pair">
+                        <div class="wcb-slot">${card(97, 'quarterFinals', 'A')}</div>
+                        <div class="wcb-slot">${card(99, 'quarterFinals', 'A')}</div>
+                    </div>
+                </div>
+
+                <!-- LEFT: Semi-final (1 match) -->
+                <div class="wcb-col" data-side="left" data-phase="semiFinals">
+                    <div class="wcb-slot">${card(101, 'semiFinals', 'A')}</div>
+                </div>
+
+                <!-- CENTER: Final + Third Place -->
+                <div class="wcb-col wcb-center-col" data-side="center">
+                    <div class="wcb-center-final">
+                        <span class="wcb-center-label">🏆 ${t.final}</span>
+                        ${card(104, 'final', 'final')}
+                    </div>
+                    <div class="wcb-center-third">
+                        <span class="wcb-center-label">🥉 ${t.thirdPlace}</span>
+                        ${card(103, 'thirdPlace', 'final')}
+                    </div>
+                </div>
+
+                <!-- RIGHT: Semi-final (1 match) -->
+                <div class="wcb-col" data-side="right" data-phase="semiFinals">
+                    <div class="wcb-slot">${card(102, 'semiFinals', 'B')}</div>
+                </div>
+
+                <!-- RIGHT: Quarter-finals (2 matches as a pair) -->
+                <div class="wcb-col" data-side="right" data-phase="quarterFinals">
+                    <div class="wcb-bracket-pair">
+                        <div class="wcb-slot">${card(98, 'quarterFinals', 'B')}</div>
+                        <div class="wcb-slot">${card(100, 'quarterFinals', 'B')}</div>
+                    </div>
+                </div>
+
+                <!-- RIGHT: Round of 16 (4 matches in 2 pairs) -->
+                <div class="wcb-col" data-side="right" data-phase="round16">
+                    <div class="wcb-bracket-pair">
+                        <div class="wcb-slot">${card(91, 'round16', 'B')}</div>
+                        <div class="wcb-slot">${card(92, 'round16', 'B')}</div>
+                    </div>
+                    <div class="wcb-bracket-pair">
+                        <div class="wcb-slot">${card(95, 'round16', 'B')}</div>
+                        <div class="wcb-slot">${card(96, 'round16', 'B')}</div>
+                    </div>
+                </div>
+
+                <!-- RIGHT: Round of 32 (8 matches in 4 pairs) -->
+                <div class="wcb-col" data-side="right" data-phase="round32">
+                    <div class="wcb-bracket-pair">
+                        <div class="wcb-slot">${card(76, 'round32', 'B')}</div>
+                        <div class="wcb-slot">${card(78, 'round32', 'B')}</div>
+                    </div>
+                    <div class="wcb-bracket-pair">
+                        <div class="wcb-slot">${card(79, 'round32', 'B')}</div>
+                        <div class="wcb-slot">${card(80, 'round32', 'B')}</div>
+                    </div>
+                    <div class="wcb-bracket-pair">
+                        <div class="wcb-slot">${card(85, 'round32', 'B')}</div>
+                        <div class="wcb-slot">${card(87, 'round32', 'B')}</div>
+                    </div>
+                    <div class="wcb-bracket-pair">
+                        <div class="wcb-slot">${card(86, 'round32', 'B')}</div>
+                        <div class="wcb-slot">${card(88, 'round32', 'B')}</div>
+                    </div>
+                </div>
+
+            </div>
         </div>
     `;
 }
