@@ -408,7 +408,107 @@ function shouldAnimateAdvancedTeam(origin, teamName) {
     return isResolvedTeamName(teamName);
 }
 
-function buildKnockoutMatchCard(match, options = {}) {
+function renderScoreBadge(options = {}) {
+    const {
+        variant = 'mini',
+        matchId,
+        team = 'home',
+        value = '',
+        lockedAttrs = '',
+        lockedClasses = '',
+        ariaLabel = '',
+        winner = false
+    } = options;
+
+    if (variant === 'full') {
+        return `
+            <div class="knockout-score-wrap">
+                ${winner ? '<span class="knockout-qualified">➜</span>' : ''}
+                <input type="number" min="0" placeholder="-" value="${value}"
+                    oninput="window.setScoreInput(${matchId}, '${team}', this.value)"
+                    aria-label="${ariaLabel}"
+                    ${lockedAttrs}
+                    class="knockout-score-input${lockedClasses}">
+            </div>
+        `;
+    }
+
+    return `
+        <div class="kob-mini-score-wrap">
+            <input type="number" min="0" placeholder="–" value="${value}"
+                oninput="window.setScoreInput(${matchId}, '${team}', this.value)"
+                aria-label="${ariaLabel}"
+                ${lockedAttrs}
+                class="kob-mini-score${lockedClasses}">
+        </div>
+    `;
+}
+
+function renderTeamRow(options = {}) {
+    const {
+        variant = 'mini',
+        matchId,
+        teamKey = 'home',
+        teamName = '',
+        teamRawName = '',
+        scoreValue = '',
+        winner = false,
+        loser = false,
+        advanced = false,
+        lockedAttrs = '',
+        lockedClasses = '',
+        ariaLabel = ''
+    } = options;
+
+    const flagTag = getFlagTag(teamRawName);
+
+    if (variant === 'full') {
+        return `
+            <div class="knockout-team-row ${winner ? 'team-winner' : ''} ${advanced ? 'team-advanced' : ''}">
+                ${flagTag}
+                <span class="knockout-team-name">${teamName}</span>
+                ${renderScoreBadge({
+                    variant: 'full',
+                    matchId,
+                    team: teamKey,
+                    value: scoreValue,
+                    lockedAttrs,
+                    lockedClasses,
+                    ariaLabel,
+                    winner
+                })}
+            </div>
+        `;
+    }
+
+    return `
+        <div class="kob-mini-team ${winner ? 'kob-mini-winner' : loser ? 'kob-mini-loser' : ''}">
+            <div class="kob-mini-team-grid">
+                ${flagTag}
+                <span class="kob-mini-name">${teamName}</span>
+                ${renderScoreBadge({
+                    variant: 'mini',
+                    matchId,
+                    team: teamKey,
+                    value: scoreValue,
+                    lockedAttrs,
+                    lockedClasses,
+                    ariaLabel
+                })}
+            </div>
+        </div>
+    `;
+}
+
+function getMiniCardPhaseAccentClass(phaseKey) {
+    if (phaseKey === 'semiFinals') return ' kob-mini-semi';
+    if (phaseKey === 'final') return ' kob-mini-final';
+    if (phaseKey === 'thirdPlace') return ' kob-mini-third';
+    if (phaseKey === 'quarterFinals') return ' kob-mini-qf';
+    return '';
+}
+
+function renderKnockoutMatchCard(match, options = {}) {
     const {
         phaseKey = 'round32',
         side = 'A',
@@ -423,11 +523,9 @@ function buildKnockoutMatchCard(match, options = {}) {
     const sa = getScoreInput(match.id, 'away');
     const penH = getPenaltiesInput(match.id, 'home');
     const penA = getPenaltiesInput(match.id, 'away');
-    const { lockedAttrs, lockedClasses } = getMatchLockState(match.id);
-
+    const { lockedAttrs, lockedClasses, badgeLabel, badgeClass } = getMatchLockState(match.id);
     const homeDisplayName = translateTeam(translatePlaceholder(dadosCalculados.home, currentLang), currentLang);
     const awayDisplayName = translateTeam(translatePlaceholder(dadosCalculados.away, currentLang), currentLang);
-
     const winnerInfo = getWinnerInfo(match, dadosCalculados);
     const isEmpate = sh !== '' && sa !== '' && parseInt(sh, 10) === parseInt(sa, 10);
     const homeWinner = winnerInfo.winner === 'home';
@@ -446,8 +544,6 @@ function buildKnockoutMatchCard(match, options = {}) {
         (hasAdvancedHome || hasAdvancedAway) ? 'knockout-card-progressed' : ''
     ].filter(Boolean).join(' ');
 
-    const { badgeLabel, badgeClass } = getMatchLockState(match.id);
-    const matchDate = normalizeMatchDate(match.data);
     const penaltiesInline = isEmpate
         ? `<span class="knockout-penalties-inline">${t.penalties} <input type="number" placeholder="P" value="${penH}" oninput="window.setPenaltiesInput(${match.id}, 'home', this.value)" aria-label="${t.penalties} ${homeDisplayName}" ${lockedAttrs} class="knockout-penalty-input${lockedClasses}">-<input type="number" placeholder="P" value="${penA}" oninput="window.setPenaltiesInput(${match.id}, 'away', this.value)" aria-label="${t.penalties} ${awayDisplayName}" ${lockedAttrs} class="knockout-penalty-input${lockedClasses}"></span>`
         : '';
@@ -456,44 +552,39 @@ function buildKnockoutMatchCard(match, options = {}) {
         <article class="${cardClass}">
             <header class="knockout-match-header">
                 <span>${t.confrontation} #${match.id}</span>
-                <span>${matchDate} · ${match.hora}</span>
+                <span>${normalizeMatchDate(match.data)} · ${match.hora}</span>
             </header>
             <div class="knockout-badge-row">
                 <span class="match-badge ${badgeClass}">${badgeLabel}</span>
             </div>
-
             <div class="knockout-match-teams">
-                <div class="knockout-team-row ${homeWinner ? 'team-winner' : ''} ${hasAdvancedHome ? 'team-advanced' : ''}">
-                    <div class="knockout-team-label">
-                        ${getFlagTag(dadosCalculados.home)}
-                        <span class="truncate">${homeDisplayName}</span>
-                    </div>
-                    <div class="knockout-score-wrap">
-                        ${homeWinner ? '<span class="knockout-qualified">➜</span>' : ''}
-                        <input type="number" min="0" placeholder="-" value="${sh}"
-                            oninput="window.setScoreInput(${match.id}, 'home', this.value)"
-                            aria-label="${t.tableVs} ${homeDisplayName}"
-                            ${lockedAttrs}
-                            class="knockout-score-input${lockedClasses}">
-                    </div>
-                </div>
-
-                <div class="knockout-team-row ${awayWinner ? 'team-winner' : ''} ${hasAdvancedAway ? 'team-advanced' : ''}">
-                    <div class="knockout-team-label">
-                        ${getFlagTag(dadosCalculados.away)}
-                        <span class="truncate">${awayDisplayName}</span>
-                    </div>
-                    <div class="knockout-score-wrap">
-                        ${awayWinner ? '<span class="knockout-qualified">➜</span>' : ''}
-                        <input type="number" min="0" placeholder="-" value="${sa}"
-                            oninput="window.setScoreInput(${match.id}, 'away', this.value)"
-                            aria-label="${t.tableVs} ${awayDisplayName}"
-                            ${lockedAttrs}
-                            class="knockout-score-input${lockedClasses}">
-                    </div>
-                </div>
+                ${renderTeamRow({
+                    variant: 'full',
+                    matchId: match.id,
+                    teamKey: 'home',
+                    teamName: homeDisplayName,
+                    teamRawName: dadosCalculados.home,
+                    scoreValue: sh,
+                    winner: homeWinner,
+                    advanced: hasAdvancedHome,
+                    lockedAttrs,
+                    lockedClasses,
+                    ariaLabel: `${t.tableVs} ${homeDisplayName}`
+                })}
+                ${renderTeamRow({
+                    variant: 'full',
+                    matchId: match.id,
+                    teamKey: 'away',
+                    teamName: awayDisplayName,
+                    teamRawName: dadosCalculados.away,
+                    scoreValue: sa,
+                    winner: awayWinner,
+                    advanced: hasAdvancedAway,
+                    lockedAttrs,
+                    lockedClasses,
+                    ariaLabel: `${t.tableVs} ${awayDisplayName}`
+                })}
             </div>
-
             <footer class="knockout-match-footer">
                 <span class="truncate">${match.local}</span>
                 <span class="knockout-footer-right">${winnerInfo.decidedByPenalties ? '<span class="knockout-pen-badge">P</span>' : ''}${penaltiesInline}</span>
@@ -502,7 +593,7 @@ function buildKnockoutMatchCard(match, options = {}) {
     `;
 }
 
-function buildMiniMatchCard(match, options = {}) {
+function renderMatchCard(match, options = {}) {
     const { phaseKey = 'round32', side = 'A' } = options;
     const t = translations.pt;
     const dadosCalculados = mapaMataMataCalculado[match.id] || { home: 'A definir', away: 'A definir' };
@@ -511,68 +602,60 @@ function buildMiniMatchCard(match, options = {}) {
     const penH = getPenaltiesInput(match.id, 'home');
     const penA = getPenaltiesInput(match.id, 'away');
     const { lockedAttrs, lockedClasses } = getMatchLockState(match.id);
-
     const homeDisplayName = translateTeam(translatePlaceholder(dadosCalculados.home, currentLang), currentLang);
     const awayDisplayName = translateTeam(translatePlaceholder(dadosCalculados.away, currentLang), currentLang);
-
     const winnerInfo = getWinnerInfo(match, dadosCalculados);
     const isEmpate = sh !== '' && sa !== '' && parseInt(sh, 10) === parseInt(sa, 10);
     const homeWinner = winnerInfo.winner === 'home';
     const awayWinner = winnerInfo.winner === 'away';
-
-    const resolvedClass = winnerInfo.winner ? ' kob-mini-resolved' : '';
-    const phaseAccentClass = phaseKey === 'semiFinals' ? ' kob-mini-semi'
-        : phaseKey === 'final' ? ' kob-mini-final'
-        : phaseKey === 'thirdPlace' ? ' kob-mini-third'
-        : phaseKey === 'quarterFinals' ? ' kob-mini-qf'
-        : '';
-    const sideClass = side === 'B' ? ' kob-mini-side-b' : side === 'final' ? ' kob-mini-side-final' : '';
-
     const penaltiesHtml = isEmpate
         ? `<div class="kob-mini-pen">${t.penalties.replace(':', '')} <input type="number" placeholder="P" value="${penH}" oninput="window.setPenaltiesInput(${match.id}, 'home', this.value)" aria-label="${t.penalties} ${homeDisplayName}" ${lockedAttrs} class="kob-mini-pen-input${lockedClasses}">-<input type="number" placeholder="P" value="${penA}" oninput="window.setPenaltiesInput(${match.id}, 'away', this.value)" aria-label="${t.penalties} ${awayDisplayName}" ${lockedAttrs} class="kob-mini-pen-input${lockedClasses}"></div>`
         : '';
-
+    const sideClass = side === 'B' ? ' kob-mini-side-b' : side === 'final' ? ' kob-mini-side-final' : '';
     const matchShortDate = match.data ? match.data.slice(0, 5) + '/26' : '';
+    const cardClass = [
+        'kob-mini-card',
+        winnerInfo.winner ? 'kob-mini-resolved' : '',
+        getMiniCardPhaseAccentClass(phaseKey).trim(),
+        sideClass.trim()
+    ].filter(Boolean).join(' ');
 
     return `
-        <article class="kob-mini-card${resolvedClass}${phaseAccentClass}${sideClass}">
+        <article class="${cardClass}">
             <div class="kob-mini-header">
                 <span class="kob-mini-date">${matchShortDate} · ${match.hora}</span>
                 <span class="kob-mini-local">${match.local || ''}</span>
             </div>
             <div class="kob-mini-teams">
-                <div class="kob-mini-team ${homeWinner ? 'kob-mini-winner' : awayWinner ? 'kob-mini-loser' : ''}">
-                    <div class="kob-mini-team-info">
-                        ${getFlagTag(dadosCalculados.home)}
-                        <span class="kob-mini-name">${homeDisplayName}</span>
-                    </div>
-                    <div class="kob-mini-score-wrap">
-                        <input type="number" min="0" placeholder="–" value="${sh}"
-                            oninput="window.setScoreInput(${match.id}, 'home', this.value)"
-                            aria-label="${t.tableVs} ${homeDisplayName}"
-                            ${lockedAttrs}
-                            class="kob-mini-score${lockedClasses}">
-                    </div>
-                </div>
-                <div class="kob-mini-team ${awayWinner ? 'kob-mini-winner' : homeWinner ? 'kob-mini-loser' : ''}">
-                    <div class="kob-mini-team-info">
-                        ${getFlagTag(dadosCalculados.away)}
-                        <span class="kob-mini-name">${awayDisplayName}</span>
-                    </div>
-                    <div class="kob-mini-score-wrap">
-                        <input type="number" min="0" placeholder="–" value="${sa}"
-                            oninput="window.setScoreInput(${match.id}, 'away', this.value)"
-                            aria-label="${t.tableVs} ${awayDisplayName}"
-                            ${lockedAttrs}
-                            class="kob-mini-score${lockedClasses}">
-                    </div>
-                </div>
+                ${renderTeamRow({
+                    matchId: match.id,
+                    teamKey: 'home',
+                    teamName: homeDisplayName,
+                    teamRawName: dadosCalculados.home,
+                    scoreValue: sh,
+                    winner: homeWinner,
+                    loser: awayWinner,
+                    lockedAttrs,
+                    lockedClasses,
+                    ariaLabel: `${t.tableVs} ${homeDisplayName}`
+                })}
+                ${renderTeamRow({
+                    matchId: match.id,
+                    teamKey: 'away',
+                    teamName: awayDisplayName,
+                    teamRawName: dadosCalculados.away,
+                    scoreValue: sa,
+                    winner: awayWinner,
+                    loser: homeWinner,
+                    lockedAttrs,
+                    lockedClasses,
+                    ariaLabel: `${t.tableVs} ${awayDisplayName}`
+                })}
             </div>
             ${penaltiesHtml}
         </article>
     `;
 }
-
 
 function ensureKnockoutViewMode() {
     if (knockoutViewMode === 'bracket' || knockoutViewMode === 'list') return;
@@ -617,7 +700,7 @@ function renderKnockoutListView() {
                             <span class="bk-phase-count">${count} jogo${count > 1 ? 's' : ''}</span>
                         </div>
                         <div class="bk-phase-grid" style="--bk-cols: ${Math.min(count, 4)}">
-                            ${fase.jogos.map((match) => buildMiniMatchCard(match, { phaseKey, compact: true })).join('')}
+                            ${fase.jogos.map((match) => renderMatchCard(match, { phaseKey, compact: true })).join('')}
                         </div>
                     </div>
                 `;
@@ -626,142 +709,81 @@ function renderKnockoutListView() {
     `;
 }
 
+function renderBracketColumn(options = {}) {
+    const { side = 'left', phaseKey = '', slotGroups = [], cardRenderer, centerContent = '' } = options;
+    const baseClass = side === 'center' ? 'wcb-col wcb-center-col' : 'wcb-col';
+    if (side === 'center') {
+        return `<div class="${baseClass}" data-side="center">${centerContent}</div>`;
+    }
+
+    const groupsHtml = slotGroups.map((group) => {
+        if (group.length <= 1) {
+            return `<div class="wcb-slot">${cardRenderer(group[0], phaseKey, side === 'right' ? 'B' : 'A')}</div>`;
+        }
+
+        return `
+            <div class="wcb-bracket-pair">
+                ${group.map((matchId) => `<div class="wcb-slot">${cardRenderer(matchId, phaseKey, side === 'right' ? 'B' : 'A')}</div>`).join('')}
+            </div>
+        `;
+    }).join('');
+
+    return `<div class="${baseClass}" data-side="${side}" data-phase="${phaseKey}">${groupsHtml}</div>`;
+}
+
 function renderKnockoutBracketView() {
+    const CENTER_COLUMN_INDEX = 4;
     const t = translations.pt;
     const allMatchesById = new Map(estruturaNosMataMata.flatMap((fase) => fase.jogos.map((jogo) => [jogo.id, jogo])));
     const m = (id) => allMatchesById.get(id);
     const card = (id, phaseKey, side) => {
         const match = m(id);
-        return match ? buildMiniMatchCard(match, { phaseKey, side }) : '';
+        return match ? renderMatchCard(match, { phaseKey, side }) : '';
     };
 
-    // Left bracket (→ SF 101)
-    // R32 pairs feeding R16: (73,75)→89, (74,77)→90, (81,82)→93, (83,84)→94
-    // R16 pairs feeding QF: (89,90)→97, (93,94)→99
-    // QF pair feeding SF: (97,99)→101
+    const phaseLabels = [
+        t.round32,
+        t.round16,
+        t.quarterFinals,
+        t.semiFinals,
+        `🏆 ${t.final}`,
+        t.semiFinals,
+        t.quarterFinals,
+        t.round16,
+        t.round32
+    ];
 
-    // Right bracket (→ SF 102)
-    // R32 pairs feeding R16: (76,78)→91, (79,80)→92, (85,87)→95, (86,88)→96
-    // R16 pairs feeding QF: (91,92)→98, (95,96)→100
-    // QF pair feeding SF: (98,100)→102
+    const columns = [
+        { side: 'left', phaseKey: 'round32', slotGroups: [[73, 75], [74, 77], [81, 82], [83, 84]] },
+        { side: 'left', phaseKey: 'round16', slotGroups: [[89, 90], [93, 94]] },
+        { side: 'left', phaseKey: 'quarterFinals', slotGroups: [[97, 99]] },
+        { side: 'left', phaseKey: 'semiFinals', slotGroups: [[101]] },
+        {
+            side: 'center',
+            centerContent: `
+                <div class="wcb-center-final">
+                    <span class="wcb-center-label">🏆 ${t.final}</span>
+                    ${card(104, 'final', 'final')}
+                </div>
+                <div class="wcb-center-third">
+                    <span class="wcb-center-label">🥉 ${t.thirdPlace}</span>
+                    ${card(103, 'thirdPlace', 'final')}
+                </div>
+            `
+        },
+        { side: 'right', phaseKey: 'semiFinals', slotGroups: [[102]] },
+        { side: 'right', phaseKey: 'quarterFinals', slotGroups: [[98, 100]] },
+        { side: 'right', phaseKey: 'round16', slotGroups: [[91, 92], [95, 96]] },
+        { side: 'right', phaseKey: 'round32', slotGroups: [[76, 78], [79, 80], [85, 87], [86, 88]] }
+    ];
 
     return `
         <div class="wcb-scroll">
             <div class="wcb-phase-bar">
-                <span class="wcb-phase-label">${t.round32}</span>
-                <span class="wcb-phase-label">${t.round16}</span>
-                <span class="wcb-phase-label">${t.quarterFinals}</span>
-                <span class="wcb-phase-label">${t.semiFinals}</span>
-                <span class="wcb-phase-label wcb-phase-label-center">🏆 ${t.final}</span>
-                <span class="wcb-phase-label">${t.semiFinals}</span>
-                <span class="wcb-phase-label">${t.quarterFinals}</span>
-                <span class="wcb-phase-label">${t.round16}</span>
-                <span class="wcb-phase-label">${t.round32}</span>
+                ${phaseLabels.map((label, index) => `<span class="wcb-phase-label ${index === CENTER_COLUMN_INDEX ? 'wcb-phase-label-center' : ''}">${label}</span>`).join('')}
             </div>
             <div class="wcb-bracket">
-
-                <!-- LEFT: Round of 32 (8 matches in 4 pairs) -->
-                <div class="wcb-col" data-side="left" data-phase="round32">
-                    <div class="wcb-bracket-pair">
-                        <div class="wcb-slot">${card(73, 'round32', 'A')}</div>
-                        <div class="wcb-slot">${card(75, 'round32', 'A')}</div>
-                    </div>
-                    <div class="wcb-bracket-pair">
-                        <div class="wcb-slot">${card(74, 'round32', 'A')}</div>
-                        <div class="wcb-slot">${card(77, 'round32', 'A')}</div>
-                    </div>
-                    <div class="wcb-bracket-pair">
-                        <div class="wcb-slot">${card(81, 'round32', 'A')}</div>
-                        <div class="wcb-slot">${card(82, 'round32', 'A')}</div>
-                    </div>
-                    <div class="wcb-bracket-pair">
-                        <div class="wcb-slot">${card(83, 'round32', 'A')}</div>
-                        <div class="wcb-slot">${card(84, 'round32', 'A')}</div>
-                    </div>
-                </div>
-
-                <!-- LEFT: Round of 16 (4 matches in 2 pairs) -->
-                <div class="wcb-col" data-side="left" data-phase="round16">
-                    <div class="wcb-bracket-pair">
-                        <div class="wcb-slot">${card(89, 'round16', 'A')}</div>
-                        <div class="wcb-slot">${card(90, 'round16', 'A')}</div>
-                    </div>
-                    <div class="wcb-bracket-pair">
-                        <div class="wcb-slot">${card(93, 'round16', 'A')}</div>
-                        <div class="wcb-slot">${card(94, 'round16', 'A')}</div>
-                    </div>
-                </div>
-
-                <!-- LEFT: Quarter-finals (2 matches as a pair) -->
-                <div class="wcb-col" data-side="left" data-phase="quarterFinals">
-                    <div class="wcb-bracket-pair">
-                        <div class="wcb-slot">${card(97, 'quarterFinals', 'A')}</div>
-                        <div class="wcb-slot">${card(99, 'quarterFinals', 'A')}</div>
-                    </div>
-                </div>
-
-                <!-- LEFT: Semi-final (1 match) -->
-                <div class="wcb-col" data-side="left" data-phase="semiFinals">
-                    <div class="wcb-slot">${card(101, 'semiFinals', 'A')}</div>
-                </div>
-
-                <!-- CENTER: Final + Third Place -->
-                <div class="wcb-col wcb-center-col" data-side="center">
-                    <div class="wcb-center-final">
-                        <span class="wcb-center-label">🏆 ${t.final}</span>
-                        ${card(104, 'final', 'final')}
-                    </div>
-                    <div class="wcb-center-third">
-                        <span class="wcb-center-label">🥉 ${t.thirdPlace}</span>
-                        ${card(103, 'thirdPlace', 'final')}
-                    </div>
-                </div>
-
-                <!-- RIGHT: Semi-final (1 match) -->
-                <div class="wcb-col" data-side="right" data-phase="semiFinals">
-                    <div class="wcb-slot">${card(102, 'semiFinals', 'B')}</div>
-                </div>
-
-                <!-- RIGHT: Quarter-finals (2 matches as a pair) -->
-                <div class="wcb-col" data-side="right" data-phase="quarterFinals">
-                    <div class="wcb-bracket-pair">
-                        <div class="wcb-slot">${card(98, 'quarterFinals', 'B')}</div>
-                        <div class="wcb-slot">${card(100, 'quarterFinals', 'B')}</div>
-                    </div>
-                </div>
-
-                <!-- RIGHT: Round of 16 (4 matches in 2 pairs) -->
-                <div class="wcb-col" data-side="right" data-phase="round16">
-                    <div class="wcb-bracket-pair">
-                        <div class="wcb-slot">${card(91, 'round16', 'B')}</div>
-                        <div class="wcb-slot">${card(92, 'round16', 'B')}</div>
-                    </div>
-                    <div class="wcb-bracket-pair">
-                        <div class="wcb-slot">${card(95, 'round16', 'B')}</div>
-                        <div class="wcb-slot">${card(96, 'round16', 'B')}</div>
-                    </div>
-                </div>
-
-                <!-- RIGHT: Round of 32 (8 matches in 4 pairs) -->
-                <div class="wcb-col" data-side="right" data-phase="round32">
-                    <div class="wcb-bracket-pair">
-                        <div class="wcb-slot">${card(76, 'round32', 'B')}</div>
-                        <div class="wcb-slot">${card(78, 'round32', 'B')}</div>
-                    </div>
-                    <div class="wcb-bracket-pair">
-                        <div class="wcb-slot">${card(79, 'round32', 'B')}</div>
-                        <div class="wcb-slot">${card(80, 'round32', 'B')}</div>
-                    </div>
-                    <div class="wcb-bracket-pair">
-                        <div class="wcb-slot">${card(85, 'round32', 'B')}</div>
-                        <div class="wcb-slot">${card(87, 'round32', 'B')}</div>
-                    </div>
-                    <div class="wcb-bracket-pair">
-                        <div class="wcb-slot">${card(86, 'round32', 'B')}</div>
-                        <div class="wcb-slot">${card(88, 'round32', 'B')}</div>
-                    </div>
-                </div>
-
+                ${columns.map((column) => renderBracketColumn({ ...column, cardRenderer: card })).join('')}
             </div>
         </div>
     `;

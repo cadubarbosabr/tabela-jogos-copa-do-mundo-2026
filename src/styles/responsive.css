@@ -1,0 +1,29 @@
+@media (max-width: 1279px) {
+  .wcb-phase-bar,
+  .wcb-bracket {
+    grid-template-columns: repeat(9, minmax(8.5rem, 1fr));
+  }
+}
+
+@media (max-width: 1024px) {
+  .wcb-phase-bar,
+  .wcb-bracket {
+    grid-template-columns: repeat(9, minmax(8rem, 1fr));
+  }
+}
+
+@media (max-width: 767px) {
+  .bk-phase-grid {
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, var(--card-width-min)), 1fr));
+    gap: 0.5rem;
+  }
+
+  .kob-mini-card {
+    max-width: none;
+  }
+
+  .wcb-phase-bar,
+  .wcb-bracket {
+    grid-template-columns: repeat(9, minmax(7.5rem, 1fr));
+  }
+}

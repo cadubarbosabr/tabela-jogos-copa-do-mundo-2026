@@ -1,0 +1,59 @@
+.bk-phase-grid {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, var(--card-width-max)), 1fr));
+}
+
+.wcb-scroll {
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding-block: 0.25rem 0.75rem;
+  container-type: inline-size;
+}
+
+.wcb-phase-bar,
+.wcb-bracket {
+  min-width: max-content;
+}
+
+.wcb-phase-bar {
+  display: grid;
+  grid-template-columns: repeat(9, minmax(var(--bracket-column-min), 1fr));
+  gap: var(--bracket-gap);
+}
+
+.wcb-phase-label {
+  min-width: 0;
+}
+
+.wcb-bracket {
+  display: grid;
+  grid-template-columns: repeat(9, minmax(var(--bracket-column-min), 1fr));
+  gap: var(--bracket-gap);
+  align-items: stretch;
+  height: unset;
+}
+
+.wcb-col {
+  min-width: 0;
+  max-width: none;
+  display: grid;
+  align-content: space-around;
+  gap: 0.4rem;
+}
+
+.wcb-center-col {
+  min-width: 0;
+  max-width: none;
+}
+
+.wcb-slot {
+  min-width: 0;
+  padding: 0.2rem;
+}
+
+.wcb-bracket-pair {
+  min-width: 0;
+}
+
+.wcb-bracket-pair .wcb-slot {
+  flex: unset;
+}
