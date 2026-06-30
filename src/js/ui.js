@@ -199,7 +199,6 @@ export function renderTablesGrid() {
         div.innerHTML = `
             <h3 class="text-base font-extrabold text-slate-950 dark:text-slate-100 uppercase tracking-[0.24em] mb-4 border-b border-slate-200/80 dark:border-slate-800/80 pb-3 flex justify-between items-center gap-3">
                 <span>${t.groupTitle} ${g}</span>
-                <span class="standings-live-badge">${t.liveClass}</span>
             </h3>
             <table class="w-full text-left">
                 <thead>
