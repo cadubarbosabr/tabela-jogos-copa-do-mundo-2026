@@ -126,6 +126,7 @@ export function recalcularTorneioCompleto() {
                     if (assignedGroup) {
                         const team = terceirosQualificados.find(t => t.group === assignedGroup);
                         timeAway = team ? team.name : `3º Grupo ${assignedGroup}`;
+                        if (team) terceirosAlocados.add(team.name);
                     } else {
                         // Fallback: qualquer 3º ainda não alocado
                         const sobrou = terceirosQualificados.find(t => !terceirosAlocados.has(t.name));

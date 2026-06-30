@@ -478,7 +478,11 @@ function resolveKnockoutTeam(orig, gruposClassificacao, terceirosQualificados, r
       const assignedGroup = ANNEX_C[key]?.[slot];
       if (assignedGroup) {
         const team = terceirosQualificados.find(t => t.group === assignedGroup);
-        return team?.name ?? null;
+        if (team) {
+          allocated.add(team.name);
+          return team.name;
+        }
+        return null;
       }
     }
     // Fallback: alocação gulosa com restrição de grupo
