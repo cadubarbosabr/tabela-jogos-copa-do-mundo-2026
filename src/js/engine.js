@@ -83,6 +83,9 @@ export function recalcularTorneioCompleto() {
     // 5. Resolver Chaveamento Dinâmico do Mata-Mata jogo por jogo
     mapaMataMataCalculado = {};
 
+    // Rastreia os 3ºs colocados já atribuídos a um confronto, evitando duplicações.
+    const terceirosAlocados = new Set();
+
     estruturaNosMataMata.forEach(faseObj => {
         faseObj.jogos.forEach(j => {
             let timeHome = "A definir";
@@ -113,18 +116,20 @@ export function recalcularTorneioCompleto() {
                     timeAway = `${pos}º Grupo ${grp}`;
                 }
             } else if (j.origAway.tipo === "terceiro") {
-                // Alocação gulosa: melhor 3º elegível ainda não atribuído a outro jogo
-                const timesJaAlocados = new Set(
-                    Object.values(mapaMataMataCalculado).flatMap(m => [m.home, m.away])
-                );
+                // Alocação gulosa: melhor 3º elegível (dentro dos grupos permitidos)
+                // ainda não atribuído a outro confronto desta fase.
                 const elegiveis = terceirosQualificados.filter(t =>
-                    j.origAway.grps.includes(t.group) && !timesJaAlocados.has(t.name)
+                    j.origAway.grps.includes(t.group) && !terceirosAlocados.has(t.name)
                 );
                 if (elegiveis.length > 0) {
                     timeAway = elegiveis[0].name;
+                    terceirosAlocados.add(elegiveis[0].name);
                 } else {
-                    const sobrou = terceirosQualificados.find(t => !timesJaAlocados.has(t.name));
+                    // Fallback último recurso: qualquer 3º ainda não alocado,
+                    // sem restrição de grupo, para não deixar a vaga vazia.
+                    const sobrou = terceirosQualificados.find(t => !terceirosAlocados.has(t.name));
                     timeAway = sobrou ? sobrou.name : `3º Grupo ${j.origAway.grps[0]}`;
+                    if (sobrou) terceirosAlocados.add(sobrou.name);
                 }
             } else if (j.origAway.tipo === "venc") {
                 timeAway = calcularVencedorMataMata(j.origAway.j);
