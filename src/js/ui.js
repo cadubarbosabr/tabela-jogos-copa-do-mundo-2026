@@ -400,12 +400,14 @@ const knockoutRadialTrophyOuterRadius = 58;
 const knockoutRadialTrophyInnerRadius = 48;
 const knockoutRadialTrophyStrokeWidth = 3;
 const knockoutRadialTrophyInnerStrokeWidth = 2;
+const knockoutRadialClipRadius = 26;
 const defaultNodeAccentColor = 'rgba(148, 163, 184, 0.9)';
 const fallbackColorSaturation = 72;
 const fallbackColorLightness = 56;
 const connectorCurveIntensity = 0.15;
 const knockoutRadialLabelRadii = [420, 320, 230, 155, 0];
 
+let knockoutRadialGradientCounter = 0;
 let knockoutViewMode = localStorage.getItem('wc2026_knockout_view');
 
 function getKnockoutPhaseKey(faseNome) {
@@ -810,14 +812,15 @@ function renderKnockoutRadialView() {
     // Phase labels for each layer
     const phaseLabels = [t.bracketR32, t.bracketR16, t.bracketQF, t.bracketSF, ''];
 
-    // Generate unique IDs for gradients
-    const gradientId = `radial-glow-${Date.now()}`;
+    // Generate unique IDs for gradients using counter
+    knockoutRadialGradientCounter += 1;
+    const gradientId = `radial-glow-${knockoutRadialGradientCounter}`;
 
     // SVG Definitions (gradients, filters, etc.)
     const svgDefs = `
         <defs>
             <!-- Glow filter for resolved nodes -->
-            <filter id="node-glow" x="-50%" y="-50%" width="200%" height="200%">
+            <filter id="node-glow-${gradientId}" x="-50%" y="-50%" width="200%" height="200%">
                 <feGaussianBlur in="SourceAlpha" stdDeviation="4" result="blur"/>
                 <feFlood flood-color="#facc15" flood-opacity="0.6"/>
                 <feComposite in2="blur" operator="in"/>
@@ -828,12 +831,12 @@ function renderKnockoutRadialView() {
             </filter>
             
             <!-- Subtle drop shadow for nodes -->
-            <filter id="node-shadow" x="-30%" y="-30%" width="160%" height="160%">
+            <filter id="node-shadow-${gradientId}" x="-30%" y="-30%" width="160%" height="160%">
                 <feDropShadow dx="0" dy="3" stdDeviation="4" flood-color="rgba(0,0,0,0.25)"/>
             </filter>
             
             <!-- Trophy glow effect -->
-            <filter id="trophy-glow" x="-100%" y="-100%" width="300%" height="300%">
+            <filter id="trophy-glow-${gradientId}" x="-100%" y="-100%" width="300%" height="300%">
                 <feGaussianBlur in="SourceAlpha" stdDeviation="8" result="blur"/>
                 <feFlood flood-color="#fbbf24" flood-opacity="0.5"/>
                 <feComposite in2="blur" operator="in"/>
@@ -903,7 +906,7 @@ function renderKnockoutRadialView() {
             const outerFill = isResolved 
                 ? 'rgba(255,255,255,0.98)' 
                 : 'rgba(30, 41, 59, 0.45)';
-            const filterAttr = isResolved ? 'filter="url(#node-glow)"' : 'filter="url(#node-shadow)"';
+            const filterAttr = isResolved ? `filter="url(#node-glow-${gradientId})"` : `filter="url(#node-shadow-${gradientId})"`;
             const glowClass = isResolved ? 'radial-node-resolved' : '';
             
             return `
@@ -921,7 +924,7 @@ function renderKnockoutRadialView() {
                     
                     <!-- Flag or fallback badge -->
                     ${flagUrl 
-                        ? `<clipPath id="clip-${nodeId}"><circle r="26" /></clipPath>
+                        ? `<clipPath id="clip-${nodeId}"><circle r="${knockoutRadialClipRadius}" /></clipPath>
                            <image href="${flagUrl}" x="-28" y="-20" width="56" height="38" 
                                 preserveAspectRatio="xMidYMid slice" clip-path="url(#clip-${nodeId})"></image>` 
                         : `<text x="0" y="4" text-anchor="middle" font-size="14" fill="rgba(248,250,252,0.85)" font-weight="700">${fallbackBadgeText}</text>
@@ -991,7 +994,7 @@ function renderKnockoutRadialView() {
 
     // Enhanced trophy center with golden glow
     const trophyMarkup = `
-        <g class="radial-trophy" transform="translate(${center} ${center})" filter="url(#trophy-glow)">
+        <g class="radial-trophy" transform="translate(${center} ${center})" filter="url(#trophy-glow-${gradientId})">
             <!-- Outer golden ring -->
             <circle r="${knockoutRadialTrophyOuterRadius}" 
                 fill="url(#${gradientId}-trophy)" 
@@ -1004,8 +1007,8 @@ function renderKnockoutRadialView() {
                 stroke="rgba(245, 158, 11, 0.6)" 
                 stroke-width="${knockoutRadialTrophyInnerStrokeWidth}"></circle>
             
-            <!-- Trophy emoji/icon -->
-            <text x="0" y="12" text-anchor="middle" font-size="36">🏆</text>
+            <!-- Trophy emoji/icon with accessibility -->
+            <text x="0" y="12" text-anchor="middle" font-size="36" role="img" aria-label="Trophy">🏆</text>
         </g>
     `;
 

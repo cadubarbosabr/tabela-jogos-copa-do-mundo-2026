@@ -1180,6 +1180,7 @@ input[type=number] { -moz-appearance: textfield; }
    RADIAL KNOCKOUT VIEW
    ========================================================= */
 .knockout-radial-shell {
+  --radial-drag-scale: 1.01;
   display: grid;
   gap: 1rem;
   padding: 1rem 0 0.5rem;
@@ -1248,7 +1249,7 @@ input[type=number] { -moz-appearance: textfield; }
 
 .knockout-radial-stage.is-dragging {
   cursor: grabbing;
-  transform: scale(1.01);
+  transform: scale(var(--radial-drag-scale));
 }
 
 .dark .knockout-radial-stage {
