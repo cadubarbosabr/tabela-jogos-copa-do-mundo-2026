@@ -387,6 +387,23 @@ export function renderGroupStage() {
 }
 
 const fifaWorldCupTrophyImageUrl = 'https://www.edigitalagency.com.au/wp-content/uploads/new-FIFA-World-Cup-2026-logo-white-PNG-small-size.png';
+const knockoutRadialStageSize = 1000;
+const knockoutRadialRotationSensitivity = 0.6;
+const knockoutRadialLayerRadii = [360, 270, 190, 120, 72];
+const knockoutRadialStartAngleDegrees = -90;
+const knockoutRadialFullCircleDegrees = 360;
+const knockoutRadialNodeOuterRadius = 44;
+const knockoutRadialNodeInnerRadius = 34;
+const knockoutRadialNodeStrokeWidth = 4;
+const knockoutRadialNodeInnerStrokeWidth = 1.5;
+const knockoutRadialTrophyOuterRadius = 92;
+const knockoutRadialTrophyInnerRadius = 78;
+const knockoutRadialTrophyStrokeWidth = 3;
+const knockoutRadialTrophyInnerStrokeWidth = 2;
+const defaultNodeAccentColor = 'rgba(148, 163, 184, 0.9)';
+const fallbackColorSaturation = 72;
+const fallbackColorLightness = 56;
+const connectorCurveIntensity = 0.12;
 
 let knockoutViewMode = localStorage.getItem('wc2026_knockout_view');
 
@@ -622,98 +639,106 @@ function buildMiniMatchCard(match, options = {}) {
 
 let knockoutRadialRotation = 0;
 
+function normalizeTeamName(teamName = '') {
+    // Strip combining marks so accented names can be matched against the palette keys.
+    return teamName
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .toLowerCase();
+}
+
 function getTeamAccentColor(teamName) {
-    if (!teamName) return 'rgba(148, 163, 184, 0.9)';
+    if (!teamName) return defaultNodeAccentColor;
 
     const palette = {
         "brasil": '#1f9d4f',
         "argentina": '#74acdf',
-        "frança": '#1d4ed8',
+        "franca": '#1d4ed8',
         "alemanha": '#000000',
         "inglaterra": '#1d4ed8',
         "espanha": '#facc15',
         "holanda": '#ff6600',
-        "itália": '#008c45',
+        "italia": '#008c45',
         "portugal": '#0f766e',
         "uruguai": '#7c2d12',
-        "méxico": '#006847',
-        "canadá": '#ff0000',
+        "mexico": '#006847',
+        "canada": '#ff0000',
         "estados unidos": '#bf0a30',
-        "japão": '#bc002d',
+        "japao": '#bc002d',
         "coreia do sul": '#e11d48',
-        "austrália": '#0a6b28',
+        "australia": '#0a6b28',
         "marrocos": '#c1272d',
         "senegal": '#0d6e2b',
         "egito": '#f6b400',
-        "colômbia": '#fcd116',
-        "croácia": '#ff0000',
+        "colombia": '#fcd116',
+        "croacia": '#ff0000',
         "turquia": '#e30a17',
-        "bélgica": '#fae042',
+        "belgica": '#fae042',
         "costa do marfim": '#f77f00',
-        "equador": '#f9e300',
-        "irã": '#239f40',
-        "suíça": '#ff0000',
-        "bósnia e herzegovina": '#0f3c6c',
+        "ecuador": '#f9e300',
+        "ira": '#239f40',
+        "suica": '#ff0000',
+        "bosnia e herzegovina": '#0f3c6c',
         "catar": '#8d1b3d',
-        "república tcheca": '#d7141a',
-        "áfrica do sul": '#007749',
-        "nova zelândia": '#00247d',
-        "árbia saudita": '#006c35',
+        "republica tcheca": '#d7141a',
+        "africa do sul": '#007749',
+        "nova zelandia": '#00247d',
+        "arabia saudita": '#006c35',
         "cabo verde": '#0f3c6c',
-        "uzbequistão": '#0099b5',
+        "uzbequistao": '#0099b5',
         "rd congo": '#007fff',
         "jordan": '#e30613',
-        "áustria": '#c8102e',
+        "austria": '#c8102e',
         "paraguai": '#d52b1e',
-        "panamá": '#d22630',
+        "panama": '#d22630',
         "gana": '#006b3f',
         "noruega": '#ba0c2f',
         "iraque": '#ce1126',
-        "south africa": '#007a4d',
-        "south korea": '#e11d48',
-        "mexico": '#006847',
-        "germany": '#000000',
-        "england": '#1d4ed8',
-        "spain": '#facc15',
-        "netherlands": '#ff6600',
-        "uruguay": '#7c2d12',
-        "japan": '#bc002d',
-        "australia": '#0a6b28',
-        "morocco": '#c1272d',
-        "egypt": '#f6b400',
-        "colombia": '#fcd116',
-        "croatia": '#ff0000',
-        "turkey": '#e30a17',
-        "belgium": '#fae042',
-        "ivory coast": '#f77f00',
-        "ecuador": '#f9e300',
-        "iran": '#239f40',
-        "switzerland": '#ff0000',
-        "canada": '#ff0000',
-        "qatar": '#8d1b3d',
-        "czech republic": '#d7141a',
-        "bosnia and herzegovina": '#0f3c6c',
-        "united states": '#bf0a30',
-        "new zealand": '#00247d',
-        "saudi arabia": '#006c35',
-        "cape verde": '#0f3c6c',
-        "uzbekistan": '#0099b5',
-        "dr congo": '#007fff',
-        "austria": '#c8102e',
-        "paraguay": '#d52b1e',
-        "panama": '#d22630',
-        "ghana": '#006b3f',
-        "norway": '#ba0c2f',
-        "iraq": '#ce1126',
-        "curaçao": '#ffcc00'
+        "curacao": '#ffcc00'
     };
 
-    const normalized = teamName.toLowerCase();
-    if (palette[normalized]) return palette[normalized];
+    const aliases = {
+        "brazil": 'brasil',
+        "france": 'franca',
+        "germany": 'alemanha',
+        "england": 'inglaterra',
+        "spain": 'espanha',
+        "netherlands": 'holanda',
+        "italy": 'italia',
+        "south africa": 'africa do sul',
+        "south korea": 'coreia do sul',
+        "japan": 'japao',
+        "morocco": 'marrocos',
+        "egypt": 'egito',
+        "croatia": 'croacia',
+        "turkey": 'turquia',
+        "belgium": 'belgica',
+        "ivory coast": 'costa do marfim',
+        "iran": 'ira',
+        "switzerland": 'suica',
+        "qatar": 'catar',
+        "czech republic": 'republica tcheca',
+        "bosnia and herzegovina": 'bosnia e herzegovina',
+        "united states": 'estados unidos',
+        "new zealand": 'nova zelandia',
+        "saudi arabia": 'arabia saudita',
+        "cape verde": 'cabo verde',
+        "uzbekistan": 'uzbequistao',
+        "dr congo": 'rd congo',
+        "ghana": 'gana',
+        "norway": 'noruega',
+        "iraq": 'iraque',
+        "united states of america": 'estados unidos',
+        "usa": 'estados unidos'
+    };
+
+    const normalized = normalizeTeamName(teamName);
+    const paletteKey = aliases[normalized] || normalized;
+    if (palette[paletteKey]) return palette[paletteKey];
 
     const hash = Array.from(teamName).reduce((sum, character) => sum + character.charCodeAt(0), 0);
     const hue = hash % 360;
-    return `hsl(${hue} 72% 56%)`;
+    return `hsl(${hue} ${fallbackColorSaturation}% ${fallbackColorLightness}%)`;
 }
 
 function getTeamFlagUrl(teamName) {
@@ -725,6 +750,7 @@ function getTeamFlagUrl(teamName) {
 function buildRadialKnockoutLayout() {
     const layers = [];
     const matchLayers = estruturaNosMataMata.map((fase) => fase.jogos);
+    const layerKeys = ['round32', 'round16', 'quarterFinals', 'semiFinals', 'final'];
 
     matchLayers.forEach((matches, layerIndex) => {
         const nodes = matches.map((match) => {
@@ -746,7 +772,7 @@ function buildRadialKnockoutLayout() {
         });
 
         layers.push({
-            key: layerIndex === 0 ? 'round32' : layerIndex === 1 ? 'round16' : layerIndex === 2 ? 'quarterFinals' : layerIndex === 3 ? 'semiFinals' : 'final',
+            key: layerKeys[layerIndex] || 'final',
             matches,
             nodes
         });
@@ -775,15 +801,16 @@ function buildRadialKnockoutLayout() {
 function renderKnockoutRadialView() {
     const t = translations[currentLang];
     const { layers, connectors } = buildRadialKnockoutLayout();
-    const stageSize = 1000;
+    const stageSize = knockoutRadialStageSize;
     const center = stageSize / 2;
-    const layerRadii = [360, 270, 190, 120, 72];
+    const layerRadii = knockoutRadialLayerRadii;
 
     const ringMarkup = layers.map((layer, layerIndex) => {
         const radius = layerRadii[layerIndex] || 56;
         const count = layer.nodes.length;
+        const fallbackBadgeText = t.fifaBadgeText;
         const points = Array.from({ length: count }, (_, index) => {
-            const angle = -90 + (index / count) * 360;
+            const angle = knockoutRadialStartAngleDegrees + (index / count) * knockoutRadialFullCircleDegrees;
             const radians = angle * (Math.PI / 180);
             return {
                 x: center + Math.cos(radians) * radius,
@@ -800,9 +827,9 @@ function renderKnockoutRadialView() {
             const isResolved = Boolean(node?.resolved);
             return `
                 <g id="${nodeId}" transform="translate(${point.x}, ${point.y})">
-                    <circle r="44" fill="${isResolved ? 'rgba(255,255,255,0.95)' : 'rgba(15,23,42,0.18)'}" stroke="${accentColor}" stroke-width="4"></circle>
-                    <circle r="34" fill="rgba(255,255,255,0.25)" stroke="rgba(255,255,255,0.45)" stroke-width="1.5"></circle>
-                    ${flagUrl ? `<image href="${flagUrl}" x="-30" y="-22" width="60" height="40" preserveAspectRatio="xMidYMid slice"></image>` : `<text x="0" y="6" text-anchor="middle" font-size="18" fill="rgba(248,250,252,0.95)" font-weight="800">FIFA</text>`}
+                    <circle r="${knockoutRadialNodeOuterRadius}" fill="${isResolved ? 'rgba(255,255,255,0.95)' : 'rgba(15,23,42,0.18)'}" stroke="${accentColor}" stroke-width="${knockoutRadialNodeStrokeWidth}"></circle>
+                    <circle r="${knockoutRadialNodeInnerRadius}" fill="rgba(255,255,255,0.25)" stroke="rgba(255,255,255,0.45)" stroke-width="${knockoutRadialNodeInnerStrokeWidth}"></circle>
+                    ${flagUrl ? `<image href="${flagUrl}" x="-30" y="-22" width="60" height="40" preserveAspectRatio="xMidYMid slice"></image>` : `<text x="0" y="6" text-anchor="middle" font-size="18" fill="rgba(248,250,252,0.95)" font-weight="800">${fallbackBadgeText}</text>`}
                 </g>
             `;
         }).join('');
@@ -831,23 +858,23 @@ function renderKnockoutRadialView() {
         const toIdx = toLayer.nodes.findIndex((node) => node.id === toNode.id);
         const fromRadius = layerRadii[fromLayerIndex] || 56;
         const toRadius = layerRadii[toLayerIndex] || 56;
-        const fromAngle = -90 + (fromIdx / Math.max(fromLayer.nodes.length, 1)) * 360;
-        const toAngle = -90 + (toIdx / Math.max(toLayer.nodes.length, 1)) * 360;
+        const fromAngle = knockoutRadialStartAngleDegrees + (fromIdx / Math.max(fromLayer.nodes.length, 1)) * knockoutRadialFullCircleDegrees;
+        const toAngle = knockoutRadialStartAngleDegrees + (toIdx / Math.max(toLayer.nodes.length, 1)) * knockoutRadialFullCircleDegrees;
         const fromX = center + Math.cos(fromAngle * (Math.PI / 180)) * fromRadius;
         const fromY = center + Math.sin(fromAngle * (Math.PI / 180)) * fromRadius;
         const toX = center + Math.cos(toAngle * (Math.PI / 180)) * toRadius;
         const toY = center + Math.sin(toAngle * (Math.PI / 180)) * toRadius;
         const midX = (fromX + toX) / 2;
         const midY = (fromY + toY) / 2;
-        const controlX = midX + (toY - fromY) * 0.12;
-        const controlY = midY - (toX - fromX) * 0.12;
+        const controlX = midX + (toY - fromY) * connectorCurveIntensity;
+        const controlY = midY - (toX - fromX) * connectorCurveIntensity;
         connectorPaths.push(`<path d="M ${fromX} ${fromY} Q ${controlX} ${controlY} ${toX} ${toY}" stroke="${connector.color}" stroke-width="8" fill="none" stroke-linecap="round" stroke-opacity="0.65"></path>`);
     });
 
     const trophyMarkup = `
         <g transform="translate(${center} ${center})">
-            <circle r="92" fill="rgba(15, 23, 42, 0.78)" stroke="rgba(250, 204, 21, 0.55)" stroke-width="3"></circle>
-            <circle r="78" fill="rgba(30, 41, 59, 0.6)" stroke="rgba(245, 158, 11, 0.4)" stroke-width="2"></circle>
+            <circle r="${knockoutRadialTrophyOuterRadius}" fill="rgba(15, 23, 42, 0.78)" stroke="rgba(250, 204, 21, 0.55)" stroke-width="${knockoutRadialTrophyStrokeWidth}"></circle>
+            <circle r="${knockoutRadialTrophyInnerRadius}" fill="rgba(30, 41, 59, 0.6)" stroke="rgba(245, 158, 11, 0.4)" stroke-width="${knockoutRadialTrophyInnerStrokeWidth}"></circle>
             <image href="${fifaWorldCupTrophyImageUrl}" x="-54" y="-44" width="108" height="72" preserveAspectRatio="xMidYMid meet"></image>
             <text x="0" y="48" text-anchor="middle" font-size="18" font-weight="800" letter-spacing="1.3" fill="rgba(255,255,255,0.95)">${t.title}</text>
         </g>
@@ -858,7 +885,7 @@ function renderKnockoutRadialView() {
             <div class="knockout-radial-hint">${t.knockoutRadialHint}</div>
             <div class="knockout-radial-stage" data-radial-stage>
                 <svg class="knockout-radial-svg" viewBox="0 0 ${stageSize} ${stageSize}">
-                    <g data-radial-rotation-group transform="translate(500 500) rotate(${knockoutRadialRotation}) translate(-500 -500)">
+                    <g data-radial-rotation-group transform="translate(${center} ${center}) rotate(${knockoutRadialRotation}) translate(-${center} -${center})">
                         ${connectorPaths.join('')}
                         ${ringMarkup}
                         ${trophyMarkup}
@@ -880,7 +907,7 @@ function bindKnockoutRadialDrag(container) {
 
     const applyRotation = (rotation) => {
         knockoutRadialRotation = rotation;
-        rotationGroup.setAttribute('transform', `translate(500 500) rotate(${rotation}) translate(-500 -500)`);
+        rotationGroup.setAttribute('transform', `translate(${knockoutRadialStageSize / 2} ${knockoutRadialStageSize / 2}) rotate(${rotation}) translate(-${knockoutRadialStageSize / 2} -${knockoutRadialStageSize / 2})`);
     };
 
     stageEl.addEventListener('pointerdown', (event) => {
@@ -894,7 +921,7 @@ function bindKnockoutRadialDrag(container) {
     stageEl.addEventListener('pointermove', (event) => {
         if (!dragging) return;
         const delta = event.clientX - startX;
-        const nextRotation = startRotation + delta * 0.6;
+        const nextRotation = startRotation + delta * knockoutRadialRotationSensitivity;
         applyRotation(nextRotation);
     });
 
@@ -904,7 +931,6 @@ function bindKnockoutRadialDrag(container) {
     };
 
     stageEl.addEventListener('pointerup', finishDrag);
-    stageEl.addEventListener('pointerleave', finishDrag);
     stageEl.addEventListener('pointercancel', finishDrag);
 }
 
