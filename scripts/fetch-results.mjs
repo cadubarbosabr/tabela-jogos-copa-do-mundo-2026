@@ -627,6 +627,23 @@ function extractPenalties(competition) {
     }
   }
 
+  // Tenta na propriedade direta de pênaltis/shootout caso a API traga dessa forma
+  if (homeComp.shootoutScore !== undefined && awayComp.shootoutScore !== undefined) {
+    const pHome = parseInt(homeComp.shootoutScore, 10);
+    const pAway = parseInt(awayComp.shootoutScore, 10);
+    if (!isNaN(pHome) && !isNaN(pAway)) {
+      return { penHome: pHome, penAway: pAway };
+    }
+  }
+
+  if (homeComp.shootout !== undefined && awayComp.shootout !== undefined) {
+    const pHome = parseInt(homeComp.shootout, 10);
+    const pAway = parseInt(awayComp.shootout, 10);
+    if (!isNaN(pHome) && !isNaN(pAway)) {
+      return { penHome: pHome, penAway: pAway };
+    }
+  }
+
   return null;
 }
 
@@ -773,18 +790,12 @@ async function main() {
             : [homePt, awayPt, homeScore, awayScore];
 
           if (isCompleted) {
-            const statusName = String(status?.name ?? '');
-            const wentToPenalties =
-              statusName.includes('PEN') ||
-              statusName.includes('PENALTY') ||
-              statusName.includes('SHOOTOUT');
-
-            if (wentToPenalties) {
-              const pen = extractPenalties(competition);
-              if (pen) {
-                result.penHome = swappedKnockout ? pen.penAway : pen.penHome;
-                result.penAway = swappedKnockout ? pen.penHome : pen.penAway;
-              }
+            // A API pode retornar diferentes status para pênaltis,
+            // então tentamos extrair os pênaltis incondicionalmente para jogos concluídos
+            const pen = extractPenalties(competition);
+            if (pen) {
+              result.penHome = swappedKnockout ? pen.penAway : pen.penHome;
+              result.penAway = swappedKnockout ? pen.penHome : pen.penAway;
             }
             const penSuffix = result.penHome !== undefined ? ` (pen ${result.penHome}–${result.penAway})` : '';
             const swapSuffix = swappedKnockout ? ' (home/away invertido)' : '';
