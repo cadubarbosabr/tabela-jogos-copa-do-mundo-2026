@@ -467,9 +467,9 @@ function resolveKnockoutTeam(orig, gruposClassificacao, terceirosQualificados, r
   }
 
   if (orig.tipo === 'terceiro') {
-    const eligible = terceirosQualificados.filter(t => orig.grps.includes(t.group));
-    if (eligible[orig.idx]) return eligible[orig.idx].name;
-    // Fallback: pegar o próximo 3º ainda não alocado
+    // Alocação gulosa: melhor 3º elegível ainda não alocado a outro jogo
+    const eligible = terceirosQualificados.filter(t => orig.grps.includes(t.group) && !allocated.has(t.name));
+    if (eligible.length > 0) return eligible[0].name;
     const remaining = terceirosQualificados.find(t => !allocated.has(t.name));
     return remaining?.name ?? null;
   }

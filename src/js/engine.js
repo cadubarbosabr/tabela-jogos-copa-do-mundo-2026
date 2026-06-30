@@ -113,13 +113,17 @@ export function recalcularTorneioCompleto() {
                     timeAway = `${pos}º Grupo ${grp}`;
                 }
             } else if (j.origAway.tipo === "terceiro") {
-                // Filtra quais dos 8 terceiros qualificados pertencem aos grupos permitidos nesta vaga
-                let elegiveis = terceirosQualificados.filter(t => j.origAway.grps.includes(t.group));
-                if (elegiveis[j.origAway.idx]) {
-                    timeAway = elegiveis[j.origAway.idx].name;
+                // Alocação gulosa: melhor 3º elegível ainda não atribuído a outro jogo
+                const timesJaAlocados = new Set(
+                    Object.values(mapaMataMataCalculado).flatMap(m => [m.home, m.away])
+                );
+                const elegiveis = terceirosQualificados.filter(t =>
+                    j.origAway.grps.includes(t.group) && !timesJaAlocados.has(t.name)
+                );
+                if (elegiveis.length > 0) {
+                    timeAway = elegiveis[0].name;
                 } else {
-                    // Fallback caso não haja dados preenchidos suficientes
-                    let sobrou = terceirosQualificados.find(t => !Object.values(mapaMataMataCalculado).some(m => m.home === t.name || m.away === t.name));
+                    const sobrou = terceirosQualificados.find(t => !timesJaAlocados.has(t.name));
                     timeAway = sobrou ? sobrou.name : `3º Grupo ${j.origAway.grps[0]}`;
                 }
             } else if (j.origAway.tipo === "venc") {
