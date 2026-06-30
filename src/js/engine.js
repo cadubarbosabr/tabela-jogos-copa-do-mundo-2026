@@ -2,6 +2,7 @@ import { getFlagTag } from './teams.js';
 import { jogosGrupos, estruturaNosMataMata } from './matches.js';
 import { calculateStandings, isGroupStarted, sortThirdPlacedTeams } from './standings.js';
 import { translateTeam } from './translate.js';
+import { ANNEX_C } from './annexC.js';
 import {
     getOfficialScoreInput,
     getOfficialPenaltiesInput,
@@ -83,6 +84,9 @@ export function recalcularTorneioCompleto() {
     // 5. Resolver Chaveamento Dinâmico do Mata-Mata jogo por jogo
     mapaMataMataCalculado = {};
 
+    // Rastreia os 3ºs colocados já alocados a um confronto, evitando duplicações.
+    const terceirosAlocados = new Set();
+
     estruturaNosMataMata.forEach(faseObj => {
         faseObj.jogos.forEach(j => {
             let timeHome = "A definir";
@@ -113,14 +117,43 @@ export function recalcularTorneioCompleto() {
                     timeAway = `${pos}º Grupo ${grp}`;
                 }
             } else if (j.origAway.tipo === "terceiro") {
-                // Filtra quais dos 8 terceiros qualificados pertencem aos grupos permitidos nesta vaga
-                let elegiveis = terceirosQualificados.filter(t => j.origAway.grps.includes(t.group));
-                if (elegiveis[j.origAway.idx]) {
-                    timeAway = elegiveis[j.origAway.idx].name;
+                if (terceirosQualificados.length === 8) {
+                    // Usar tabela oficial do Anexo C da FIFA para garantir
+                    // que o 3º do grupo correto seja pareado com cada líder.
+                    const key = terceirosQualificados.map(t => t.group).sort().join('');
+                    const slot = `1${j.origHome.grp}`;
+                    const assignedGroup = ANNEX_C[key]?.[slot];
+                    if (assignedGroup) {
+                        const team = terceirosQualificados.find(t => t.group === assignedGroup);
+                        timeAway = team ? team.name : `3º Grupo ${assignedGroup}`;
+                        if (team) terceirosAlocados.add(team.name);
+                    } else {
+                        // Fallback: qualquer 3º ainda não alocado
+                        const sobrou = terceirosQualificados.find(t => !terceirosAlocados.has(t.name));
+                        if (sobrou) {
+                            timeAway = sobrou.name;
+                            terceirosAlocados.add(sobrou.name);
+                        } else {
+                            timeAway = `3º Grupo ${j.origAway.grps[0]}`;
+                        }
+                    }
                 } else {
-                    // Fallback caso não haja dados preenchidos suficientes
-                    let sobrou = terceirosQualificados.find(t => !Object.values(mapaMataMataCalculado).some(m => m.home === t.name || m.away === t.name));
-                    timeAway = sobrou ? sobrou.name : `3º Grupo ${j.origAway.grps[0]}`;
+                    // Grupos ainda não finalizados – alocação gulosa com restrição de grupo
+                    const elegiveis = terceirosQualificados.filter(t =>
+                        j.origAway.grps.includes(t.group) && !terceirosAlocados.has(t.name)
+                    );
+                    if (elegiveis.length > 0) {
+                        timeAway = elegiveis[0].name;
+                        terceirosAlocados.add(elegiveis[0].name);
+                    } else {
+                        const sobrou = terceirosQualificados.find(t => !terceirosAlocados.has(t.name));
+                        if (sobrou) {
+                            timeAway = sobrou.name;
+                            terceirosAlocados.add(sobrou.name);
+                        } else {
+                            timeAway = `3º Grupo ${j.origAway.grps[0]}`;
+                        }
+                    }
                 }
             } else if (j.origAway.tipo === "venc") {
                 timeAway = calcularVencedorMataMata(j.origAway.j);
