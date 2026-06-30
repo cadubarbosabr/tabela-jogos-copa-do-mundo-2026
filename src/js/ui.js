@@ -389,21 +389,22 @@ export function renderGroupStage() {
 const fifaWorldCupTrophyImageUrl = 'https://www.edigitalagency.com.au/wp-content/uploads/new-FIFA-World-Cup-2026-logo-white-PNG-small-size.png';
 const knockoutRadialStageSize = 1000;
 const knockoutRadialRotationSensitivity = 0.6;
-const knockoutRadialLayerRadii = [360, 270, 190, 120, 72];
+const knockoutRadialLayerRadii = [380, 290, 200, 130, 80];
 const knockoutRadialStartAngleDegrees = -90;
 const knockoutRadialFullCircleDegrees = 360;
-const knockoutRadialNodeOuterRadius = 44;
-const knockoutRadialNodeInnerRadius = 34;
-const knockoutRadialNodeStrokeWidth = 4;
+const knockoutRadialNodeOuterRadius = 42;
+const knockoutRadialNodeInnerRadius = 32;
+const knockoutRadialNodeStrokeWidth = 3;
 const knockoutRadialNodeInnerStrokeWidth = 1.5;
-const knockoutRadialTrophyOuterRadius = 92;
-const knockoutRadialTrophyInnerRadius = 78;
+const knockoutRadialTrophyOuterRadius = 58;
+const knockoutRadialTrophyInnerRadius = 48;
 const knockoutRadialTrophyStrokeWidth = 3;
 const knockoutRadialTrophyInnerStrokeWidth = 2;
 const defaultNodeAccentColor = 'rgba(148, 163, 184, 0.9)';
 const fallbackColorSaturation = 72;
 const fallbackColorLightness = 56;
-const connectorCurveIntensity = 0.12;
+const connectorCurveIntensity = 0.15;
+const knockoutRadialLabelRadii = [420, 320, 230, 155, 0];
 
 let knockoutViewMode = localStorage.getItem('wc2026_knockout_view');
 
@@ -804,6 +805,77 @@ function renderKnockoutRadialView() {
     const stageSize = knockoutRadialStageSize;
     const center = stageSize / 2;
     const layerRadii = knockoutRadialLayerRadii;
+    const labelRadii = knockoutRadialLabelRadii;
+
+    // Phase labels for each layer
+    const phaseLabels = [t.bracketR32, t.bracketR16, t.bracketQF, t.bracketSF, ''];
+
+    // Generate unique IDs for gradients
+    const gradientId = `radial-glow-${Date.now()}`;
+
+    // SVG Definitions (gradients, filters, etc.)
+    const svgDefs = `
+        <defs>
+            <!-- Glow filter for resolved nodes -->
+            <filter id="node-glow" x="-50%" y="-50%" width="200%" height="200%">
+                <feGaussianBlur in="SourceAlpha" stdDeviation="4" result="blur"/>
+                <feFlood flood-color="#facc15" flood-opacity="0.6"/>
+                <feComposite in2="blur" operator="in"/>
+                <feMerge>
+                    <feMergeNode/>
+                    <feMergeNode in="SourceGraphic"/>
+                </feMerge>
+            </filter>
+            
+            <!-- Subtle drop shadow for nodes -->
+            <filter id="node-shadow" x="-30%" y="-30%" width="160%" height="160%">
+                <feDropShadow dx="0" dy="3" stdDeviation="4" flood-color="rgba(0,0,0,0.25)"/>
+            </filter>
+            
+            <!-- Trophy glow effect -->
+            <filter id="trophy-glow" x="-100%" y="-100%" width="300%" height="300%">
+                <feGaussianBlur in="SourceAlpha" stdDeviation="8" result="blur"/>
+                <feFlood flood-color="#fbbf24" flood-opacity="0.5"/>
+                <feComposite in2="blur" operator="in"/>
+                <feMerge>
+                    <feMergeNode/>
+                    <feMergeNode in="SourceGraphic"/>
+                </feMerge>
+            </filter>
+            
+            <!-- Radial gradient for trophy center -->
+            <radialGradient id="${gradientId}-trophy" cx="50%" cy="40%" r="60%">
+                <stop offset="0%" stop-color="#fef3c7"/>
+                <stop offset="50%" stop-color="#fbbf24"/>
+                <stop offset="100%" stop-color="#b45309"/>
+            </radialGradient>
+            
+            <!-- Connector gradient -->
+            <linearGradient id="${gradientId}-connector" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" stop-color="currentColor" stop-opacity="0.8"/>
+                <stop offset="100%" stop-color="currentColor" stop-opacity="0.3"/>
+            </linearGradient>
+        </defs>
+    `;
+
+    // Phase label rings (positioned outside nodes)
+    const phaseLabelMarkup = phaseLabels.map((label, layerIndex) => {
+        if (!label || layerIndex >= 4) return '';
+        const labelRadius = labelRadii[layerIndex];
+        // Place label at top of ring (-90 degrees)
+        const angle = -90;
+        const radians = angle * (Math.PI / 180);
+        const x = center + Math.cos(radians) * labelRadius;
+        const y = center + Math.sin(radians) * labelRadius;
+        return `
+            <g class="knockout-radial-phase-label">
+                <text x="${x}" y="${y}" text-anchor="middle" dominant-baseline="middle" 
+                    font-size="13" font-weight="800" letter-spacing="1.5" 
+                    fill="rgba(250, 204, 21, 0.9)" 
+                    class="radial-phase-text">${label}</text>
+            </g>
+        `;
+    }).join('');
 
     const ringMarkup = layers.map((layer, layerIndex) => {
         const radius = layerRadii[layerIndex] || 56;
@@ -825,25 +897,58 @@ function renderKnockoutRadialView() {
             const accentColor = node?.accentColor || 'rgba(148, 163, 184, 0.8)';
             const flagUrl = node?.teamName ? getTeamFlagUrl(node.teamName) : '';
             const isResolved = Boolean(node?.resolved);
+            const matchNumber = node?.matchId ? `#${node.matchId}` : '';
+            
+            // Enhanced styling based on resolution state
+            const outerFill = isResolved 
+                ? 'rgba(255,255,255,0.98)' 
+                : 'rgba(30, 41, 59, 0.45)';
+            const filterAttr = isResolved ? 'filter="url(#node-glow)"' : 'filter="url(#node-shadow)"';
+            const glowClass = isResolved ? 'radial-node-resolved' : '';
+            
             return `
-                <g id="${nodeId}" transform="translate(${point.x}, ${point.y})">
-                    <circle r="${knockoutRadialNodeOuterRadius}" fill="${isResolved ? 'rgba(255,255,255,0.95)' : 'rgba(15,23,42,0.18)'}" stroke="${accentColor}" stroke-width="${knockoutRadialNodeStrokeWidth}"></circle>
-                    <circle r="${knockoutRadialNodeInnerRadius}" fill="rgba(255,255,255,0.25)" stroke="rgba(255,255,255,0.45)" stroke-width="${knockoutRadialNodeInnerStrokeWidth}"></circle>
-                    ${flagUrl ? `<image href="${flagUrl}" x="-30" y="-22" width="60" height="40" preserveAspectRatio="xMidYMid slice"></image>` : `<text x="0" y="6" text-anchor="middle" font-size="18" fill="rgba(248,250,252,0.95)" font-weight="800">${fallbackBadgeText}</text>`}
+                <g id="${nodeId}" class="radial-node ${glowClass}" transform="translate(${point.x}, ${point.y})">
+                    <!-- Outer ring with accent color -->
+                    <circle r="${knockoutRadialNodeOuterRadius}" fill="${outerFill}" 
+                        stroke="${accentColor}" stroke-width="${knockoutRadialNodeStrokeWidth}" 
+                        ${filterAttr}></circle>
+                    
+                    <!-- Inner ring -->
+                    <circle r="${knockoutRadialNodeInnerRadius}" 
+                        fill="${isResolved ? 'rgba(255,255,255,0.9)' : 'rgba(255,255,255,0.15)'}" 
+                        stroke="${isResolved ? accentColor : 'rgba(255,255,255,0.3)'}" 
+                        stroke-width="${knockoutRadialNodeInnerStrokeWidth}"></circle>
+                    
+                    <!-- Flag or fallback badge -->
+                    ${flagUrl 
+                        ? `<clipPath id="clip-${nodeId}"><circle r="26" /></clipPath>
+                           <image href="${flagUrl}" x="-28" y="-20" width="56" height="38" 
+                                preserveAspectRatio="xMidYMid slice" clip-path="url(#clip-${nodeId})"></image>` 
+                        : `<text x="0" y="4" text-anchor="middle" font-size="14" fill="rgba(248,250,252,0.85)" font-weight="700">${fallbackBadgeText}</text>
+                           <text x="0" y="18" text-anchor="middle" font-size="9" fill="rgba(148,163,184,0.7)" font-weight="600">${matchNumber}</text>`
+                    }
                 </g>
             `;
         }).join('');
 
+        // Enhanced ring guides with gradient
+        const ringGuide = layerIndex < 4 
+            ? `<circle cx="${center}" cy="${center}" r="${radius}" fill="none" 
+                stroke="rgba(148,163,184,0.12)" stroke-width="2" 
+                stroke-dasharray="4 6"></circle>`
+            : '';
+
         return `
-            <g class="knockout-radial-layer">
-                ${layerIndex < 4 ? `<circle cx="${center}" cy="${center}" r="${radius}" fill="none" stroke="rgba(148,163,184,0.16)" stroke-width="1.5" stroke-dasharray="6 8"></circle>` : ''}
+            <g class="knockout-radial-layer" data-layer="${layer.key}">
+                ${ringGuide}
                 ${nodeMarkup}
             </g>
         `;
     }).join('');
 
+    // Enhanced connector paths with gradients
     const connectorPaths = [];
-    connectors.forEach((connector) => {
+    connectors.forEach((connector, idx) => {
         const fromLayerIndex = layers.findIndex((layer) => layer.nodes.some((node) => node.id === connector.from.id));
         const toLayerIndex = layers.findIndex((layer) => layer.nodes.some((node) => node.id === connector.to.id));
         const fromLayer = layers[fromLayerIndex];
@@ -868,15 +973,39 @@ function renderKnockoutRadialView() {
         const midY = (fromY + toY) / 2;
         const controlX = midX + (toY - fromY) * connectorCurveIntensity;
         const controlY = midY - (toX - fromX) * connectorCurveIntensity;
-        connectorPaths.push(`<path d="M ${fromX} ${fromY} Q ${controlX} ${controlY} ${toX} ${toY}" stroke="${connector.color}" stroke-width="8" fill="none" stroke-linecap="round" stroke-opacity="0.65"></path>`);
+        
+        const isResolved = connector.from.resolved;
+        const strokeWidth = isResolved ? 6 : 4;
+        const opacity = isResolved ? 0.75 : 0.35;
+        
+        connectorPaths.push(`
+            <path class="radial-connector ${isResolved ? 'connector-resolved' : ''}" 
+                d="M ${fromX} ${fromY} Q ${controlX} ${controlY} ${toX} ${toY}" 
+                stroke="${connector.color}" 
+                stroke-width="${strokeWidth}" 
+                fill="none" 
+                stroke-linecap="round" 
+                stroke-opacity="${opacity}"></path>
+        `);
     });
 
+    // Enhanced trophy center with golden glow
     const trophyMarkup = `
-        <g transform="translate(${center} ${center})">
-            <circle r="${knockoutRadialTrophyOuterRadius}" fill="rgba(15, 23, 42, 0.78)" stroke="rgba(250, 204, 21, 0.55)" stroke-width="${knockoutRadialTrophyStrokeWidth}"></circle>
-            <circle r="${knockoutRadialTrophyInnerRadius}" fill="rgba(30, 41, 59, 0.6)" stroke="rgba(245, 158, 11, 0.4)" stroke-width="${knockoutRadialTrophyInnerStrokeWidth}"></circle>
-            <image href="${fifaWorldCupTrophyImageUrl}" x="-54" y="-44" width="108" height="72" preserveAspectRatio="xMidYMid meet"></image>
-            <text x="0" y="48" text-anchor="middle" font-size="18" font-weight="800" letter-spacing="1.3" fill="rgba(255,255,255,0.95)">${t.title}</text>
+        <g class="radial-trophy" transform="translate(${center} ${center})" filter="url(#trophy-glow)">
+            <!-- Outer golden ring -->
+            <circle r="${knockoutRadialTrophyOuterRadius}" 
+                fill="url(#${gradientId}-trophy)" 
+                stroke="rgba(251, 191, 36, 0.8)" 
+                stroke-width="${knockoutRadialTrophyStrokeWidth}"></circle>
+            
+            <!-- Inner ring -->
+            <circle r="${knockoutRadialTrophyInnerRadius}" 
+                fill="rgba(15, 23, 42, 0.85)" 
+                stroke="rgba(245, 158, 11, 0.6)" 
+                stroke-width="${knockoutRadialTrophyInnerStrokeWidth}"></circle>
+            
+            <!-- Trophy emoji/icon -->
+            <text x="0" y="12" text-anchor="middle" font-size="36">🏆</text>
         </g>
     `;
 
@@ -885,9 +1014,11 @@ function renderKnockoutRadialView() {
             <div class="knockout-radial-hint">${t.knockoutRadialHint}</div>
             <div class="knockout-radial-stage" data-radial-stage>
                 <svg class="knockout-radial-svg" viewBox="0 0 ${stageSize} ${stageSize}">
+                    ${svgDefs}
                     <g data-radial-rotation-group transform="translate(${center} ${center}) rotate(${knockoutRadialRotation}) translate(-${center} -${center})">
                         ${connectorPaths.join('')}
                         ${ringMarkup}
+                        ${phaseLabelMarkup}
                         ${trophyMarkup}
                     </g>
                 </svg>
