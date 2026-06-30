@@ -594,26 +594,36 @@ function buildMiniMatchCard(match, options = {}) {
     return `
         <article class="kob-mini-card${resolvedClass}${phaseAccentClass}${sideClass}">
             <div class="kob-mini-header">
-                <span>${matchShortDate} · ${match.hora}</span>
+                <span class="kob-mini-date">${matchShortDate} · ${match.hora}</span>
                 <span class="kob-mini-local">${match.local || ''}</span>
             </div>
-            <div class="kob-mini-team ${homeWinner ? 'kob-mini-winner' : ''}">
-                ${getFlagTag(dadosCalculados.home)}
-                <span class="kob-mini-name">${homeDisplayName}</span>
-                <input type="number" min="0" placeholder="–" value="${sh}"
-                    oninput="window.setScoreInput(${match.id}, 'home', this.value)"
-                    aria-label="${t.tableVs} ${homeDisplayName}"
-                    ${lockedAttrs}
-                    class="kob-mini-score${lockedClasses}">
-            </div>
-            <div class="kob-mini-team ${awayWinner ? 'kob-mini-winner' : ''}">
-                ${getFlagTag(dadosCalculados.away)}
-                <span class="kob-mini-name">${awayDisplayName}</span>
-                <input type="number" min="0" placeholder="–" value="${sa}"
-                    oninput="window.setScoreInput(${match.id}, 'away', this.value)"
-                    aria-label="${t.tableVs} ${awayDisplayName}"
-                    ${lockedAttrs}
-                    class="kob-mini-score${lockedClasses}">
+            <div class="kob-mini-teams">
+                <div class="kob-mini-team ${homeWinner ? 'kob-mini-winner' : awayWinner ? 'kob-mini-loser' : ''}">
+                    <div class="kob-mini-team-info">
+                        ${getFlagTag(dadosCalculados.home)}
+                        <span class="kob-mini-name">${homeDisplayName}</span>
+                    </div>
+                    <div class="kob-mini-score-wrap">
+                        <input type="number" min="0" placeholder="–" value="${sh}"
+                            oninput="window.setScoreInput(${match.id}, 'home', this.value)"
+                            aria-label="${t.tableVs} ${homeDisplayName}"
+                            ${lockedAttrs}
+                            class="kob-mini-score${lockedClasses}">
+                    </div>
+                </div>
+                <div class="kob-mini-team ${awayWinner ? 'kob-mini-winner' : homeWinner ? 'kob-mini-loser' : ''}">
+                    <div class="kob-mini-team-info">
+                        ${getFlagTag(dadosCalculados.away)}
+                        <span class="kob-mini-name">${awayDisplayName}</span>
+                    </div>
+                    <div class="kob-mini-score-wrap">
+                        <input type="number" min="0" placeholder="–" value="${sa}"
+                            oninput="window.setScoreInput(${match.id}, 'away', this.value)"
+                            aria-label="${t.tableVs} ${awayDisplayName}"
+                            ${lockedAttrs}
+                            class="kob-mini-score${lockedClasses}">
+                    </div>
+                </div>
             </div>
             ${penaltiesHtml}
         </article>
