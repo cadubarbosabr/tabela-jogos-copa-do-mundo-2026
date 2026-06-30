@@ -29,7 +29,7 @@
   grid-template-columns: repeat(9, minmax(var(--bracket-column-min), 1fr));
   gap: var(--bracket-gap);
   align-items: stretch;
-  height: auto;
+  height: unset;
 }
 
 .wcb-col {

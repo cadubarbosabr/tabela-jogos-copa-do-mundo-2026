@@ -1,6 +1,5 @@
 .kob-mini-card {
   inline-size: min(100%, var(--card-width-max));
-  width: 100%;
   min-width: 0;
   border-radius: var(--card-radius);
   overflow: clip;
