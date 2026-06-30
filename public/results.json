@@ -298,8 +298,10 @@
     "penAway": 4
   },
   "75": {
-    "home": 0,
-    "away": 0
+    "home": 1,
+    "away": 1,
+    "penHome": 2,
+    "penAway": 3
   },
   "76": {
     "home": 2,
