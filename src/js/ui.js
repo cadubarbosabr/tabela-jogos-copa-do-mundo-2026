@@ -18,7 +18,7 @@ function getMatchLockState(matchId) {
     return {
         isLocked,
         lockedAttrs: isLocked ? 'disabled' : '',
-        lockedClasses: isLocked ? ' cursor-not-allowed !bg-slate-100 dark:!bg-slate-900 !text-slate-500 dark:!text-slate-400' : '',
+        lockedClasses: isLocked ? ' official-score-locked' : '',
         badgeLabel: isLocked ? translations.pt.officialBadge : translations.pt.editableBadge,
         badgeClass: isLocked ? 'is-official' : 'is-editable'
     };

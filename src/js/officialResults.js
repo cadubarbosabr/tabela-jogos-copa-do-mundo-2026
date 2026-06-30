@@ -34,10 +34,8 @@ function normalizeInteger(value) {
 }
 
 function normalizeScoreValue(value) {
-    if (value === undefined || value === null || value === '') return '';
-
-    const parsedValue = Number.parseInt(value, 10);
-    return Number.isNaN(parsedValue) ? '' : String(parsedValue);
+    const normalizedValue = normalizeInteger(value);
+    return normalizedValue === null ? '' : String(normalizedValue);
 }
 
 function hasOfficialScore(result) {
