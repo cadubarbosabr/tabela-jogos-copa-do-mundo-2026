@@ -226,9 +226,8 @@ export function atualizarPainelDoCampeao() {
 
     const finalVencedor = calcularVencedorMataMata(104);
 
-    if (finalVencedor && !finalVencedor.includes('Vencedor') && !finalVencedor.includes('Winner') && !finalVencedor.includes('/')) {
-        const lang = localStorage.getItem('wc2026_lang') || 'pt';
-        const localizedWinner = translateTeam(finalVencedor, lang);
+    if (finalVencedor && !finalVencedor.includes('Vencedor') && !finalVencedor.includes('/')) {
+        const localizedWinner = translateTeam(finalVencedor, 'pt');
         textCamp.innerHTML = `${getFlagTag(finalVencedor)} ${localizedWinner}`;
         banner.classList.remove('hidden');
     } else {

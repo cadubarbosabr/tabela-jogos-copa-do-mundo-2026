@@ -1,47 +1,77 @@
-import { 
-    recalcularTorneioCompleto, 
-    setScoreInput, 
+import {
+    recalcularTorneioCompleto,
+    setScoreInput,
     setPenaltiesInput,
-    addUpdateListener 
+    addUpdateListener
 } from './engine.js';
-import { loadOfficialResults } from './officialResults.js';
-import { 
-    renderTablesGrid, 
-    renderGroupStage, 
+import { loadOfficialResults, getOfficialResultsStatus } from './officialResults.js';
+import {
+    renderTablesGrid,
+    renderGroupStage,
     renderKnockoutStage,
-    renderStatistics,
     switchTab,
     showToast,
-    initToggles,
-    currentLang
+    initToggles
 } from './ui.js';
 import { translations } from './translate.js';
 
-function updateLastUpdateLabel() {
-    const lastUpdateEl = document.getElementById('last-update');
-    if (!lastUpdateEl) return;
-
-    const rawTimestamp = localStorage.getItem('wc2026_lastUpdate');
-    if (!rawTimestamp) {
-        lastUpdateEl.textContent = '';
-        return;
-    }
+function formatStatusDate(rawTimestamp) {
+    if (!rawTimestamp) return '';
 
     const date = new Date(rawTimestamp);
-    if (Number.isNaN(date.getTime())) {
-        lastUpdateEl.textContent = '';
-        return;
-    }
+    if (Number.isNaN(date.getTime())) return '';
 
-    const locale = currentLang === 'pt' ? 'pt-BR' : 'en-US';
-    const datePart = date.toLocaleDateString(locale, { day: '2-digit', month: '2-digit' });
-    const timePart = date.toLocaleTimeString(locale, { hour: '2-digit', minute: '2-digit' });
-    lastUpdateEl.textContent = currentLang === 'pt'
-        ? `Atualizado: ${datePart} às ${timePart}`
-        : `Updated: ${datePart} at ${timePart}`;
+    const datePart = date.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' });
+    const timePart = date.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+    return `${datePart} às ${timePart}`;
 }
 
-// Bind para as chamadas inline oninput presentes nas strings de templates HTML dinâmicos
+function updateOfficialStatusLabel() {
+    const statusTitle = document.getElementById('official-status');
+    const statusDetail = document.getElementById('official-status-detail');
+    const footerUpdate = document.getElementById('last-update');
+    const status = getOfficialResultsStatus();
+    const t = translations.pt;
+    const formattedDate = formatStatusDate(status.lastFetch);
+    const hasOfficialData = status.entryCount > 0;
+
+    if (statusTitle) {
+        if (status.hasError && hasOfficialData) {
+            statusTitle.textContent = t.officialStatusFallback;
+            statusTitle.dataset.state = 'fallback';
+        } else if (status.hasError) {
+            statusTitle.textContent = t.officialStatusUnavailable;
+            statusTitle.dataset.state = 'error';
+        } else {
+            statusTitle.textContent = t.officialStatusLive;
+            statusTitle.dataset.state = 'live';
+        }
+    }
+
+    if (statusDetail) {
+        if (status.hasError && hasOfficialData) {
+            statusDetail.textContent = `${t.officialStatusCached}${formattedDate ? ` Snapshot de ${formattedDate}.` : ''}`;
+        } else if (status.hasError) {
+            statusDetail.textContent = t.officialStatusEmpty;
+        } else {
+            const qualityNote = status.droppedEntries > 0
+                ? ` ${status.droppedEntries} registro(s) inválido(s) foram ignorados com segurança.`
+                : '';
+            statusDetail.textContent = `${t.officialStatusReady}${formattedDate ? ` Atualizado em ${formattedDate}.` : ''}${qualityNote}`;
+        }
+    }
+
+    if (footerUpdate) {
+        if (formattedDate) {
+            footerUpdate.textContent = `Resultados oficiais ${status.hasError && hasOfficialData ? 'em cache' : 'atualizados'} em ${formattedDate}`;
+        } else if (status.hasError) {
+            footerUpdate.textContent = 'Resultados oficiais indisponíveis no momento.';
+        } else {
+            footerUpdate.textContent = 'Aguardando primeira atualização oficial.';
+        }
+    }
+}
+
 window.setScoreInput = (id, side, val) => {
     setScoreInput(id, side, val);
 };
@@ -51,58 +81,41 @@ window.setPenaltiesInput = (id, side, val) => {
 };
 
 document.addEventListener('DOMContentLoaded', async () => {
-    // 0. Inicializa os alternadores de Idioma e Tema
     initToggles();
 
-    // 1. Carrega resultados oficiais versionados; se falhar, segue só com o LocalStorage.
     await loadOfficialResults();
-    updateLastUpdateLabel();
+    updateOfficialStatusLabel();
 
-    // 2. Roda a engine de cálculo lendo resultados oficiais e o LocalStorage do navegador
     recalcularTorneioCompleto();
 
-    // 3. Renderização Inicial do DOM
     renderTablesGrid();
     renderGroupStage();
+    switchTab('grupos');
+
     const loadingOverlay = document.getElementById('loading-overlay');
     if (loadingOverlay) loadingOverlay.remove();
 
-    // 4. Escuta atualizações da Engine de Dados e redesenha as tabelas em tempo real
     addUpdateListener(() => {
         renderTablesGrid();
-        
-        // Redesenha o mata-mata para manter a consistência se ele estiver visível
+
         const sectionMataMata = document.getElementById('section-mata-mata');
         if (sectionMataMata && !sectionMataMata.classList.contains('hidden')) {
             renderKnockoutStage();
         }
-
-        const sectionEstatisticas = document.getElementById('section-estatisticas');
-        if (sectionEstatisticas && !sectionEstatisticas.classList.contains('hidden')) {
-            renderStatistics();
-        }
     });
 
-    // 5. Associar cliques nos botões de controle de Abas
     const btnGrupos = document.getElementById('btn-grupos');
     const btnMataMata = document.getElementById('btn-mata-mata');
-    const btnEstatisticas = document.getElementById('btn-estatisticas');
     const btnGruposMobile = document.getElementById('btn-grupos-mobile');
     const btnMataMataMobile = document.getElementById('btn-mata-mata-mobile');
-    const btnEstatisticasMobile = document.getElementById('btn-estatisticas-mobile');
-    const btnLang = document.getElementById('btn-lang');
     const btnResetPredictions = document.getElementById('btn-reset-predictions');
-    
+
     if (btnGrupos) {
         btnGrupos.addEventListener('click', () => switchTab('grupos'));
     }
-    
+
     if (btnMataMata) {
         btnMataMata.addEventListener('click', () => switchTab('mata-mata'));
-    }
-
-    if (btnEstatisticas) {
-        btnEstatisticas.addEventListener('click', () => switchTab('estatisticas'));
     }
 
     if (btnGruposMobile) {
@@ -113,19 +126,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         btnMataMataMobile.addEventListener('click', () => switchTab('mata-mata'));
     }
 
-    if (btnEstatisticasMobile) {
-        btnEstatisticasMobile.addEventListener('click', () => switchTab('estatisticas'));
-    }
-
-    if (btnLang) {
-        btnLang.addEventListener('click', () => {
-            updateLastUpdateLabel();
-        });
-    }
-
     if (btnResetPredictions) {
         btnResetPredictions.addEventListener('click', () => {
-            const t = translations[currentLang];
+            const t = translations.pt;
             if (!confirm(t.resetConfirm)) return;
 
             const predictionKeys = Object.keys(localStorage).filter((key) =>
@@ -144,16 +147,10 @@ document.addEventListener('DOMContentLoaded', async () => {
                 renderKnockoutStage();
             }
 
-            const sectionEstatisticas = document.getElementById('section-estatisticas');
-            if (sectionEstatisticas && !sectionEstatisticas.classList.contains('hidden')) {
-                renderStatistics();
-            }
-
             showToast(t.resetDone);
         });
     }
 
-    // 6. Associar evento de mudança no Filtro de Grupos
     const filterGrupo = document.getElementById('filter-grupo');
     const btnPrevGroup = document.getElementById('btn-prev-group');
     const btnNextGroup = document.getElementById('btn-next-group');
@@ -183,17 +180,15 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     }
 
-    // 7. Associar evento de clique ao botão inteligente de doações via PIX
     const btnPix = document.getElementById('btn-pix');
     if (btnPix) {
         btnPix.addEventListener('click', (e) => {
             e.preventDefault();
             navigator.clipboard.writeText('sicwnb@outlook.com');
-            showToast(translations[currentLang].pixCopied);
+            showToast(translations.pt.pixCopied);
         });
     }
 
-    // 8. Botão Scroll to Top
     const btnScrollTop = document.getElementById('btn-scroll-top');
     if (btnScrollTop) {
         window.addEventListener('scroll', () => {

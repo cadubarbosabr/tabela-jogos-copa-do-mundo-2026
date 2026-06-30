@@ -5,13 +5,11 @@ import {
     getPenaltiesInput 
 } from './engine.js';
 import { hasOfficialResult } from './officialResults.js';
-import { countryCodes, getFlagTag } from './teams.js';
+import { getFlagTag } from './teams.js';
 import { jogosGrupos, estruturaNosMataMata } from './matches.js';
 import { translations, translateTeam, translatePlaceholder } from './translate.js';
-import { sortThirdPlacedTeams } from './standings.js';
 
-// Estado global de Tema e Idioma
-export let currentLang = localStorage.getItem('wc2026_lang') || 'pt';
+export const currentLang = 'pt';
 export let currentTheme = localStorage.getItem('wc2026_theme') || 'dark';
 
 function getMatchLockState(matchId) {
@@ -20,25 +18,14 @@ function getMatchLockState(matchId) {
     return {
         isLocked,
         lockedAttrs: isLocked ? 'disabled' : '',
-        lockedClasses: isLocked ? ' cursor-not-allowed !bg-slate-100 dark:!bg-slate-900' : ''
+        lockedClasses: isLocked ? ' cursor-not-allowed !bg-slate-100 dark:!bg-slate-900 !text-slate-500 dark:!text-slate-400' : '',
+        badgeLabel: isLocked ? translations.pt.officialBadge : translations.pt.editableBadge,
+        badgeClass: isLocked ? 'is-official' : 'is-editable'
     };
 }
 
 export function initToggles() {
-    const btnLang = document.getElementById('btn-lang');
     const btnTheme = document.getElementById('btn-theme');
-
-    if (btnLang) {
-        btnLang.addEventListener('click', () => {
-            currentLang = currentLang === 'pt' ? 'en' : 'pt';
-            localStorage.setItem('wc2026_lang', currentLang);
-            applyLanguage();
-            renderTablesGrid();
-            renderGroupStage();
-            renderKnockoutStage();
-            renderStatistics();
-        });
-    }
 
     if (btnTheme) {
         btnTheme.addEventListener('click', () => {
@@ -59,16 +46,16 @@ export function applyTheme() {
     
     if (currentTheme === 'dark') {
         htmlEl.classList.add('dark');
-        if (lblBtnTheme) lblBtnTheme.textContent = currentLang === 'pt' ? 'Modo Claro' : 'Light Mode';
+        if (lblBtnTheme) lblBtnTheme.textContent = 'Modo Claro';
     } else {
         htmlEl.classList.remove('dark');
-        if (lblBtnTheme) lblBtnTheme.textContent = currentLang === 'pt' ? 'Modo Escuro' : 'Dark Mode';
+        if (lblBtnTheme) lblBtnTheme.textContent = 'Modo Escuro';
     }
 }
 
 export function applyLanguage() {
-    const t = translations[currentLang];
-    document.documentElement.lang = currentLang === 'en' ? 'en' : 'pt-BR';
+    const t = translations.pt;
+    document.documentElement.lang = 'pt-BR';
     
     // Header
     const titleApp = document.getElementById('title-app');
@@ -81,21 +68,13 @@ export function applyLanguage() {
     // Tabs
     const btnGrupos = document.getElementById('btn-grupos');
     const btnMataMata = document.getElementById('btn-mata-mata');
-    const btnEstatisticas = document.getElementById('btn-estatisticas');
     const lblBtnGruposMobile = document.getElementById('lbl-btn-grupos-mobile');
     const lblBtnMataMataMobile = document.getElementById('lbl-btn-mata-mata-mobile');
-    const lblBtnEstatisticasMobile = document.getElementById('lbl-btn-estatisticas-mobile');
     
     if (btnGrupos) btnGrupos.textContent = t.tabGroups;
     if (btnMataMata) btnMataMata.textContent = t.tabKnockout;
-    if (btnEstatisticas) btnEstatisticas.textContent = t.tabStats;
     if (lblBtnGruposMobile) lblBtnGruposMobile.textContent = t.tabGroups;
     if (lblBtnMataMataMobile) lblBtnMataMataMobile.textContent = t.tabKnockout;
-    if (lblBtnEstatisticasMobile) lblBtnEstatisticasMobile.textContent = t.tabStats;
-
-    // Botão de idioma
-    const lblBtnLang = document.getElementById('lbl-btn-lang');
-    if (lblBtnLang) lblBtnLang.textContent = currentLang === 'pt' ? 'English' : 'Português';
 
     // Botão de Tema
     applyTheme();
@@ -138,70 +117,42 @@ export function applyLanguage() {
     const lblBtnPix = document.getElementById('lbl-btn-pix');
     const lblBtnReset = document.getElementById('lbl-btn-reset');
     if (lblFooterTitle) lblFooterTitle.textContent = `© 2026 ${t.title}`;
-    if (lblFooterSub) lblFooterSub.textContent = currentLang === 'pt' 
-        ? "Desenvolvido por Cadu Barbosa • Dados Públicos • FIFA World Cup 2026"
-        : "Developed by Cadu Barbosa • Public Data • FIFA World Cup 2026";
+    if (lblFooterSub) lblFooterSub.textContent = "Desenvolvido por Cadu Barbosa • Dados públicos • Copa do Mundo FIFA 2026";
     if (lblBtnPix) lblBtnPix.textContent = t.contribPix;
     if (lblBtnReset) lblBtnReset.textContent = t.resetPredictions;
+}
+
+function getTabButtonClassName(isActive) {
+    return `header-tab-btn${isActive ? ' is-active' : ''}`;
 }
 
 export function switchTab(tab) {
     const btnGrupos = document.getElementById('btn-grupos');
     const btnMataMata = document.getElementById('btn-mata-mata');
-    const btnEstatisticas = document.getElementById('btn-estatisticas');
     const sectionGrupos = document.getElementById('section-grupos');
     const sectionMataMata = document.getElementById('section-mata-mata');
-    const sectionEstatisticas = document.getElementById('section-estatisticas');
 
-    if (!btnGrupos || !btnMataMata || !btnEstatisticas || !sectionGrupos || !sectionMataMata || !sectionEstatisticas) return;
+    if (!btnGrupos || !btnMataMata || !sectionGrupos || !sectionMataMata) return;
 
-    const t = translations[currentLang];
+    const t = translations.pt;
+    const normalizedTab = tab === 'mata-mata' ? 'mata-mata' : 'grupos';
 
-    if (tab === 'grupos') {
-        btnGrupos.className = "px-3 md:px-5 py-2 md:py-2.5 rounded-lg text-xs md:text-sm font-bold bg-gradient-to-b from-white to-gray-100 text-blue-950 shadow-md transition-all transform scale-105 select-none";
-        btnGrupos.textContent = t.tabGroups;
-        btnMataMata.className = "px-3 md:px-5 py-2 md:py-2.5 rounded-lg text-xs md:text-sm font-bold text-blue-200 hover:text-white transition-all select-none";
-        btnMataMata.textContent = t.tabKnockout;
-        btnEstatisticas.className = "px-3 md:px-5 py-2 md:py-2.5 rounded-lg text-xs md:text-sm font-bold text-blue-200 hover:text-white transition-all select-none";
-        btnEstatisticas.textContent = t.tabStats;
-    } else if (tab === 'mata-mata') {
-        btnGrupos.className = "px-3 md:px-5 py-2 md:py-2.5 rounded-lg text-xs md:text-sm font-bold text-blue-200 hover:text-white transition-all select-none";
-        btnGrupos.textContent = t.tabGroups;
-        btnMataMata.className = "px-3 md:px-5 py-2 md:py-2.5 rounded-lg text-xs md:text-sm font-bold bg-gradient-to-b from-white to-gray-100 text-blue-950 shadow-md transition-all transform scale-105 select-none";
-        btnMataMata.textContent = t.tabKnockout;
-        btnEstatisticas.className = "px-3 md:px-5 py-2 md:py-2.5 rounded-lg text-xs md:text-sm font-bold text-blue-200 hover:text-white transition-all select-none";
-        btnEstatisticas.textContent = t.tabStats;
-    } else if (tab === 'estatisticas') {
-        btnGrupos.className = "px-3 md:px-5 py-2 md:py-2.5 rounded-lg text-xs md:text-sm font-bold text-blue-200 hover:text-white transition-all select-none";
-        btnGrupos.textContent = t.tabGroups;
-        btnMataMata.className = "px-3 md:px-5 py-2 md:py-2.5 rounded-lg text-xs md:text-sm font-bold text-blue-200 hover:text-white transition-all select-none";
-        btnMataMata.textContent = t.tabKnockout;
-        btnEstatisticas.className = "px-3 md:px-5 py-2 md:py-2.5 rounded-lg text-xs md:text-sm font-bold bg-gradient-to-b from-white to-gray-100 text-blue-950 shadow-md transition-all transform scale-105 select-none";
-        btnEstatisticas.textContent = t.tabStats;
-    } else {
-        btnGrupos.className = "px-3 md:px-5 py-2 md:py-2.5 rounded-lg text-xs md:text-sm font-bold bg-gradient-to-b from-white to-gray-100 text-blue-950 shadow-md transition-all transform scale-105 select-none";
-        btnGrupos.textContent = t.tabGroups;
-        btnMataMata.className = "px-3 md:px-5 py-2 md:py-2.5 rounded-lg text-xs md:text-sm font-bold text-blue-200 hover:text-white transition-all select-none";
-        btnMataMata.textContent = t.tabKnockout;
-        btnEstatisticas.className = "px-3 md:px-5 py-2 md:py-2.5 rounded-lg text-xs md:text-sm font-bold text-blue-200 hover:text-white transition-all select-none";
-        btnEstatisticas.textContent = t.tabStats;
-        tab = 'grupos';
-    }
+    btnGrupos.className = getTabButtonClassName(normalizedTab === 'grupos');
+    btnMataMata.className = getTabButtonClassName(normalizedTab === 'mata-mata');
+    btnGrupos.textContent = t.tabGroups;
+    btnMataMata.textContent = t.tabKnockout;
     
-    sectionGrupos.classList.toggle('hidden', tab !== 'grupos');
-    sectionMataMata.classList.toggle('hidden', tab !== 'mata-mata');
-    sectionEstatisticas.classList.toggle('hidden', tab !== 'estatisticas');
+    sectionGrupos.classList.toggle('hidden', normalizedTab !== 'grupos');
+    sectionMataMata.classList.toggle('hidden', normalizedTab !== 'mata-mata');
 
     document.querySelectorAll('.mobile-tab-btn').forEach((btn) => {
-        const isActive = btn.getAttribute('data-tab') === tab;
+        const isActive = btn.getAttribute('data-tab') === normalizedTab;
         btn.classList.toggle('is-active', isActive);
         btn.setAttribute('aria-current', isActive ? 'page' : 'false');
     });
     
-    if (tab === 'mata-mata') {
+    if (normalizedTab === 'mata-mata') {
         renderKnockoutStage();
-    } else if (tab === 'estatisticas') {
-        renderStatistics();
     }
 
     const mainContent = document.getElementById('main-content');
@@ -219,46 +170,46 @@ export function renderTablesGrid() {
     container.innerHTML = '';
 
     const gruposParaMostrar = filtro === 'Todos' ? Object.keys(gruposClassificacao) : [filtro];
-    const t = translations[currentLang];
+    const t = translations.pt;
 
     gruposParaMostrar.forEach(g => {
         const div = document.createElement('div');
-        div.className = "bg-white dark:bg-slate-900 rounded-2xl shadow-md border border-slate-200/80 dark:border-slate-800/80 p-4 transition-all hover:shadow-lg transition-colors duration-300";
+        div.className = "group-standings-card";
 
         let rowsHtml = gruposClassificacao[g].map((teamObj, idx) => {
             let rowBg = "text-slate-700 dark:text-slate-300";
-            if (idx < 2) rowBg = "bg-emerald-50/40 dark:bg-emerald-950/20 text-emerald-900 dark:text-emerald-300 font-bold";
+            if (idx < 2) rowBg = "standings-row-highlight text-emerald-900 dark:text-emerald-300 font-bold";
             
             const localizedTeamName = translateTeam(teamObj.name, currentLang);
             
             return `
-                <tr class="text-sm md:text-xs ${rowBg} border-b border-slate-100 dark:border-slate-800/50 last:border-0">
-                    <td class="py-2.5 font-bold text-center w-6">${idx + 1}º</td>
-                    <td class="py-2.5 font-semibold flex items-center gap-2">
-                        ${getFlagTag(teamObj.name)} <span class="whitespace-nowrap text-sm md:text-xs">${localizedTeamName}</span>
+                <tr class="text-sm ${rowBg} border-b border-slate-100 dark:border-slate-800/50 last:border-0">
+                    <td class="py-3 font-bold text-center w-8">${idx + 1}º</td>
+                    <td class="py-3 font-semibold flex items-center gap-2 min-w-0">
+                        ${getFlagTag(teamObj.name)} <span class="whitespace-nowrap text-sm truncate">${localizedTeamName}</span>
                     </td>
-                    <td class="py-2.5 font-bold text-center">${teamObj.P}</td>
-                    <td class="py-2.5 text-center text-slate-400 dark:text-slate-500">${teamObj.J}</td>
-                    <td class="py-2.5 text-center font-medium">${teamObj.SG > 0 ? '+' + teamObj.SG : teamObj.SG}</td>
-                    <td class="py-2.5 text-center text-slate-400 dark:text-slate-500">${teamObj.GP}</td>
+                    <td class="py-3 font-bold text-center">${teamObj.P}</td>
+                    <td class="py-3 text-center text-slate-400 dark:text-slate-500">${teamObj.J}</td>
+                    <td class="py-3 text-center font-medium">${teamObj.SG > 0 ? '+' + teamObj.SG : teamObj.SG}</td>
+                    <td class="py-3 text-center text-slate-400 dark:text-slate-500">${teamObj.GP}</td>
                 </tr>
             `;
         }).join('');
 
         div.innerHTML = `
-            <h3 class="text-base md:text-sm font-extrabold text-blue-950 dark:text-blue-200 uppercase tracking-wider mb-3 border-b dark:border-slate-800/80 pb-2 flex justify-between">
+            <h3 class="text-base font-extrabold text-slate-950 dark:text-slate-100 uppercase tracking-[0.24em] mb-4 border-b border-slate-200/80 dark:border-slate-800/80 pb-3 flex justify-between items-center gap-3">
                 <span>${t.groupTitle} ${g}</span>
-                <span class="text-[10px] text-slate-400 dark:text-slate-500 font-normal">${t.liveClass}</span>
+                <span class="standings-live-badge">${t.liveClass}</span>
             </h3>
             <table class="w-full text-left">
                 <thead>
-                    <tr class="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase border-b dark:border-slate-800/80">
-                        <th class="pb-1 text-center">${t.tablePos}</th>
-                        <th class="pb-1">${t.tableTeam}</th>
-                        <th class="pb-1 text-center">${t.tablePts}</th>
-                        <th class="pb-1 text-center">${t.tablePl}</th>
-                        <th class="pb-1 text-center">${t.tableGd}</th>
-                        <th class="pb-1 text-center">${t.tableGf}</th>
+                    <tr class="text-[11px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-[0.18em] border-b border-slate-200/80 dark:border-slate-800/80">
+                        <th class="pb-2 text-center">${t.tablePos}</th>
+                        <th class="pb-2">${t.tableTeam}</th>
+                        <th class="pb-2 text-center">${t.tablePts}</th>
+                        <th class="pb-2 text-center">${t.tablePl}</th>
+                        <th class="pb-2 text-center">${t.tableGd}</th>
+                        <th class="pb-2 text-center">${t.tableGf}</th>
                     </tr>
                 </thead>
                 <tbody>${rowsHtml}</tbody>
@@ -282,79 +233,72 @@ export function renderGroupStage() {
     cardsContainer.innerHTML = '';
 
     const jogosFiltrados = filtro === 'Todos' ? jogosGrupos : jogosGrupos.filter(j => j.grupo === filtro);
-    const t = translations[currentLang];
+    const t = translations.pt;
 
     jogosFiltrados.forEach(j => {
         const tr = document.createElement('tr');
         tr.className = j.destaque 
-            ? "bg-amber-50/30 dark:bg-amber-950/10 hover:bg-amber-50 dark:hover:bg-amber-950/20 transition-colors" 
-            : "hover:bg-slate-50/80 dark:hover:bg-slate-950/40 transition-colors border-b border-slate-100 dark:border-slate-800/50 last:border-0";
+            ? "fixture-row fixture-row-highlight" 
+            : "fixture-row";
 
         const sh = getScoreInput(j.id, 'home');
         const sa = getScoreInput(j.id, 'away');
-        const { lockedAttrs, lockedClasses } = getMatchLockState(j.id);
+        const { lockedAttrs, lockedClasses, badgeLabel, badgeClass } = getMatchLockState(j.id);
 
         const homeName = translateTeam(j.home, currentLang);
         const awayName = translateTeam(j.away, currentLang);
 
-        let localizedDate = j.data;
-        if (currentLang === 'en') {
-            localizedDate = localizedDate
-                .replace('(Qui)', '(Thu)').replace('(Sex)', '(Fri)').replace('(Sáb)', '(Sat)')
-                .replace('(Dom)', '(Sun)').replace('(Seg)', '(Mon)').replace('(Ter)', '(Tue)')
-                .replace('(Qua)', '(Wed)');
-        }
-
-        let localizedVenue = j.local;
-        if (currentLang === 'en') {
-            localizedVenue = localizedVenue
-                .replace('Cidade do México', 'Mexico City')
-                .replace('Nova York', 'New York')
-                .replace('Filadélfia', 'Philadelphia');
-        }
-
         tr.innerHTML = `
-            <td class="px-6 py-3.5 font-bold text-slate-400 dark:text-slate-500 text-xs">#${j.id}</td>
-            <td class="px-6 py-3.5 text-slate-600 dark:text-slate-400 font-medium text-xs whitespace-nowrap">${localizedDate}</td>
+            <td class="px-6 py-4">
+                <div class="flex flex-col gap-1">
+                    <span class="font-bold text-slate-500 dark:text-slate-400 text-xs">#${j.id}</span>
+                    <span class="match-badge ${badgeClass}">${badgeLabel}</span>
+                </div>
+            </td>
+            <td class="px-6 py-4 text-slate-600 dark:text-slate-400 font-medium text-sm whitespace-nowrap">${j.data}</td>
             <td class="px-6 py-3.5">
-                <span class="px-2 py-0.5 bg-slate-100 dark:bg-slate-950 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-800 rounded-md text-[11px] font-bold">${t.groupTitle} ${j.grupo}</span>
+                <span class="match-group-pill">${t.groupTitle} ${j.grupo}</span>
             </td>
             <td class="px-6 py-3.5">
-                <div class="flex items-center justify-center gap-3">
+                <div class="fixture-versus">
                 <div class="flex items-center justify-end gap-2 w-36 md:w-44 text-right">
-                    <span class="font-semibold text-slate-800 dark:text-slate-200 text-xs md:text-sm whitespace-nowrap">${homeName}</span>
+                    <span class="font-semibold text-slate-800 dark:text-slate-200 text-sm whitespace-nowrap">${homeName}</span>
                         ${getFlagTag(j.home)}
                     </div>
                     <input type="number" min="0" placeholder="- " value="${sh}" 
                         oninput="window.setScoreInput(${j.id}, 'home', this.value)"
                         aria-label="${t.tableVs} ${homeName}"
                         ${lockedAttrs}
-                    class="w-12 h-11 md:w-11 md:h-9 min-h-[44px] md:min-h-0 text-center bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-800 rounded-lg font-black text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-blue-500 shadow-sm transition-all${lockedClasses}">
-                    <span class="text-slate-300 dark:text-slate-700 font-bold text-xs">✕</span>
+                    class="score-input-lg${lockedClasses}">
+                    <span class="text-slate-300 dark:text-slate-700 font-bold text-sm">✕</span>
                     <input type="number" min="0" placeholder="- " value="${sa}" 
                         oninput="window.setScoreInput(${j.id}, 'away', this.value)"
                         aria-label="${t.tableVs} ${awayName}"
                         ${lockedAttrs}
-                    class="w-12 h-11 md:w-11 md:h-9 min-h-[44px] md:min-h-0 text-center bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-800 rounded-lg font-black text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-blue-500 shadow-sm transition-all${lockedClasses}">
+                    class="score-input-lg${lockedClasses}">
                 <div class="flex items-center justify-start gap-2 w-36 md:w-44 text-left">
                         ${getFlagTag(j.away)}
-                    <span class="font-semibold text-slate-800 dark:text-slate-200 text-xs md:text-sm whitespace-nowrap">${awayName}</span>
+                    <span class="font-semibold text-slate-800 dark:text-slate-200 text-sm whitespace-nowrap">${awayName}</span>
                     </div>
                 </div>
             </td>
-            <td class="px-6 py-3.5 text-slate-400 dark:text-slate-500 text-xs max-w-[200px] truncate">${localizedVenue}</td>
+            <td class="px-6 py-4 text-slate-500 dark:text-slate-400 text-sm max-w-[240px] truncate">${j.local}</td>
         `;
         tbody.appendChild(tr);
 
         const card = document.createElement('article');
         card.className = j.destaque
-            ? "bg-amber-50/40 dark:bg-amber-950/10 border border-amber-200/60 dark:border-amber-900/40 rounded-xl p-4 space-y-3"
-            : "bg-slate-50/80 dark:bg-slate-950/40 border border-slate-200/70 dark:border-slate-800/70 rounded-xl p-4 space-y-3";
+            ? "fixture-card fixture-card-highlight"
+            : "fixture-card";
 
         card.innerHTML = `
             <div class="flex items-center justify-between gap-2">
-                <span class="font-bold text-xs text-slate-500 dark:text-slate-400">${localizedDate}</span>
-                <span class="px-2 py-0.5 bg-slate-100 dark:bg-slate-950 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-800 rounded-md text-[11px] font-bold">${t.groupTitle} ${j.grupo}</span>
+                <span class="font-bold text-xs text-slate-500 dark:text-slate-400">${j.data}</span>
+                <span class="match-group-pill">${t.groupTitle} ${j.grupo}</span>
+            </div>
+            <div class="flex items-center justify-between gap-3">
+                <span class="font-bold text-xs text-slate-400 dark:text-slate-500">Jogo #${j.id}</span>
+                <span class="match-badge ${badgeClass}">${badgeLabel}</span>
             </div>
             <div class="space-y-2">
                 <div class="flex items-center justify-between gap-2">
@@ -366,7 +310,7 @@ export function renderGroupStage() {
                     oninput="window.setScoreInput(${j.id}, 'home', this.value)"
                     aria-label="${t.tableVs} ${homeName}"
                     ${lockedAttrs}
-                    class="w-12 h-11 min-h-[44px] text-center bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-800 rounded-lg font-black text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-blue-500 shadow-sm transition-all${lockedClasses}">
+                    class="score-input-lg${lockedClasses}">
                 </div>
                 <div class="flex items-center justify-between gap-2">
                 <div class="flex items-center gap-2 min-w-0">
@@ -377,10 +321,10 @@ export function renderGroupStage() {
                     oninput="window.setScoreInput(${j.id}, 'away', this.value)"
                     aria-label="${t.tableVs} ${awayName}"
                     ${lockedAttrs}
-                    class="w-12 h-11 min-h-[44px] text-center bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-800 rounded-lg font-black text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-blue-500 shadow-sm transition-all${lockedClasses}">
+                    class="score-input-lg${lockedClasses}">
                 </div>
             </div>
-            <div class="text-[11px] text-slate-400 dark:text-slate-500 truncate">${localizedVenue}</div>
+            <div class="text-[11px] text-slate-400 dark:text-slate-500 truncate">${j.local}</div>
         `;
         cardsContainer.appendChild(card);
     });
@@ -410,12 +354,8 @@ function getLocalizedKnockoutPhaseLabel(faseNome, t) {
     return t.final;
 }
 
-function normalizeMatchDate(matchDate, lang) {
-    if (lang !== 'en') return matchDate;
-    return matchDate
-        .replace('(Qui)', '(Thu)').replace('(Sex)', '(Fri)').replace('(Sáb)', '(Sat)')
-        .replace('(Dom)', '(Sun)').replace('(Seg)', '(Mon)').replace('(Ter)', '(Tue)')
-        .replace('(Qua)', '(Wed)');
+function normalizeMatchDate(matchDate) {
+    return matchDate;
 }
 
 function getWinnerInfo(match, dadosCalculados) {
@@ -478,7 +418,7 @@ function buildKnockoutMatchCard(match, options = {}) {
         compact = true
     } = options;
 
-    const t = translations[currentLang];
+    const t = translations.pt;
     const dadosCalculados = mapaMataMataCalculado[match.id] || { home: 'A definir', away: 'A definir' };
     const sh = getScoreInput(match.id, 'home');
     const sa = getScoreInput(match.id, 'away');
@@ -507,7 +447,8 @@ function buildKnockoutMatchCard(match, options = {}) {
         (hasAdvancedHome || hasAdvancedAway) ? 'knockout-card-progressed' : ''
     ].filter(Boolean).join(' ');
 
-    const matchDate = normalizeMatchDate(match.data, currentLang);
+    const { badgeLabel, badgeClass } = getMatchLockState(match.id);
+    const matchDate = normalizeMatchDate(match.data);
     const penaltiesInline = isEmpate
         ? `<span class="knockout-penalties-inline">${t.penalties} <input type="number" placeholder="P" value="${penH}" oninput="window.setPenaltiesInput(${match.id}, 'home', this.value)" aria-label="${t.penalties} ${homeDisplayName}" ${lockedAttrs} class="knockout-penalty-input${lockedClasses}">-<input type="number" placeholder="P" value="${penA}" oninput="window.setPenaltiesInput(${match.id}, 'away', this.value)" aria-label="${t.penalties} ${awayDisplayName}" ${lockedAttrs} class="knockout-penalty-input${lockedClasses}"></span>`
         : '';
@@ -516,8 +457,11 @@ function buildKnockoutMatchCard(match, options = {}) {
         <article class="${cardClass}">
             <header class="knockout-match-header">
                 <span>${t.confrontation} #${match.id}</span>
-                <span>${matchDate} - ${match.hora}</span>
+                <span>${matchDate} · ${match.hora}</span>
             </header>
+            <div class="knockout-badge-row">
+                <span class="match-badge ${badgeClass}">${badgeLabel}</span>
+            </div>
 
             <div class="knockout-match-teams">
                 <div class="knockout-team-row ${homeWinner ? 'team-winner' : ''} ${hasAdvancedHome ? 'team-advanced' : ''}">
@@ -561,7 +505,7 @@ function buildKnockoutMatchCard(match, options = {}) {
 
 function buildMiniMatchCard(match, options = {}) {
     const { phaseKey = 'round32', side = 'A' } = options;
-    const t = translations[currentLang];
+    const t = translations.pt;
     const dadosCalculados = mapaMataMataCalculado[match.id] || { home: 'A definir', away: 'A definir' };
     const sh = getScoreInput(match.id, 'home');
     const sa = getScoreInput(match.id, 'away');
@@ -640,7 +584,7 @@ function ensureKnockoutViewMode() {
 }
 
 function renderKnockoutListView() {
-    const t = translations[currentLang];
+    const t = translations.pt;
 
     return `
         <div class="space-y-8">
@@ -661,7 +605,7 @@ function renderKnockoutListView() {
 }
 
 function renderKnockoutBracketView() {
-    const t = translations[currentLang];
+    const t = translations.pt;
     const allMatchesById = new Map(estruturaNosMataMata.flatMap((fase) => fase.jogos.map((jogo) => [jogo.id, jogo])));
     const getMatch = (id) => allMatchesById.get(id);
 
@@ -715,8 +659,8 @@ function renderKnockoutBracketView() {
                 <!-- CENTER: Trophy + Final + 3rd Place -->
                 <div class="kob-center">
                     <div class="kob-trophy-wrap">
-                        <img class="kob-trophy-img" src="${fifaWorldCupTrophyImageUrl}" alt="FIFA World Cup Trophy">
-                        <p class="kob-trophy-label">FIFA World Cup 2026</p>
+                        <img class="kob-trophy-img" src="${fifaWorldCupTrophyImageUrl}" alt="Troféu da Copa do Mundo FIFA 2026">
+                        <p class="kob-trophy-label">Copa do Mundo FIFA 2026</p>
                     </div>
                     <div class="kob-center-games">
                         <p class="kob-center-phase-label">${t.final}</p>
@@ -769,15 +713,26 @@ export function renderKnockoutStage() {
 
     ensureKnockoutViewMode();
 
-    const t = translations[currentLang];
+    const t = translations.pt;
     container.innerHTML = `
-        <div class="knockout-controls">
-            <div class="knockout-view-toggle" role="tablist" aria-label="${t.knockoutViewLabel}">
-                <button class="knockout-view-btn ${knockoutViewMode === 'bracket' ? 'is-active' : ''}" data-knockout-view="bracket">🌳 ${t.knockoutBracketMode}</button>
-                <button class="knockout-view-btn ${knockoutViewMode === 'list' ? 'is-active' : ''}" data-knockout-view="list">📋 ${t.knockoutListMode}</button>
+        <div class="knockout-shell">
+            <div class="knockout-header-copy">
+                <div>
+                    <p class="knockout-kicker">Chave eliminatória</p>
+                    <h3 class="knockout-headline">Visualização moderna do mata-mata</h3>
+                    <p class="knockout-subheadline">Acompanhe progressão entre fases, decisões por pênaltis e confrontos oficiais em um bracket responsivo.</p>
+                </div>
+                <div class="knockout-controls">
+                    <div class="knockout-view-toggle" role="tablist" aria-label="${t.knockoutViewLabel}">
+                        <button class="knockout-view-btn ${knockoutViewMode === 'bracket' ? 'is-active' : ''}" data-knockout-view="bracket">🌳 ${t.knockoutBracketMode}</button>
+                        <button class="knockout-view-btn ${knockoutViewMode === 'list' ? 'is-active' : ''}" data-knockout-view="list">📋 ${t.knockoutListMode}</button>
+                    </div>
+                </div>
+            </div>
+            <div class="knockout-content">
+                ${knockoutViewMode === 'bracket' ? renderKnockoutBracketView() : renderKnockoutListView()}
             </div>
         </div>
-        ${knockoutViewMode === 'bracket' ? renderKnockoutBracketView() : renderKnockoutListView()}
     `;
 
     container.querySelectorAll('[data-knockout-view]').forEach((btn) => {
@@ -792,141 +747,12 @@ export function renderKnockoutStage() {
 
 }
 
-function getStatsPhaseLabel(fase, t) {
-    if (fase.includes('Dezesseis-avos')) return t.statsRound32;
-    if (fase.includes('Oitavas')) return t.statsRound16;
-    if (fase.includes('Quartas')) return t.statsQuarters;
-    if (fase.includes('Semifinais')) return t.statsSemis;
-    return t.tabKnockout;
-}
-
 function isResolvedTeamName(teamName) {
     return teamName &&
         !teamName.includes('Vencedor #') &&
-        !teamName.includes('Winner #') &&
         !teamName.includes('Perdedor #') &&
-        !teamName.includes('Loser #') &&
         !teamName.includes('Grupo ') &&
-        teamName !== 'A definir' &&
-        teamName !== 'TBD';
-}
-
-export function renderStatistics() {
-    const container = document.getElementById('section-estatisticas');
-    if (!container) return;
-    container.innerHTML = '';
-
-    const t = translations[currentLang];
-    const gruposIniciados = Object.keys(gruposClassificacao).filter((grupo) =>
-        jogosGrupos.some((jogo) =>
-            jogo.grupo === grupo &&
-            getScoreInput(jogo.id, 'home') !== '' &&
-            getScoreInput(jogo.id, 'away') !== ''
-        )
-    );
-
-    if (gruposIniciados.length === 0) {
-        container.innerHTML = `<p class="text-sm font-semibold text-slate-500 dark:text-slate-400">${t.statsNoData}</p>`;
-        return;
-    }
-
-    const classificados = [];
-    const eliminadosPorNome = new Map();
-    const terceiros = [];
-
-    gruposIniciados.forEach((grupo) => {
-        const classificacao = gruposClassificacao[grupo] || [];
-        if (classificacao[0]) classificados.push({ name: classificacao[0].name, source: `1º Grupo ${grupo}` });
-        if (classificacao[1]) classificados.push({ name: classificacao[1].name, source: `2º Grupo ${grupo}` });
-        if (classificacao[2]) terceiros.push(classificacao[2]);
-        if (classificacao[3]) eliminadosPorNome.set(classificacao[3].name, { name: classificacao[3].name, phase: t.statsGroupStage });
-    });
-
-    const terceirosOrdenados = sortThirdPlacedTeams(terceiros);
-    const terceirosClassificados = terceirosOrdenados.slice(0, 8);
-    const terceirosEliminados = terceirosOrdenados.slice(8);
-
-    terceirosClassificados.forEach((team) => {
-        classificados.push({ name: team.name, source: `3º Grupo ${team.group}` });
-    });
-    terceirosEliminados.forEach((team) => {
-        eliminadosPorNome.set(team.name, { name: team.name, phase: t.statsGroupStage });
-    });
-
-    estruturaNosMataMata.forEach((fase) => {
-        fase.jogos.forEach((jogo) => {
-            const sh = getScoreInput(jogo.id, 'home');
-            const sa = getScoreInput(jogo.id, 'away');
-            if (sh === '' || sa === '') return;
-
-            const gh = parseInt(sh, 10);
-            const ga = parseInt(sa, 10);
-            if (Number.isNaN(gh) || Number.isNaN(ga)) return;
-
-            const dados = mapaMataMataCalculado[jogo.id] || {};
-            const home = dados.home;
-            const away = dados.away;
-
-            if (!isResolvedTeamName(home) || !isResolvedTeamName(away)) return;
-
-            let perdedor = null;
-            if (gh > ga) perdedor = away;
-            else if (ga > gh) perdedor = home;
-            else {
-                const penH = getPenaltiesInput(jogo.id, 'home');
-                const penA = getPenaltiesInput(jogo.id, 'away');
-                if (penH === '' || penA === '') return;
-                const ph = parseInt(penH, 10);
-                const pa = parseInt(penA, 10);
-                if (Number.isNaN(ph) || Number.isNaN(pa) || ph === pa) return;
-                perdedor = ph > pa ? away : home;
-            }
-
-            if (!perdedor) return;
-            eliminadosPorNome.set(perdedor, {
-                name: perdedor,
-                phase: getStatsPhaseLabel(fase.fase, t)
-            });
-        });
-    });
-
-    const classificadosHtml = classificados.map((team) => {
-        const nome = translateTeam(team.name, currentLang);
-        const origem = translatePlaceholder(team.source, currentLang);
-        return `
-            <div class="bg-white/70 dark:bg-slate-900/70 border border-emerald-200/70 dark:border-emerald-900/40 rounded-xl p-4">
-                <div class="flex items-center gap-2 text-sm font-bold text-slate-800 dark:text-slate-200">
-                    ${getFlagTag(team.name)}
-                    <span>${nome}</span>
-                </div>
-                <p class="mt-2 text-xs font-semibold text-emerald-700 dark:text-emerald-300">${t.statsQualifiedFrom}: ${origem}</p>
-            </div>
-        `;
-    }).join('');
-
-    const eliminadosHtml = Array.from(eliminadosPorNome.values()).map((team) => {
-        const nome = translateTeam(team.name, currentLang);
-        return `
-            <div class="bg-white/70 dark:bg-slate-900/70 border border-rose-200/70 dark:border-rose-900/40 rounded-xl p-4">
-                <div class="flex items-center gap-2 text-sm font-bold text-slate-800 dark:text-slate-200">
-                    ${getFlagTag(team.name)}
-                    <span>${nome}</span>
-                </div>
-                <p class="mt-2 text-xs font-semibold text-rose-700 dark:text-rose-300">${t.statsEliminatedIn}: ${team.phase}</p>
-            </div>
-        `;
-    }).join('');
-
-    container.innerHTML = `
-        <section class="bg-emerald-50/40 dark:bg-emerald-950/20 border border-emerald-100 dark:border-emerald-900/40 rounded-2xl p-5 md:p-6 space-y-4">
-            <h3 class="text-lg font-extrabold text-emerald-900 dark:text-emerald-300">${t.statsQualified}</h3>
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">${classificadosHtml}</div>
-        </section>
-        <section class="bg-rose-50/40 dark:bg-rose-950/20 border border-rose-100 dark:border-rose-900/40 rounded-2xl p-5 md:p-6 space-y-4">
-            <h3 class="text-lg font-extrabold text-rose-900 dark:text-rose-300">${t.statsEliminated}</h3>
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">${eliminadosHtml}</div>
-        </section>
-    `;
+        teamName !== 'A definir';
 }
 
 export function showToast(message) {

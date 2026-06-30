@@ -35,27 +35,35 @@
 
     <!-- Header Principal -->
     <header class="site-header text-white shadow-2xl">
-        <div class="max-w-7xl mx-auto px-4 py-3 md:py-8 flex flex-col md:flex-row justify-between items-center gap-4 md:gap-6">
-            <div class="text-center md:text-left">
-                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/88/2026_FIFA_World_Cup_emblem_%28horizontal%2C_with_wordmark%29.svg/960px-2026_FIFA_World_Cup_emblem_%28horizontal%2C_with_wordmark%29.svg.png" alt="Logo FIFA World Cup 2026" class="h-10 md:h-14 mx-auto md:mx-0 drop-shadow-lg">
-                <h1 id="title-app" class="text-2xl md:text-4xl font-extrabold tracking-tight mt-1 md:mt-2 drop-shadow-md header-title">COPA DO MUNDO FIFA 2026</h1>
+        <div class="max-w-7xl mx-auto px-4 py-5 md:py-9 flex flex-col xl:flex-row justify-between items-start gap-6 md:gap-8">
+            <div class="hero-copy text-center xl:text-left w-full xl:max-w-3xl">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/88/2026_FIFA_World_Cup_emblem_%28horizontal%2C_with_wordmark%29.svg/960px-2026_FIFA_World_Cup_emblem_%28horizontal%2C_with_wordmark%29.svg.png" alt="Logo da Copa do Mundo FIFA 2026" class="h-10 md:h-14 mx-auto xl:mx-0 drop-shadow-lg">
+                <h1 id="title-app" class="text-3xl md:text-5xl font-extrabold tracking-tight mt-2 drop-shadow-md header-title">COPA DO MUNDO FIFA 2026</h1>
+                <p id="subtitle-app" class="mt-3 text-sm md:text-base text-blue-100/90 max-w-2xl mx-auto xl:mx-0 leading-relaxed">
+                    Resultados oficiais da ESPN, simulações em tempo real e chaveamento automático em português-BR.
+                </p>
+                <div class="hero-highlights mt-4">
+                    <span class="hero-pill">Português-BR</span>
+                    <span class="hero-pill">Atualização segura</span>
+                    <span class="hero-pill">Bracket responsivo</span>
+                </div>
             </div>
             
-            <!-- Controles do Topo (Abas + Toggles de Idioma & Tema) -->
-            <div class="flex flex-col sm:flex-row items-center gap-3 md:gap-4">
+            <!-- Controles do Topo -->
+            <div class="flex flex-col items-stretch gap-4 w-full xl:w-auto xl:min-w-[22rem]">
+                <div class="official-status-card">
+                    <span class="official-status-kicker">Status dos resultados</span>
+                    <strong id="official-status" class="official-status-title">Resultados oficiais ESPN</strong>
+                    <p id="official-status-detail" class="official-status-detail">Dados normalizados e prontos para exibição.</p>
+                </div>
                 <!-- Alternador de Abas -->
-                <div class="flex tab-switcher p-1 rounded-xl shadow-inner backdrop-blur-sm">
-                    <button id="btn-grupos" class="px-3 md:px-5 py-2 md:py-2.5 rounded-lg text-xs md:text-sm font-bold bg-gradient-to-b from-white to-gray-100 text-blue-950 shadow-md transition-all duration-300 transform scale-105">Fase de Grupos</button>
-                    <button id="btn-mata-mata" class="px-3 md:px-5 py-2 md:py-2.5 rounded-lg text-xs md:text-sm font-bold text-blue-200 hover:text-white hover:bg-white/10 transition-all duration-300">Eliminatórias</button>
-                    <button id="btn-estatisticas" class="px-3 md:px-5 py-2 md:py-2.5 rounded-lg text-xs md:text-sm font-bold text-blue-200 hover:text-white hover:bg-white/10 transition-all duration-300">Estatísticas</button>
+                <div class="flex tab-switcher p-1.5 rounded-2xl shadow-inner backdrop-blur-sm w-full">
+                    <button id="btn-grupos" class="header-tab-btn is-active">Fase de Grupos</button>
+                    <button id="btn-mata-mata" class="header-tab-btn">Mata-mata</button>
                 </div>
                 
-                <!-- Toggles Rápidos -->
-                <div class="flex gap-2">
-                    <button id="btn-lang" class="header-btn text-blue-200 hover:text-white px-3 py-2 rounded-xl transition-all duration-300 text-xs font-bold backdrop-blur-sm">
-                        🌐 <span id="lbl-btn-lang">English</span>
-                    </button>
-                    <button id="btn-theme" class="header-btn text-blue-200 hover:text-white px-3 py-2 rounded-xl transition-all duration-300 text-xs font-bold backdrop-blur-sm">
+                <div class="flex justify-end">
+                    <button id="btn-theme" class="header-btn text-blue-200 hover:text-white px-4 py-3 rounded-2xl transition-all duration-300 text-xs font-bold backdrop-blur-sm min-h-[48px]">
                         🌙 <span id="lbl-btn-theme">Modo Claro</span>
                     </button>
                 </div>
@@ -66,7 +74,7 @@
     </header>
 
     <!-- Conteúdo Principal -->
-    <main id="main-content" class="flex-grow max-w-[1920px] w-full mx-auto px-4 xl:px-10 2xl:px-16 py-8">
+    <main id="main-content" class="flex-grow max-w-[1680px] w-full mx-auto px-4 xl:px-8 2xl:px-12 py-8 md:py-10">
         <div id="loading-overlay" class="flex flex-col items-center justify-center py-20 gap-4">
             <div class="w-10 h-10 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin"></div>
             <p id="loading-overlay-text" class="text-sm text-slate-500 dark:text-slate-400 font-medium"></p>
@@ -76,25 +84,25 @@
         <section id="section-grupos" class="space-y-8 transition-all duration-500">
             
             <!-- Painel de Filtros e Resumos -->
-            <div class="bg-white dark:bg-slate-900 p-5 rounded-2xl shadow-md border border-slate-200/80 dark:border-slate-800/80 flex flex-col md:flex-row gap-4 items-center justify-between transition-colors duration-300">
-                <div class="flex items-center gap-3">
-                    <label id="lbl-filter-grupo" for="filter-grupo" class="text-sm font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Visualizar Grupo:</label>
+            <div class="surface-panel flex flex-col xl:flex-row gap-5 xl:items-center xl:justify-between transition-colors duration-300">
+                <div class="flex flex-col sm:flex-row sm:items-center gap-3">
+                    <label id="lbl-filter-grupo" for="filter-grupo" class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-[0.24em]">Visualizar grupo</label>
                     <div class="flex items-center gap-2">
-                        <button id="btn-prev-group" type="button" class="group-nav-btn md:hidden h-9 w-9 rounded-xl border border-slate-300 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 text-slate-700 dark:text-slate-200 font-black text-lg leading-none" aria-label="Grupo anterior">‹</button>
-                        <select id="filter-grupo" class="bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-800 text-slate-800 dark:text-slate-200 text-sm rounded-xl font-semibold px-4 py-2 focus:ring-2 focus:ring-blue-500 transition-colors duration-300">
+                        <button id="btn-prev-group" type="button" class="group-nav-btn md:hidden h-11 w-11 rounded-2xl border border-slate-300 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 text-slate-700 dark:text-slate-200 font-black text-lg leading-none" aria-label="Grupo anterior">‹</button>
+                        <select id="filter-grupo" class="surface-select">
                             <option id="opt-all-groups" value="Todos">Todos os Grupos (A ao L)</option>
                             <option value="A">Grupo A</option><option value="B">Grupo B</option><option value="C">Grupo C</option>
                             <option value="D">Grupo D</option><option value="E">Grupo E</option><option value="F">Grupo F</option>
                             <option value="G">Grupo G</option><option value="H">Grupo H</option><option value="I">Grupo I</option>
                             <option value="J">Grupo J</option><option value="K">Grupo K</option><option value="L">Grupo L</option>
                         </select>
-                        <button id="btn-next-group" type="button" class="group-nav-btn md:hidden h-9 w-9 rounded-xl border border-slate-300 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 text-slate-700 dark:text-slate-200 font-black text-lg leading-none" aria-label="Próximo grupo">›</button>
+                        <button id="btn-next-group" type="button" class="group-nav-btn md:hidden h-11 w-11 rounded-2xl border border-slate-300 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 text-slate-700 dark:text-slate-200 font-black text-lg leading-none" aria-label="Próximo grupo">›</button>
                     </div>
                 </div>
-                <div id="lbl-group-info" class="text-xs font-semibold bg-blue-50 dark:bg-blue-950/30 text-blue-700 dark:text-blue-300 px-4 py-2 rounded-xl border border-blue-100 dark:border-blue-900/50 shadow-sm transition-colors duration-300">
-                    ℹ️ Os 2 melhores de cada grupo + os 8 melhores 3º colocados avançam dinamicamente.
+                <div id="lbl-group-info" class="surface-callout transition-colors duration-300">
+                    Os 2 melhores de cada grupo + os 8 melhores 3º colocados avançam dinamicamente.
                 </div>
-                <button id="btn-reset-predictions" type="button" class="text-xs font-semibold bg-rose-50 dark:bg-rose-950/30 text-rose-700 dark:text-rose-300 px-4 py-2 rounded-xl border border-rose-100 dark:border-rose-900/50 shadow-sm hover:bg-rose-100 dark:hover:bg-rose-950/50 transition-colors duration-300">
+                <button id="btn-reset-predictions" type="button" class="reset-btn">
                     <span id="lbl-btn-reset"></span>
                 </button>
             </div>
@@ -105,17 +113,17 @@
             </div>
 
             <!-- Tabela Cronológica de Partidas do Grupo -->
-            <div class="bg-white dark:bg-slate-900 rounded-2xl shadow-xl border border-slate-200/60 dark:border-slate-800/60 overflow-hidden mt-6 transition-colors duration-300">
-                <div class="p-5 bg-slate-50 dark:bg-slate-950 border-b border-slate-200 dark:border-slate-800/80 flex justify-between items-center transition-colors duration-300">
-                    <h2 id="lbl-fixtures-title" class="font-extrabold text-slate-800 dark:text-slate-200 tracking-tight">Jogos e Calendário da Fase de Grupos</h2>
-                    <span id="lbl-fixtures-count" class="text-xs font-bold text-slate-400 dark:text-slate-500">72 PARTIDAS</span>
+            <div class="surface-panel surface-panel-lg overflow-hidden mt-6 transition-colors duration-300">
+                <div class="p-5 md:p-6 bg-slate-50/90 dark:bg-slate-950/85 border-b border-slate-200/80 dark:border-slate-800/80 flex flex-col sm:flex-row gap-3 sm:justify-between sm:items-center transition-colors duration-300">
+                    <h2 id="lbl-fixtures-title" class="font-extrabold text-xl text-slate-900 dark:text-slate-100 tracking-tight">Jogos e Calendário da Fase de Grupos</h2>
+                    <span id="lbl-fixtures-count" class="surface-counter">72 PARTIDAS</span>
                 </div>
                 <div id="cards-body-grupos" class="md:hidden p-4 space-y-3">
                     <!-- Renderizado via JS -->
                 </div>
                 <div class="hidden md:block overflow-x-auto">
                     <table class="w-full text-left border-collapse">
-                        <thead class="bg-slate-100/50 dark:bg-slate-950/50 text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider border-b border-slate-200 dark:border-slate-800">
+                        <thead class="bg-slate-100/70 dark:bg-slate-950/70 text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-[0.22em] border-b border-slate-200 dark:border-slate-800">
                             <tr>
                                 <th id="th-match" class="px-6 py-4">Jogo</th>
                                 <th id="th-datetime" class="px-6 py-4">Data / Hora (BRT)</th>
@@ -147,10 +155,6 @@
             </div>
         </section>
 
-        <!-- SEÇÃO: ESTATÍSTICAS -->
-        <section id="section-estatisticas" class="hidden space-y-8 transition-all duration-500">
-            <!-- Conteúdo renderizado via JS -->
-        </section>
     </main>
 
     <!-- Footer com Seção de Contatos e PIX Customizada -->
@@ -159,8 +163,8 @@
             
             <!-- Créditos e Copy -->
             <div class="text-center md:text-left">
-                <p id="lbl-footer-title" class="font-bold text-slate-300">© 2026 Tabela Cronológica FIFA World Cup</p>
-                <p id="lbl-footer-sub" class="text-xs text-slate-500 mt-0.5">Desenvolvido por Cadu Barbosa • Dados Públicos • FIFA World Cup 2026</p>
+                <p id="lbl-footer-title" class="font-bold text-slate-300">© 2026 COPA DO MUNDO FIFA 2026</p>
+                <p id="lbl-footer-sub" class="text-xs text-slate-500 mt-0.5">Desenvolvido por Cadu Barbosa • Dados públicos • Copa do Mundo FIFA 2026</p>
             </div>
             
             <!-- Bloco de Contatos, Redes Sociais e PIX -->
@@ -194,18 +198,14 @@
 
     <!-- Bottom Navigation Mobile -->
     <nav class="mobile-bottom-nav md:hidden fixed bottom-0 inset-x-0 z-40 px-3 py-2 border-t border-slate-200/70 dark:border-slate-800/80" aria-label="Navegação principal">
-        <div class="max-w-7xl mx-auto grid grid-cols-3 gap-2">
+        <div class="max-w-7xl mx-auto grid grid-cols-2 gap-2">
             <button id="btn-grupos-mobile" class="mobile-tab-btn is-active" data-tab="grupos">
                 <span aria-hidden="true">🏟️</span>
                 <span id="lbl-btn-grupos-mobile">Fase de Grupos</span>
             </button>
             <button id="btn-mata-mata-mobile" class="mobile-tab-btn" data-tab="mata-mata">
                 <span aria-hidden="true">🏆</span>
-                <span id="lbl-btn-mata-mata-mobile">Eliminatórias</span>
-            </button>
-            <button id="btn-estatisticas-mobile" class="mobile-tab-btn" data-tab="estatisticas">
-                <span aria-hidden="true">📊</span>
-                <span id="lbl-btn-estatisticas-mobile">Estatísticas</span>
+                <span id="lbl-btn-mata-mata-mobile">Mata-mata</span>
             </button>
         </div>
     </nav>
