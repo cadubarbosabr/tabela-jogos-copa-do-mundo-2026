@@ -1200,3 +1200,74 @@ input[type=number] { -moz-appearance: textfield; }
     min-width: 0;
   }
 }
+
+/* ============================================================
+   KOB — Large desktop (≥ 1440px)
+   ============================================================ */
+
+@media (min-width: 1440px) {
+  .kob-wrap {
+    --kob-card-w: 210px;
+    --kob-col-gap: 12px;
+  }
+
+  .kob-track {
+    gap: 16px;
+    justify-content: center;
+    min-width: 0;
+  }
+
+  .kob-center {
+    width: 230px;
+  }
+
+  .kob-center .kob-mini-card {
+    width: 220px;
+  }
+
+  .kob-mini-team .kob-mini-name {
+    font-size: 11px;
+  }
+
+  .kob-label {
+    font-size: 10px;
+  }
+}
+
+/* ============================================================
+   KOB — Ultra-wide (≥ 1920px)
+   ============================================================ */
+
+@media (min-width: 1920px) {
+  .kob-wrap {
+    --kob-card-w: 240px;
+    --kob-col-gap: 16px;
+  }
+
+  .kob-track {
+    gap: 24px;
+    justify-content: center;
+    min-width: 0;
+  }
+
+  .kob-center {
+    width: 270px;
+  }
+
+  .kob-center .kob-mini-card {
+    width: 260px;
+  }
+
+  .kob-cell {
+    gap: 6px;
+  }
+
+  .kob-mini-team .kob-mini-name {
+    font-size: 12px;
+  }
+
+  .kob-label {
+    font-size: 11px;
+    letter-spacing: 0.14em;
+  }
+}
