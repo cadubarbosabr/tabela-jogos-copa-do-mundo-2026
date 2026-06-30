@@ -28,7 +28,7 @@ function normalizeInteger(value) {
     if (value === undefined || value === null || value === '') return null;
 
     const parsedValue = Number.parseInt(value, 10);
-    if (!Number.isInteger(parsedValue) || parsedValue < 0) return null;
+    if (Number.isNaN(parsedValue) || parsedValue < 0) return null;
 
     return parsedValue;
 }

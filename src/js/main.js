@@ -50,12 +50,12 @@ function updateOfficialStatusLabel() {
 
     if (statusDetail) {
         if (status.hasError && hasOfficialData) {
-            statusDetail.textContent = `${t.officialStatusCached}${formattedDate ? ` Snapshot de ${formattedDate}.` : ''}`;
+            statusDetail.textContent = `${t.officialStatusCached}${formattedDate ? ` ${t.officialStatusSnapshotPrefix} ${formattedDate}.` : ''}`;
         } else if (status.hasError) {
             statusDetail.textContent = t.officialStatusEmpty;
         } else {
             const qualityNote = status.droppedEntries > 0
-                ? ` ${status.droppedEntries} registro(s) inválido(s) foram ignorados com segurança.`
+                ? ` ${status.droppedEntries} ${t.officialStatusDroppedEntries}`
                 : '';
             statusDetail.textContent = `${t.officialStatusReady}${formattedDate ? ` Atualizado em ${formattedDate}.` : ''}${qualityNote}`;
         }

@@ -58,7 +58,9 @@ export const translations = {
         officialStatusUnavailable: "Sem atualização oficial",
         officialStatusReady: "Dados normalizados e prontos para exibição.",
         officialStatusCached: "Exibindo fallback local seguro enquanto a ESPN está indisponível.",
-        officialStatusEmpty: "Resultados oficiais ainda não foram publicados para este momento."
+        officialStatusEmpty: "Resultados oficiais ainda não foram publicados para este momento.",
+        officialStatusSnapshotPrefix: "Snapshot de",
+        officialStatusDroppedEntries: "registro(s) inválido(s) foram ignorados com segurança."
     }
 };
 
