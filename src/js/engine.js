@@ -83,7 +83,7 @@ export function recalcularTorneioCompleto() {
     // 5. Resolver Chaveamento Dinâmico do Mata-Mata jogo por jogo
     mapaMataMataCalculado = {};
 
-    // Rastreia os 3ºs colocados já atribuídos a um confronto, evitando duplicações.
+    // Rastreia os 3ºs colocados já alocados a um confronto, evitando duplicações.
     const terceirosAlocados = new Set();
 
     estruturaNosMataMata.forEach(faseObj => {
@@ -117,7 +117,7 @@ export function recalcularTorneioCompleto() {
                 }
             } else if (j.origAway.tipo === "terceiro") {
                 // Alocação gulosa: melhor 3º elegível (dentro dos grupos permitidos)
-                // ainda não atribuído a outro confronto desta fase.
+                // ainda não alocado a outro confronto desta fase.
                 const elegiveis = terceirosQualificados.filter(t =>
                     j.origAway.grps.includes(t.group) && !terceirosAlocados.has(t.name)
                 );
@@ -128,8 +128,12 @@ export function recalcularTorneioCompleto() {
                     // Fallback último recurso: qualquer 3º ainda não alocado,
                     // sem restrição de grupo, para não deixar a vaga vazia.
                     const sobrou = terceirosQualificados.find(t => !terceirosAlocados.has(t.name));
-                    timeAway = sobrou ? sobrou.name : `3º Grupo ${j.origAway.grps[0]}`;
-                    if (sobrou) terceirosAlocados.add(sobrou.name);
+                    if (sobrou) {
+                        timeAway = sobrou.name;
+                        terceirosAlocados.add(sobrou.name);
+                    } else {
+                        timeAway = `3º Grupo ${j.origAway.grps[0]}`;
+                    }
                 }
             } else if (j.origAway.tipo === "venc") {
                 timeAway = calcularVencedorMataMata(j.origAway.j);
