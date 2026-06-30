@@ -577,27 +577,50 @@ function buildMiniMatchCard(match, options = {}) {
 
 function ensureKnockoutViewMode() {
     if (knockoutViewMode === 'bracket' || knockoutViewMode === 'list') return;
-
-    const prefersList = window.matchMedia && window.matchMedia('(max-width: 767px)').matches;
-    knockoutViewMode = prefersList ? 'list' : 'bracket';
+    // Default to list on narrow screens for better readability
+    knockoutViewMode = window.innerWidth < 640 ? 'list' : 'bracket';
     localStorage.setItem('wc2026_knockout_view', knockoutViewMode);
 }
 
 function renderKnockoutListView() {
     const t = translations.pt;
 
+    const phaseAccents = {
+        round32: 'rgb(59 130 246)',
+        round16: 'rgb(139 92 246)',
+        quarterFinals: 'rgb(236 72 153)',
+        semiFinals: 'rgb(245 158 11)',
+        thirdPlace: 'rgb(100 116 139)',
+        final: 'rgb(212 175 55)',
+    };
+
+    const phaseShortLabels = {
+        round32: '16 avos',
+        round16: 'Oitavas',
+        quarterFinals: 'Quartas',
+        semiFinals: 'Semi',
+        thirdPlace: '3º Lugar',
+        final: 'Final',
+    };
+
     return `
-        <div class="space-y-8">
+        <div class="bk-cascade">
             ${estruturaNosMataMata.map((fase) => {
                 const phaseKey = getKnockoutPhaseKey(fase.fase);
                 const localizedFase = getLocalizedKnockoutPhaseLabel(fase.fase, t);
+                const accent = phaseAccents[phaseKey] || 'rgb(59 130 246)';
+                const count = fase.jogos.length;
                 return `
-                    <section class="space-y-4" data-phase-key="${phaseKey}">
-                        <h3 class="text-lg md:text-xl font-extrabold text-slate-800 dark:text-slate-200 border-b border-slate-200 dark:border-slate-800/80 pb-2">${localizedFase}</h3>
-                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-                            ${fase.jogos.map((match) => buildKnockoutMatchCard(match, { phaseKey, compact: true })).join('')}
+                    <div class="bk-phase" data-phase-key="${phaseKey}" style="--bk-accent: ${accent}">
+                        <div class="bk-phase-header">
+                            <span class="bk-phase-badge">${phaseShortLabels[phaseKey] || localizedFase}</span>
+                            <h4 class="bk-phase-title">${localizedFase}</h4>
+                            <span class="bk-phase-count">${count} jogo${count > 1 ? 's' : ''}</span>
                         </div>
-                    </section>
+                        <div class="bk-phase-grid" style="--bk-cols: ${Math.min(count, 4)}">
+                            ${fase.jogos.map((match) => buildMiniMatchCard(match, { phaseKey, compact: true })).join('')}
+                        </div>
+                    </div>
                 `;
             }).join('')}
         </div>
@@ -609,100 +632,76 @@ function renderKnockoutBracketView() {
     const allMatchesById = new Map(estruturaNosMataMata.flatMap((fase) => fase.jogos.map((jogo) => [jogo.id, jogo])));
     const getMatch = (id) => allMatchesById.get(id);
 
-    const renderMiniCards = (ids, phaseKey, side) =>
-        ids.map((id) => getMatch(id)).filter(Boolean)
-            .map((m) => buildMiniMatchCard(m, { phaseKey, side })).join('');
-
-    const r32Short = t.bracketR32;
-    const r16Short = t.bracketR16;
-    const qfShort  = t.bracketQF;
-    const sfShort  = t.bracketSF;
-
-    const finalMatch      = getMatch(104);
-    const thirdPlaceMatch = getMatch(103);
+    const phases = [
+        {
+            key: 'round32',
+            label: t.round32,
+            short: '16 avos',
+            accent: 'rgb(59 130 246)',
+            cols: 4,
+            matchIds: [73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88]
+        },
+        {
+            key: 'round16',
+            label: t.round16,
+            short: 'Oitavas',
+            accent: 'rgb(139 92 246)',
+            cols: 4,
+            matchIds: [89, 90, 91, 92, 93, 94, 95, 96]
+        },
+        {
+            key: 'quarterFinals',
+            label: t.quarterFinals,
+            short: 'Quartas',
+            accent: 'rgb(236 72 153)',
+            cols: 4,
+            matchIds: [97, 98, 99, 100]
+        },
+        {
+            key: 'semiFinals',
+            label: t.semiFinals,
+            short: 'Semi',
+            accent: 'rgb(245 158 11)',
+            cols: 2,
+            matchIds: [101, 102]
+        },
+        {
+            key: 'final',
+            label: t.final,
+            short: 'Final',
+            accent: 'rgb(212 175 55)',
+            cols: 1,
+            matchIds: [104]
+        },
+        {
+            key: 'thirdPlace',
+            label: t.thirdPlace,
+            short: '3º Lugar',
+            accent: 'rgb(100 116 139)',
+            cols: 1,
+            matchIds: [103]
+        },
+    ];
 
     return `
-        <div class="kob-wrap" id="knockout-bracket-scroll">
-            <div class="kob-track">
-
-                <!-- LEFT SIDE: R32 | R16 | QF | SF (columns 1-4, flows left→center) -->
-                <div class="kob-side kob-side-left">
-                    <div class="kob-label">${r32Short}</div>
-                    <div class="kob-label">${r16Short}</div>
-                    <div class="kob-label">${qfShort}</div>
-                    <div class="kob-label">${sfShort}</div>
-
-                    <div class="kob-cell kob-left-r32-upper kob-conn-right" data-phase="round32">
-                        ${renderMiniCards([73, 74, 75, 76, 77], 'round32', 'A')}
+        <div class="bk-cascade">
+            ${phases.map(phase => {
+                const matches = phase.matchIds.map(id => getMatch(id)).filter(Boolean);
+                if (matches.length === 0) return '';
+                const cardSide = (phase.key === 'final' || phase.key === 'thirdPlace') ? 'final' : 'A';
+                return `
+                    <div class="bk-phase" data-phase="${phase.key}" style="--bk-accent: ${phase.accent}">
+                        <div class="bk-phase-header">
+                            <span class="bk-phase-badge">${phase.short}</span>
+                            <h4 class="bk-phase-title">${phase.label}</h4>
+                            <span class="bk-phase-count">${matches.length} jogo${matches.length > 1 ? 's' : ''}</span>
+                        </div>
+                        <div class="bk-phase-grid" style="--bk-cols: ${Math.min(matches.length, phase.cols)}">
+                            ${matches.map(m => buildMiniMatchCard(m, { phaseKey: phase.key, side: cardSide })).join('')}
+                        </div>
                     </div>
-                    <div class="kob-cell kob-left-r16-upper kob-conn-right" data-phase="round16">
-                        ${renderMiniCards([89, 90], 'round16', 'A')}
-                    </div>
-                    <div class="kob-cell kob-left-qf-upper kob-conn-right" data-phase="quarterFinals">
-                        ${renderMiniCards([97], 'quarterFinals', 'A')}
-                    </div>
-                    <div class="kob-cell kob-left-sf" data-phase="semiFinals">
-                        ${renderMiniCards([101], 'semiFinals', 'A')}
-                    </div>
-
-                    <div class="kob-cell kob-left-r32-lower kob-conn-right" data-phase="round32">
-                        ${renderMiniCards([78, 79, 80, 81, 82], 'round32', 'A')}
-                    </div>
-                    <div class="kob-cell kob-left-r16-lower kob-conn-right" data-phase="round16">
-                        ${renderMiniCards([91, 92], 'round16', 'A')}
-                    </div>
-                    <div class="kob-cell kob-left-qf-lower kob-conn-right" data-phase="quarterFinals">
-                        ${renderMiniCards([99], 'quarterFinals', 'A')}
-                    </div>
-                </div>
-
-                <!-- CENTER: Trophy + Final + 3rd Place -->
-                <div class="kob-center">
-                    <div class="kob-trophy-wrap">
-                        <img class="kob-trophy-img" src="${fifaWorldCupTrophyImageUrl}" alt="Troféu da Copa do Mundo FIFA 2026">
-                        <p class="kob-trophy-label">Copa do Mundo FIFA 2026</p>
-                    </div>
-                    <div class="kob-center-games">
-                        <p class="kob-center-phase-label">${t.final}</p>
-                        ${finalMatch ? buildMiniMatchCard(finalMatch, { phaseKey: 'final', side: 'final' }) : ''}
-                        <p class="kob-center-phase-label kob-third-label">${t.thirdPlace}</p>
-                        ${thirdPlaceMatch ? buildMiniMatchCard(thirdPlaceMatch, { phaseKey: 'thirdPlace', side: 'final' }) : ''}
-                    </div>
-                </div>
-
-                <!-- RIGHT SIDE: SF | QF | R16 | R32 (columns 1-4, matches flow center→right) -->
-                <!-- Note: right side has 3 R32 matches per half (vs 5 on left), per the 48-team bracket spec -->
-                <div class="kob-side kob-side-right">
-                    <div class="kob-label">${sfShort}</div>
-                    <div class="kob-label">${qfShort}</div>
-                    <div class="kob-label">${r16Short}</div>
-                    <div class="kob-label">${r32Short}</div>
-
-                    <div class="kob-cell kob-right-sf" data-phase="semiFinals">
-                        ${renderMiniCards([102], 'semiFinals', 'B')}
-                    </div>
-                    <div class="kob-cell kob-right-qf-upper kob-conn-left" data-phase="quarterFinals">
-                        ${renderMiniCards([98], 'quarterFinals', 'B')}
-                    </div>
-                    <div class="kob-cell kob-right-r16-upper kob-conn-left" data-phase="round16">
-                        ${renderMiniCards([93, 94], 'round16', 'B')}
-                    </div>
-                    <div class="kob-cell kob-right-r32-upper kob-conn-left" data-phase="round32">
-                        ${renderMiniCards([83, 84, 85], 'round32', 'B')}
-                    </div>
-
-                    <div class="kob-cell kob-right-qf-lower kob-conn-left" data-phase="quarterFinals">
-                        ${renderMiniCards([100], 'quarterFinals', 'B')}
-                    </div>
-                    <div class="kob-cell kob-right-r16-lower kob-conn-left" data-phase="round16">
-                        ${renderMiniCards([95, 96], 'round16', 'B')}
-                    </div>
-                    <div class="kob-cell kob-right-r32-lower kob-conn-left" data-phase="round32">
-                        ${renderMiniCards([86, 87, 88], 'round32', 'B')}
-                    </div>
-                </div>
-
-            </div>
+                `;
+            }).join('')}
         </div>
     `;
 }
@@ -718,13 +717,13 @@ export function renderKnockoutStage() {
         <div class="knockout-shell">
             <div class="knockout-header-copy">
                 <div>
-                    <p class="knockout-kicker">Chave eliminatória</p>
-                    <h3 class="knockout-headline">Visualização moderna do mata-mata</h3>
-                    <p class="knockout-subheadline">Acompanhe progressão entre fases, decisões por pênaltis e confrontos oficiais em um bracket responsivo.</p>
+                    <p class="knockout-kicker">Mata-Mata · Copa do Mundo FIFA 2026</p>
+                    <h3 class="knockout-headline">Chave eliminatória</h3>
+                    <p class="knockout-subheadline">Acompanhe todos os confrontos oficiais, progresso de fases, pênaltis e o caminho até a grande final.</p>
                 </div>
                 <div class="knockout-controls">
                     <div class="knockout-view-toggle" role="tablist" aria-label="${t.knockoutViewLabel}">
-                        <button class="knockout-view-btn ${knockoutViewMode === 'bracket' ? 'is-active' : ''}" data-knockout-view="bracket">🌳 ${t.knockoutBracketMode}</button>
+                        <button class="knockout-view-btn ${knockoutViewMode === 'bracket' ? 'is-active' : ''}" data-knockout-view="bracket">🏆 ${t.knockoutBracketMode}</button>
                         <button class="knockout-view-btn ${knockoutViewMode === 'list' ? 'is-active' : ''}" data-knockout-view="list">📋 ${t.knockoutListMode}</button>
                     </div>
                 </div>
