@@ -144,13 +144,14 @@
         <section id="section-mata-mata" class="hidden space-y-8 transition-all duration-500">
             
             <!-- BANNER DO CAMPEÃO DINÂMICO -->
-            <div id="banner-campeao" class="hidden bg-gradient-to-r from-amber-500 via-yellow-400 to-amber-600 p-6 rounded-3xl shadow-2xl text-white text-center border-2 border-amber-300 animate-bounce relative overflow-hidden">
-                <p id="lbl-champion-title" class="text-xs uppercase font-extrabold tracking-widest text-amber-950">🏆 Campeão do Mundo 🏆</p>
-                <h2 id="nome-campeao" class="text-3xl md:text-5xl font-black mt-2 drop-shadow-lg uppercase tracking-tight">---</h2>
-                <p id="lbl-champion-subtitle" class="text-sm font-bold text-amber-950/80 mt-1">VENCEDOR DA COPA DO MUNDO FIFA 2026</p>
+            <div id="banner-campeao" class="hidden p-8 rounded-3xl shadow-2xl text-white text-center relative overflow-hidden">
+                <div class="absolute inset-0 opacity-20" style="background-image: radial-gradient(circle at 30% 50%, white 1px, transparent 1px), radial-gradient(circle at 70% 50%, white 1px, transparent 1px); background-size: 32px 32px;"></div>
+                <p id="lbl-champion-title" class="text-xs uppercase font-black tracking-[0.3em] text-amber-950/80">🏆 Campeão do Mundo 🏆</p>
+                <h2 id="nome-campeao" class="text-4xl md:text-6xl font-black mt-3 drop-shadow-lg uppercase tracking-tight" style="font-family: 'Plus Jakarta Sans', sans-serif;">---</h2>
+                <p id="lbl-champion-subtitle" class="text-sm font-bold text-amber-950/70 mt-2 tracking-widest">VENCEDOR DA COPA DO MUNDO FIFA 2026</p>
             </div>
 
-            <div id="container-mata-mata" aria-live="polite" class="space-y-10">
+            <div id="container-mata-mata" aria-live="polite">
                 <!-- Renderizado via JS -->
             </div>
         </section>

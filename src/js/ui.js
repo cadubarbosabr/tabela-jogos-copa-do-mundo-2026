@@ -178,26 +178,31 @@ export function renderTablesGrid() {
 
         let rowsHtml = gruposClassificacao[g].map((teamObj, idx) => {
             let rowBg = "text-slate-700 dark:text-slate-300";
-            if (idx < 2) rowBg = "standings-row-highlight text-emerald-900 dark:text-emerald-300 font-bold";
+            let qualifierMark = '';
+            if (idx < 2) {
+                rowBg = "standings-row-highlight text-emerald-900 dark:text-emerald-300 font-bold";
+                qualifierMark = '<span class="inline-block w-1.5 h-1.5 rounded-full bg-emerald-500 dark:bg-emerald-400 ml-1 flex-shrink-0"></span>';
+            }
             
             const localizedTeamName = translateTeam(teamObj.name, currentLang);
             
             return `
                 <tr class="text-sm ${rowBg} border-b border-slate-100 dark:border-slate-800/50 last:border-0">
                     <td class="py-3 font-bold text-center w-8">${idx + 1}º</td>
-                    <td class="py-3 font-semibold flex items-center gap-2 min-w-0">
-                        ${getFlagTag(teamObj.name)} <span class="whitespace-nowrap text-sm truncate">${localizedTeamName}</span>
+                    <td class="py-3 font-semibold">
+                        <div class="flex items-center gap-2 min-w-0">
+                            ${getFlagTag(teamObj.name)} <span class="whitespace-nowrap text-sm truncate">${localizedTeamName}</span>${qualifierMark}
+                        </div>
                     </td>
                     <td class="py-3 font-bold text-center">${teamObj.P}</td>
                     <td class="py-3 text-center text-slate-400 dark:text-slate-500">${teamObj.J}</td>
-                    <td class="py-3 text-center font-medium">${teamObj.SG > 0 ? '+' + teamObj.SG : teamObj.SG}</td>
-                    <td class="py-3 text-center text-slate-400 dark:text-slate-500">${teamObj.GP}</td>
+                    <td class="py-3 text-center font-semibold">${teamObj.V}-${teamObj.E}-${teamObj.D}</td>
                 </tr>
             `;
         }).join('');
 
         div.innerHTML = `
-            <h3 class="text-base font-extrabold text-slate-950 dark:text-slate-100 uppercase tracking-[0.24em] mb-4 border-b border-slate-200/80 dark:border-slate-800/80 pb-3 flex justify-between items-center gap-3">
+            <h3 class="text-base font-extrabold text-slate-950 dark:text-slate-100 uppercase tracking-[0.22em] mb-4 border-b border-slate-200/80 dark:border-slate-800/80 pb-3 flex justify-between items-center gap-3">
                 <span>${t.groupTitle} ${g}</span>
                 <span class="standings-live-badge">${t.liveClass}</span>
             </h3>
@@ -208,8 +213,7 @@ export function renderTablesGrid() {
                         <th class="pb-2">${t.tableTeam}</th>
                         <th class="pb-2 text-center">${t.tablePts}</th>
                         <th class="pb-2 text-center">${t.tablePl}</th>
-                        <th class="pb-2 text-center">${t.tableGd}</th>
-                        <th class="pb-2 text-center">${t.tableGf}</th>
+                        <th class="pb-2 text-center">V-E-D</th>
                     </tr>
                 </thead>
                 <tbody>${rowsHtml}</tbody>
@@ -330,9 +334,6 @@ export function renderGroupStage() {
     });
 }
 
-const fifaWorldCupTrophyImageUrl = 'https://www.edigitalagency.com.au/wp-content/uploads/new-FIFA-World-Cup-2026-logo-white-PNG-small-size.png';
-
-let knockoutViewMode = localStorage.getItem('wc2026_knockout_view');
 
 function getKnockoutPhaseKey(faseNome) {
     if (faseNome.includes('Dezesseis-avos')) return 'round32';
@@ -352,10 +353,6 @@ function getLocalizedKnockoutPhaseLabel(faseNome, t) {
     if (key === 'semiFinals') return t.semiFinals;
     if (key === 'thirdPlace') return t.thirdPlace;
     return t.final;
-}
-
-function normalizeMatchDate(matchDate) {
-    return matchDate;
 }
 
 function getWinnerInfo(match, dadosCalculados) {
@@ -390,41 +387,23 @@ function getWinnerInfo(match, dadosCalculados) {
     return { winner: null, decidedByPenalties: false };
 }
 
-function getCardStageClasses(phaseKey) {
-    if (phaseKey === 'round16') return 'knockout-card-stage-round16';
-    if (phaseKey === 'quarterFinals') return 'knockout-card-stage-quarterfinals';
-    if (phaseKey === 'semiFinals') return 'knockout-card-stage-semifinals';
-    if (phaseKey === 'final') return 'knockout-card-stage-final';
-    return 'knockout-card-stage-round32';
+function getPhaseIcon(phaseKey) {
+    if (phaseKey === 'round32') return '⚽';
+    if (phaseKey === 'round16') return '⚡';
+    if (phaseKey === 'quarterFinals') return '🔥';
+    if (phaseKey === 'semiFinals') return '⭐';
+    if (phaseKey === 'thirdPlace') return '🥉';
+    return '🏆';
 }
 
-function getToneClasses(side) {
-    if (side === 'B') return 'knockout-tone-b';
-    if (side === 'final') return 'knockout-tone-final';
-    return 'knockout-tone-a';
-}
-
-function shouldAnimateAdvancedTeam(origin, teamName) {
-    if (!origin || (origin.tipo !== 'venc' && origin.tipo !== 'perd')) return false;
-    return isResolvedTeamName(teamName);
-}
-
-function buildKnockoutMatchCard(match, options = {}) {
-    const {
-        phaseKey = 'round32',
-        side = 'A',
-        showConnector = false,
-        connectorClass = '',
-        compact = true
-    } = options;
-
+function buildKoMatchCard(match, phaseKey) {
     const t = translations.pt;
     const dadosCalculados = mapaMataMataCalculado[match.id] || { home: 'A definir', away: 'A definir' };
     const sh = getScoreInput(match.id, 'home');
     const sa = getScoreInput(match.id, 'away');
     const penH = getPenaltiesInput(match.id, 'home');
     const penA = getPenaltiesInput(match.id, 'away');
-    const { lockedAttrs, lockedClasses } = getMatchLockState(match.id);
+    const { lockedAttrs, lockedClasses, badgeLabel, badgeClass } = getMatchLockState(match.id);
 
     const homeDisplayName = translateTeam(translatePlaceholder(dadosCalculados.home, currentLang), currentLang);
     const awayDisplayName = translateTeam(translatePlaceholder(dadosCalculados.away, currentLang), currentLang);
@@ -433,277 +412,79 @@ function buildKnockoutMatchCard(match, options = {}) {
     const isEmpate = sh !== '' && sa !== '' && parseInt(sh, 10) === parseInt(sa, 10);
     const homeWinner = winnerInfo.winner === 'home';
     const awayWinner = winnerInfo.winner === 'away';
-    const hasAdvancedHome = shouldAnimateAdvancedTeam(match.origHome, dadosCalculados.home);
-    const hasAdvancedAway = shouldAnimateAdvancedTeam(match.origAway, dadosCalculados.away);
 
-    const cardClass = [
-        'knockout-match-card',
-        getCardStageClasses(phaseKey),
-        getToneClasses(side),
-        compact ? 'knockout-match-card-compact' : '',
-        match.destaque ? 'knockout-match-highlight' : '',
-        showConnector ? 'connector-right' : '',
-        connectorClass,
-        (hasAdvancedHome || hasAdvancedAway) ? 'knockout-card-progressed' : ''
-    ].filter(Boolean).join(' ');
+    const homeRowClass = homeWinner ? 'ko-winner' : awayWinner ? 'ko-loser' : '';
+    const awayRowClass = awayWinner ? 'ko-winner' : homeWinner ? 'ko-loser' : '';
 
-    const { badgeLabel, badgeClass } = getMatchLockState(match.id);
-    const matchDate = normalizeMatchDate(match.data);
-    const penaltiesInline = isEmpate
-        ? `<span class="knockout-penalties-inline">${t.penalties} <input type="number" placeholder="P" value="${penH}" oninput="window.setPenaltiesInput(${match.id}, 'home', this.value)" aria-label="${t.penalties} ${homeDisplayName}" ${lockedAttrs} class="knockout-penalty-input${lockedClasses}">-<input type="number" placeholder="P" value="${penA}" oninput="window.setPenaltiesInput(${match.id}, 'away', this.value)" aria-label="${t.penalties} ${awayDisplayName}" ${lockedAttrs} class="knockout-penalty-input${lockedClasses}"></span>`
+    const cardExtraClass = phaseKey === 'final' ? ' ko-card-final'
+        : phaseKey === 'thirdPlace' ? ' ko-card-third'
+        : '';
+
+    const penaltiesHtml = isEmpate
+        ? `<div class="ko-card-penalties">
+            ${t.penalties}
+            <input type="number" placeholder="P" value="${penH}" oninput="window.setPenaltiesInput(${match.id}, 'home', this.value)" aria-label="${t.penalties} ${homeDisplayName}" ${lockedAttrs} class="ko-pen-input${lockedClasses}">
+            –
+            <input type="number" placeholder="P" value="${penA}" oninput="window.setPenaltiesInput(${match.id}, 'away', this.value)" aria-label="${t.penalties} ${awayDisplayName}" ${lockedAttrs} class="ko-pen-input${lockedClasses}">
+           </div>`
+        : '';
+
+    const penDecidedHtml = winnerInfo.decidedByPenalties
+        ? `<div class="ko-pen-decided">Decidido nos pênaltis</div>`
+        : '';
+
+    const homeWinnerIndicator = homeWinner
+        ? `<span class="ko-winner-indicator" aria-label="Classificado">✓</span>`
+        : '';
+    const awayWinnerIndicator = awayWinner
+        ? `<span class="ko-winner-indicator" aria-label="Classificado">✓</span>`
         : '';
 
     return `
-        <article class="${cardClass}">
-            <header class="knockout-match-header">
-                <span>${t.confrontation} #${match.id}</span>
-                <span>${matchDate} · ${match.hora}</span>
-            </header>
-            <div class="knockout-badge-row">
+        <article class="ko-card${cardExtraClass}">
+            <div class="ko-card-meta">
+                <span class="ko-card-number">Jogo #${match.id}</span>
+                <span class="ko-card-date">${match.data} · ${match.hora}</span>
                 <span class="match-badge ${badgeClass}">${badgeLabel}</span>
             </div>
 
-            <div class="knockout-match-teams">
-                <div class="knockout-team-row ${homeWinner ? 'team-winner' : ''} ${hasAdvancedHome ? 'team-advanced' : ''}">
-                    <div class="knockout-team-label">
+            <div class="ko-card-teams">
+                <div class="ko-team-row ${homeRowClass}">
+                    <div class="ko-team-identity">
                         ${getFlagTag(dadosCalculados.home)}
-                        <span class="truncate">${homeDisplayName}</span>
+                        <span class="ko-team-name">${homeDisplayName}</span>
                     </div>
-                    <div class="knockout-score-wrap">
-                        ${homeWinner ? '<span class="knockout-qualified">➜</span>' : ''}
-                        <input type="number" min="0" placeholder="-" value="${sh}"
-                            oninput="window.setScoreInput(${match.id}, 'home', this.value)"
-                            aria-label="${t.tableVs} ${homeDisplayName}"
-                            ${lockedAttrs}
-                            class="knockout-score-input${lockedClasses}">
-                    </div>
-                </div>
-
-                <div class="knockout-team-row ${awayWinner ? 'team-winner' : ''} ${hasAdvancedAway ? 'team-advanced' : ''}">
-                    <div class="knockout-team-label">
-                        ${getFlagTag(dadosCalculados.away)}
-                        <span class="truncate">${awayDisplayName}</span>
-                    </div>
-                    <div class="knockout-score-wrap">
-                        ${awayWinner ? '<span class="knockout-qualified">➜</span>' : ''}
-                        <input type="number" min="0" placeholder="-" value="${sa}"
-                            oninput="window.setScoreInput(${match.id}, 'away', this.value)"
-                            aria-label="${t.tableVs} ${awayDisplayName}"
-                            ${lockedAttrs}
-                            class="knockout-score-input${lockedClasses}">
-                    </div>
-                </div>
-            </div>
-
-            <footer class="knockout-match-footer">
-                <span class="truncate">${match.local}</span>
-                <span class="knockout-footer-right">${winnerInfo.decidedByPenalties ? '<span class="knockout-pen-badge">P</span>' : ''}${penaltiesInline}</span>
-            </footer>
-        </article>
-    `;
-}
-
-function buildMiniMatchCard(match, options = {}) {
-    const { phaseKey = 'round32', side = 'A' } = options;
-    const t = translations.pt;
-    const dadosCalculados = mapaMataMataCalculado[match.id] || { home: 'A definir', away: 'A definir' };
-    const sh = getScoreInput(match.id, 'home');
-    const sa = getScoreInput(match.id, 'away');
-    const penH = getPenaltiesInput(match.id, 'home');
-    const penA = getPenaltiesInput(match.id, 'away');
-    const { lockedAttrs, lockedClasses } = getMatchLockState(match.id);
-
-    const homeDisplayName = translateTeam(translatePlaceholder(dadosCalculados.home, currentLang), currentLang);
-    const awayDisplayName = translateTeam(translatePlaceholder(dadosCalculados.away, currentLang), currentLang);
-
-    const winnerInfo = getWinnerInfo(match, dadosCalculados);
-    const isEmpate = sh !== '' && sa !== '' && parseInt(sh, 10) === parseInt(sa, 10);
-    const homeWinner = winnerInfo.winner === 'home';
-    const awayWinner = winnerInfo.winner === 'away';
-
-    const resolvedClass = winnerInfo.winner ? ' kob-mini-resolved' : '';
-    const phaseAccentClass = phaseKey === 'semiFinals' ? ' kob-mini-semi'
-        : phaseKey === 'final' ? ' kob-mini-final'
-        : phaseKey === 'thirdPlace' ? ' kob-mini-third'
-        : phaseKey === 'quarterFinals' ? ' kob-mini-qf'
-        : '';
-    const sideClass = side === 'B' ? ' kob-mini-side-b' : side === 'final' ? ' kob-mini-side-final' : '';
-
-    const penaltiesHtml = isEmpate
-        ? `<div class="kob-mini-pen">${t.penalties.replace(':', '')} <input type="number" placeholder="P" value="${penH}" oninput="window.setPenaltiesInput(${match.id}, 'home', this.value)" aria-label="${t.penalties} ${homeDisplayName}" ${lockedAttrs} class="kob-mini-pen-input${lockedClasses}">-<input type="number" placeholder="P" value="${penA}" oninput="window.setPenaltiesInput(${match.id}, 'away', this.value)" aria-label="${t.penalties} ${awayDisplayName}" ${lockedAttrs} class="kob-mini-pen-input${lockedClasses}"></div>`
-        : '';
-
-    const matchShortDate = match.data ? match.data.slice(0, 5) + '/26' : '';
-
-    return `
-        <article class="kob-mini-card${resolvedClass}${phaseAccentClass}${sideClass}">
-            <div class="kob-mini-header">
-                <span class="kob-mini-date">${matchShortDate} · ${match.hora}</span>
-                <span class="kob-mini-local">${match.local || ''}</span>
-            </div>
-            <div class="kob-mini-teams">
-                <div class="kob-mini-team ${homeWinner ? 'kob-mini-winner' : awayWinner ? 'kob-mini-loser' : ''}">
-                    <div class="kob-mini-team-info">
-                        ${getFlagTag(dadosCalculados.home)}
-                        <span class="kob-mini-name">${homeDisplayName}</span>
-                    </div>
-                    <div class="kob-mini-score-wrap">
+                    <div class="ko-score-area">
+                        ${homeWinnerIndicator}
                         <input type="number" min="0" placeholder="–" value="${sh}"
                             oninput="window.setScoreInput(${match.id}, 'home', this.value)"
                             aria-label="${t.tableVs} ${homeDisplayName}"
                             ${lockedAttrs}
-                            class="kob-mini-score${lockedClasses}">
+                            class="ko-score${lockedClasses}">
                     </div>
                 </div>
-                <div class="kob-mini-team ${awayWinner ? 'kob-mini-winner' : homeWinner ? 'kob-mini-loser' : ''}">
-                    <div class="kob-mini-team-info">
+
+                <div class="ko-team-row ${awayRowClass}">
+                    <div class="ko-team-identity">
                         ${getFlagTag(dadosCalculados.away)}
-                        <span class="kob-mini-name">${awayDisplayName}</span>
+                        <span class="ko-team-name">${awayDisplayName}</span>
                     </div>
-                    <div class="kob-mini-score-wrap">
+                    <div class="ko-score-area">
+                        ${awayWinnerIndicator}
                         <input type="number" min="0" placeholder="–" value="${sa}"
                             oninput="window.setScoreInput(${match.id}, 'away', this.value)"
                             aria-label="${t.tableVs} ${awayDisplayName}"
                             ${lockedAttrs}
-                            class="kob-mini-score${lockedClasses}">
+                            class="ko-score${lockedClasses}">
                     </div>
                 </div>
             </div>
+
             ${penaltiesHtml}
+            ${penDecidedHtml}
+
+            <div class="ko-card-venue">📍 ${match.local}</div>
         </article>
-    `;
-}
-
-
-function ensureKnockoutViewMode() {
-    if (knockoutViewMode === 'bracket' || knockoutViewMode === 'list') return;
-
-    const prefersList = window.matchMedia && window.matchMedia('(max-width: 767px)').matches;
-    knockoutViewMode = prefersList ? 'list' : 'bracket';
-    localStorage.setItem('wc2026_knockout_view', knockoutViewMode);
-}
-
-function renderKnockoutListView() {
-    const t = translations.pt;
-
-    return `
-        <div class="space-y-8">
-            ${estruturaNosMataMata.map((fase) => {
-                const phaseKey = getKnockoutPhaseKey(fase.fase);
-                const localizedFase = getLocalizedKnockoutPhaseLabel(fase.fase, t);
-                return `
-                    <section class="space-y-4" data-phase-key="${phaseKey}">
-                        <h3 class="text-lg md:text-xl font-extrabold text-slate-800 dark:text-slate-200 border-b border-slate-200 dark:border-slate-800/80 pb-2">${localizedFase}</h3>
-                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-                            ${fase.jogos.map((match) => buildKnockoutMatchCard(match, { phaseKey, compact: true })).join('')}
-                        </div>
-                    </section>
-                `;
-            }).join('')}
-        </div>
-    `;
-}
-
-function renderKnockoutBracketView() {
-    const t = translations.pt;
-    const allMatchesById = new Map(estruturaNosMataMata.flatMap((fase) => fase.jogos.map((jogo) => [jogo.id, jogo])));
-    const getMatch = (id) => allMatchesById.get(id);
-
-    const renderMiniCards = (ids, phaseKey, side) =>
-        ids.map((id) => getMatch(id)).filter(Boolean)
-            .map((m) => buildMiniMatchCard(m, { phaseKey, side })).join('');
-
-    const r32Short = t.bracketR32;
-    const r16Short = t.bracketR16;
-    const qfShort  = t.bracketQF;
-    const sfShort  = t.bracketSF;
-
-    const finalMatch      = getMatch(104);
-    const thirdPlaceMatch = getMatch(103);
-
-    return `
-        <div class="kob-wrap" id="knockout-bracket-scroll">
-            <div class="kob-track">
-
-                <!-- LEFT SIDE: R32 | R16 | QF | SF (columns 1-4, flows left→center) -->
-                <div class="kob-side kob-side-left">
-                    <div class="kob-label">${r32Short}</div>
-                    <div class="kob-label">${r16Short}</div>
-                    <div class="kob-label">${qfShort}</div>
-                    <div class="kob-label">${sfShort}</div>
-
-                    <div class="kob-cell kob-left-r32-upper kob-conn-right" data-phase="round32">
-                        ${renderMiniCards([73, 74, 75, 76, 77], 'round32', 'A')}
-                    </div>
-                    <div class="kob-cell kob-left-r16-upper kob-conn-right" data-phase="round16">
-                        ${renderMiniCards([89, 90], 'round16', 'A')}
-                    </div>
-                    <div class="kob-cell kob-left-qf-upper kob-conn-right" data-phase="quarterFinals">
-                        ${renderMiniCards([97], 'quarterFinals', 'A')}
-                    </div>
-                    <div class="kob-cell kob-left-sf" data-phase="semiFinals">
-                        ${renderMiniCards([101], 'semiFinals', 'A')}
-                    </div>
-
-                    <div class="kob-cell kob-left-r32-lower kob-conn-right" data-phase="round32">
-                        ${renderMiniCards([78, 79, 80, 81, 82], 'round32', 'A')}
-                    </div>
-                    <div class="kob-cell kob-left-r16-lower kob-conn-right" data-phase="round16">
-                        ${renderMiniCards([91, 92], 'round16', 'A')}
-                    </div>
-                    <div class="kob-cell kob-left-qf-lower kob-conn-right" data-phase="quarterFinals">
-                        ${renderMiniCards([99], 'quarterFinals', 'A')}
-                    </div>
-                </div>
-
-                <!-- CENTER: Trophy + Final + 3rd Place -->
-                <div class="kob-center">
-                    <div class="kob-trophy-wrap">
-                        <img class="kob-trophy-img" src="${fifaWorldCupTrophyImageUrl}" alt="Troféu da Copa do Mundo FIFA 2026">
-                        <p class="kob-trophy-label">Copa do Mundo FIFA 2026</p>
-                    </div>
-                    <div class="kob-center-games">
-                        <p class="kob-center-phase-label">${t.final}</p>
-                        ${finalMatch ? buildMiniMatchCard(finalMatch, { phaseKey: 'final', side: 'final' }) : ''}
-                        <p class="kob-center-phase-label kob-third-label">${t.thirdPlace}</p>
-                        ${thirdPlaceMatch ? buildMiniMatchCard(thirdPlaceMatch, { phaseKey: 'thirdPlace', side: 'final' }) : ''}
-                    </div>
-                </div>
-
-                <!-- RIGHT SIDE: SF | QF | R16 | R32 (columns 1-4, matches flow center→right) -->
-                <!-- Note: right side has 3 R32 matches per half (vs 5 on left), per the 48-team bracket spec -->
-                <div class="kob-side kob-side-right">
-                    <div class="kob-label">${sfShort}</div>
-                    <div class="kob-label">${qfShort}</div>
-                    <div class="kob-label">${r16Short}</div>
-                    <div class="kob-label">${r32Short}</div>
-
-                    <div class="kob-cell kob-right-sf" data-phase="semiFinals">
-                        ${renderMiniCards([102], 'semiFinals', 'B')}
-                    </div>
-                    <div class="kob-cell kob-right-qf-upper kob-conn-left" data-phase="quarterFinals">
-                        ${renderMiniCards([98], 'quarterFinals', 'B')}
-                    </div>
-                    <div class="kob-cell kob-right-r16-upper kob-conn-left" data-phase="round16">
-                        ${renderMiniCards([93, 94], 'round16', 'B')}
-                    </div>
-                    <div class="kob-cell kob-right-r32-upper kob-conn-left" data-phase="round32">
-                        ${renderMiniCards([83, 84, 85], 'round32', 'B')}
-                    </div>
-
-                    <div class="kob-cell kob-right-qf-lower kob-conn-left" data-phase="quarterFinals">
-                        ${renderMiniCards([100], 'quarterFinals', 'B')}
-                    </div>
-                    <div class="kob-cell kob-right-r16-lower kob-conn-left" data-phase="round16">
-                        ${renderMiniCards([95, 96], 'round16', 'B')}
-                    </div>
-                    <div class="kob-cell kob-right-r32-lower kob-conn-left" data-phase="round32">
-                        ${renderMiniCards([86, 87, 88], 'round32', 'B')}
-                    </div>
-                </div>
-
-            </div>
-        </div>
     `;
 }
 
@@ -711,40 +492,50 @@ export function renderKnockoutStage() {
     const container = document.getElementById('container-mata-mata');
     if (!container) return;
 
-    ensureKnockoutViewMode();
-
     const t = translations.pt;
+
+    const phasesHtml = estruturaNosMataMata.map((fase) => {
+        const phaseKey = getKnockoutPhaseKey(fase.fase);
+        const localizedFase = getLocalizedKnockoutPhaseLabel(fase.fase, t);
+        const icon = getPhaseIcon(phaseKey);
+        const count = fase.jogos.length;
+        const countLabel = count === 1 ? '1 jogo' : `${count} jogos`;
+
+        const matchCards = fase.jogos
+            .map((match) => buildKoMatchCard(match, phaseKey))
+            .join('');
+
+        return `
+            <section class="ko-phase" data-phase="${phaseKey}">
+                <div class="ko-phase-header" data-phase="${phaseKey}">
+                    <span class="ko-phase-icon">${icon}</span>
+                    <h3 class="ko-phase-title">${localizedFase}</h3>
+                    <span class="ko-phase-count">${countLabel}</span>
+                </div>
+                <div class="ko-phase-grid" data-phase="${phaseKey}">
+                    ${matchCards}
+                </div>
+            </section>
+        `;
+    }).join('');
+
     container.innerHTML = `
         <div class="knockout-shell">
             <div class="knockout-header-copy">
                 <div>
                     <p class="knockout-kicker">Chave eliminatória</p>
-                    <h3 class="knockout-headline">Visualização moderna do mata-mata</h3>
-                    <p class="knockout-subheadline">Acompanhe progressão entre fases, decisões por pênaltis e confrontos oficiais em um bracket responsivo.</p>
+                    <h3 class="knockout-headline">Fase Eliminatória 2026</h3>
+                    <p class="knockout-subheadline">Confira cada confronto, registre seus palpites e acompanhe o caminho até o campeão.</p>
                 </div>
-                <div class="knockout-controls">
-                    <div class="knockout-view-toggle" role="tablist" aria-label="${t.knockoutViewLabel}">
-                        <button class="knockout-view-btn ${knockoutViewMode === 'bracket' ? 'is-active' : ''}" data-knockout-view="bracket">🌳 ${t.knockoutBracketMode}</button>
-                        <button class="knockout-view-btn ${knockoutViewMode === 'list' ? 'is-active' : ''}" data-knockout-view="list">📋 ${t.knockoutListMode}</button>
-                    </div>
+                <div class="flex items-center gap-3">
+                    <span class="text-5xl" role="img" aria-label="Troféu">🏆</span>
                 </div>
             </div>
-            <div class="knockout-content">
-                ${knockoutViewMode === 'bracket' ? renderKnockoutBracketView() : renderKnockoutListView()}
+            <div class="knockout-content space-y-0">
+                ${phasesHtml}
             </div>
         </div>
     `;
-
-    container.querySelectorAll('[data-knockout-view]').forEach((btn) => {
-        btn.addEventListener('click', () => {
-            const nextMode = btn.getAttribute('data-knockout-view');
-            if (!nextMode || nextMode === knockoutViewMode) return;
-            knockoutViewMode = nextMode;
-            localStorage.setItem('wc2026_knockout_view', knockoutViewMode);
-            renderKnockoutStage();
-        });
-    });
-
 }
 
 function isResolvedTeamName(teamName) {
@@ -781,3 +572,4 @@ export function showToast(message) {
         }, 300);
     }, 3000);
 }
+

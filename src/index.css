@@ -2,10 +2,11 @@
 @import "tailwindcss/components";
 @import "tailwindcss/utilities";
 
-@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght=400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap');
 
 body {
-  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-family: 'Inter', 'Plus Jakarta Sans', sans-serif;
+  font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
   /* Subtle radial gradient pattern layered over Tailwind bg */
   background-image:
     radial-gradient(ellipse at 20% 0%, rgb(59 130 246 / 0.04) 0%, transparent 60%),
@@ -1916,4 +1917,573 @@ body {
   .knockout-controls {
     justify-content: flex-start;
   }
+}
+
+/* ============================================================
+   TIPOGRAFIA — Headings usam Plus Jakarta Sans
+   ============================================================ */
+h1, h2, h3, h4, h5, .knockout-headline, .header-title {
+  font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;
+}
+
+/* ============================================================
+   MELHORIAS VISUAIS GERAIS — cards + superfícies
+   ============================================================ */
+
+/* Sombras mais sofisticadas */
+.group-standings-card {
+  box-shadow: 
+    0 0 0 1px rgb(226 232 240 / 0.6),
+    0 4px 6px -1px rgb(15 23 42 / 0.05),
+    0 24px 48px -12px rgb(15 23 42 / 0.1);
+}
+.dark .group-standings-card {
+  box-shadow: 
+    0 0 0 1px rgb(51 65 85 / 0.5),
+    0 4px 6px -1px rgb(0 0 0 / 0.15),
+    0 24px 48px -12px rgb(0 0 0 / 0.3);
+}
+
+/* Header melhorado */
+.site-header {
+  background: 
+    radial-gradient(ellipse at 0% 0%, rgb(59 130 246 / 0.22) 0%, transparent 40%),
+    radial-gradient(ellipse at 100% 100%, rgb(245 158 11 / 0.16) 0%, transparent 40%),
+    linear-gradient(135deg, rgb(2 6 23) 0%, rgb(7 14 50) 25%, rgb(20 27 80) 55%, rgb(45 20 100) 80%, rgb(30 10 60) 100%);
+}
+
+/* Background body dark mode mais premium */
+.dark body {
+  background-color: rgb(2 6 23);
+  background-image:
+    radial-gradient(ellipse at 15% 5%, rgb(30 58 138 / 0.12) 0%, transparent 45%),
+    radial-gradient(ellipse at 85% 95%, rgb(67 56 202 / 0.1) 0%, transparent 45%);
+}
+
+/* Standings badge melhorado */
+.standings-live-badge {
+  padding: 0.28rem 0.6rem;
+  font-size: 0.6rem;
+  letter-spacing: 0.1em;
+  background: linear-gradient(135deg, rgb(219 234 254), rgb(238 242 255));
+  border: 1px solid rgb(191 219 254 / 0.6);
+  color: rgb(30 64 175);
+}
+.dark .standings-live-badge {
+  background: linear-gradient(135deg, rgb(30 58 138 / 0.4), rgb(49 46 129 / 0.35));
+  border-color: rgb(55 65 180 / 0.45);
+  color: rgb(165 180 252);
+}
+
+/* Score input mais polido */
+.score-input-lg {
+  background: rgb(255 255 255);
+  box-shadow: inset 0 1px 3px rgb(15 23 42 / 0.1), 0 1px 0 rgb(255 255 255 / 0.8);
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.score-input-lg:focus-visible {
+  border-color: rgb(96 165 250);
+  box-shadow: 0 0 0 3px rgb(96 165 250 / 0.25), inset 0 1px 3px rgb(15 23 42 / 0.05);
+}
+
+/* ============================================================
+   TABELAS DE CLASSIFICAÇÃO — redesign das linhas
+   ============================================================ */
+.group-standings-card table {
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+/* ============================================================
+   FASE ELIMINATÓRIA — Nova visualização moderna (ko-* prefix)
+   ============================================================ */
+
+/* Container geral do mata-mata */
+:root {
+  --ko-card-min-width: 272px;
+}
+.knockout-shell {
+  gap: 1.5rem;
+  padding: 1.5rem;
+  border-radius: 1.75rem;
+}
+
+.knockout-header-copy {
+  gap: 1.25rem;
+}
+
+.knockout-kicker {
+  font-size: 0.68rem;
+  letter-spacing: 0.22em;
+}
+
+.knockout-headline {
+  font-size: clamp(1.4rem, 2.2vw, 2rem);
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+}
+
+.knockout-subheadline {
+  font-size: 0.9rem;
+  color: rgb(100 116 139);
+  line-height: 1.65;
+}
+.dark .knockout-subheadline { color: rgb(100 116 139); }
+
+/* Phase section */
+.ko-phase {
+  margin-bottom: 2.5rem;
+}
+
+/* Phase header banner */
+.ko-phase-header {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  padding: 0.9rem 1.4rem;
+  border-radius: 1.2rem;
+  margin-bottom: 1.1rem;
+  position: relative;
+  overflow: hidden;
+}
+.ko-phase-header::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at 90% 50%, rgb(255 255 255 / 0.12) 0%, transparent 55%);
+  pointer-events: none;
+}
+
+/* Phase-specific gradients */
+.ko-phase-header[data-phase="round32"] {
+  background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 100%);
+}
+.ko-phase-header[data-phase="round16"] {
+  background: linear-gradient(135deg, #312e81 0%, #4f46e5 100%);
+}
+.ko-phase-header[data-phase="quarterFinals"] {
+  background: linear-gradient(135deg, #4c1d95 0%, #7c3aed 100%);
+}
+.ko-phase-header[data-phase="semiFinals"] {
+  background: linear-gradient(135deg, #701a75 0%, #a21caf 100%);
+}
+.ko-phase-header[data-phase="thirdPlace"] {
+  background: linear-gradient(135deg, #374151 0%, #6b7280 100%);
+}
+.ko-phase-header[data-phase="final"] {
+  background: linear-gradient(135deg, #78350f 0%, #d97706 100%);
+  box-shadow: 0 0 0 2px rgb(245 158 11 / 0.35), 0 8px 32px rgb(245 158 11 / 0.18);
+}
+
+.ko-phase-icon {
+  font-size: 1.4rem;
+  line-height: 1;
+  flex-shrink: 0;
+  filter: drop-shadow(0 2px 4px rgb(0 0 0 / 0.2));
+}
+.ko-phase-title {
+  color: white;
+  font-size: 1rem;
+  font-weight: 900;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  margin: 0;
+  flex: 1;
+  text-shadow: 0 1px 3px rgb(0 0 0 / 0.3);
+}
+.ko-phase-count {
+  color: rgb(255 255 255 / 0.7);
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  flex-shrink: 0;
+  background: rgb(255 255 255 / 0.12);
+  padding: 0.25rem 0.65rem;
+  border-radius: 9999px;
+}
+
+/* Phase matches grid */
+.ko-phase-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(var(--ko-card-min-width), 1fr));
+  gap: 1rem;
+}
+.ko-phase-grid[data-phase="final"] {
+  max-width: 520px;
+}
+.ko-phase-grid[data-phase="thirdPlace"] {
+  max-width: 520px;
+}
+
+/* Match card */
+.ko-card {
+  background: white;
+  border: 1px solid rgb(226 232 240 / 0.9);
+  border-radius: 1.15rem;
+  overflow: hidden;
+  box-shadow:
+    0 0 0 1px rgb(226 232 240 / 0.4),
+    0 4px 12px rgb(15 23 42 / 0.07);
+  transition: transform 0.22s ease, box-shadow 0.22s ease;
+}
+.ko-card:hover {
+  transform: translateY(-3px);
+  box-shadow:
+    0 0 0 1px rgb(191 219 254 / 0.5),
+    0 12px 32px rgb(15 23 42 / 0.12);
+}
+.dark .ko-card {
+  background: rgb(15 23 42);
+  border-color: rgb(51 65 85 / 0.8);
+  box-shadow:
+    0 0 0 1px rgb(51 65 85 / 0.4),
+    0 4px 12px rgb(0 0 0 / 0.25);
+}
+.dark .ko-card:hover {
+  border-color: rgb(71 85 105 / 0.8);
+  box-shadow:
+    0 0 0 1px rgb(71 85 105 / 0.5),
+    0 12px 32px rgb(0 0 0 / 0.4);
+}
+
+/* Final card special */
+.ko-card-final {
+  border-width: 2px;
+  border-color: rgb(245 158 11 / 0.7);
+  box-shadow:
+    0 0 0 2px rgb(245 158 11 / 0.15),
+    0 8px 32px rgb(245 158 11 / 0.1),
+    0 4px 12px rgb(15 23 42 / 0.08);
+}
+.dark .ko-card-final {
+  border-color: rgb(245 158 11 / 0.55);
+  box-shadow:
+    0 0 0 2px rgb(245 158 11 / 0.1),
+    0 8px 32px rgb(245 158 11 / 0.12);
+}
+
+/* Third-place card */
+.ko-card-third {
+  border-style: dashed;
+  border-color: rgb(148 163 184 / 0.5);
+}
+.dark .ko-card-third {
+  border-color: rgb(71 85 105 / 0.6);
+}
+
+/* Card meta header */
+.ko-card-meta {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.55rem 0.9rem;
+  background: rgb(248 250 252 / 0.85);
+  border-bottom: 1px solid rgb(226 232 240 / 0.7);
+}
+.dark .ko-card-meta {
+  background: rgb(2 6 23 / 0.7);
+  border-bottom-color: rgb(30 41 59 / 0.8);
+}
+.ko-card-number {
+  font-size: 0.62rem;
+  font-weight: 900;
+  color: rgb(100 116 139);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.dark .ko-card-number { color: rgb(71 85 105); }
+.ko-card-date {
+  font-size: 0.62rem;
+  font-weight: 600;
+  color: rgb(100 116 139);
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.dark .ko-card-date { color: rgb(71 85 105); }
+
+/* Teams section */
+.ko-card-teams {
+  padding: 0.55rem 0.75rem 0.65rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+/* Individual team row */
+.ko-team-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding: 0.6rem 0.45rem;
+  border-radius: 0.6rem;
+  transition: background 0.15s;
+}
+.ko-team-row + .ko-team-row {
+  border-top: 1px solid rgb(241 245 249);
+}
+.dark .ko-team-row + .ko-team-row {
+  border-top-color: rgb(30 41 59);
+}
+
+/* Winner / loser states */
+.ko-team-row.ko-winner {
+  background: linear-gradient(90deg, rgb(240 253 244), rgb(220 252 231 / 0.5));
+}
+.dark .ko-team-row.ko-winner {
+  background: linear-gradient(90deg, rgb(20 83 45 / 0.35), rgb(22 101 52 / 0.15));
+}
+.ko-team-row.ko-loser {
+  opacity: 0.6;
+}
+
+/* Team identity */
+.ko-team-identity {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+}
+.ko-team-flag {
+  width: 24px;
+  height: 16px;
+  border-radius: 2px;
+  flex-shrink: 0;
+  object-fit: cover;
+  box-shadow: 0 1px 3px rgb(0 0 0 / 0.2);
+}
+.ko-team-name {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: rgb(30 41 59);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  letter-spacing: -0.01em;
+}
+.dark .ko-team-name { color: rgb(226 232 240); }
+.ko-team-row.ko-winner .ko-team-name {
+  color: rgb(22 101 52);
+  font-weight: 800;
+}
+.dark .ko-team-row.ko-winner .ko-team-name { color: rgb(134 239 172); }
+.ko-team-row.ko-loser .ko-team-name { color: rgb(148 163 184); }
+.dark .ko-team-row.ko-loser .ko-team-name { color: rgb(71 85 105); }
+
+/* Score area */
+.ko-score-area {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  flex-shrink: 0;
+}
+.ko-winner-indicator {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.25rem;
+  height: 1.25rem;
+  border-radius: 9999px;
+  background: rgb(22 101 52);
+  color: white;
+  font-size: 0.6rem;
+  font-weight: 900;
+  flex-shrink: 0;
+}
+.dark .ko-winner-indicator {
+  background: rgb(134 239 172 / 0.25);
+  color: rgb(134 239 172);
+}
+
+/* Score input */
+.ko-score {
+  width: 2.6rem;
+  height: 2.6rem;
+  border-radius: 0.6rem;
+  border: 2px solid rgb(203 213 225);
+  background: white;
+  text-align: center;
+  font-size: 1.05rem;
+  font-weight: 900;
+  color: rgb(15 23 42);
+  transition: border-color 0.15s, box-shadow 0.15s;
+  box-shadow: inset 0 1px 2px rgb(15 23 42 / 0.06);
+}
+.ko-score:focus-visible {
+  outline: none;
+  border-color: rgb(96 165 250 / 0.7);
+  box-shadow: 0 0 0 3px rgb(96 165 250 / 0.2);
+}
+.dark .ko-score {
+  background: rgb(2 6 23);
+  border-color: rgb(51 65 85);
+  color: rgb(241 245 249);
+  box-shadow: inset 0 1px 2px rgb(0 0 0 / 0.15);
+}
+.ko-team-row.ko-winner .ko-score {
+  border-color: rgb(134 239 172 / 0.5);
+  color: rgb(22 101 52);
+  background: rgb(240 253 244);
+  font-weight: 900;
+}
+.dark .ko-team-row.ko-winner .ko-score {
+  border-color: rgb(134 239 172 / 0.3);
+  color: rgb(134 239 172);
+  background: rgb(20 83 45 / 0.2);
+}
+.ko-team-row.ko-loser .ko-score { color: rgb(148 163 184); }
+.dark .ko-team-row.ko-loser .ko-score { color: rgb(71 85 105); }
+
+/* Locked score */
+.ko-score.official-score-locked,
+.ko-pen-input.official-score-locked {
+  cursor: not-allowed;
+  background: rgb(248 250 252) !important;
+  color: rgb(100 116 139) !important;
+  border-color: rgb(226 232 240) !important;
+}
+.dark .ko-score.official-score-locked,
+.dark .ko-pen-input.official-score-locked {
+  background: rgb(15 23 42) !important;
+  color: rgb(100 116 139) !important;
+  border-color: rgb(51 65 85) !important;
+}
+
+/* Penalties */
+.ko-card-penalties {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  padding: 0.4rem 0.85rem;
+  background: rgb(255 243 199 / 0.55);
+  border-top: 1px solid rgb(253 186 116 / 0.3);
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: rgb(146 64 14);
+}
+.dark .ko-card-penalties {
+  background: rgb(78 37 0 / 0.3);
+  border-top-color: rgba(212, 175, 55, 0.2);
+  color: rgb(253 186 116);
+}
+.ko-pen-input {
+  width: 1.9rem;
+  height: 1.65rem;
+  border-radius: 0.35rem;
+  border: 1px solid rgb(203 213 225);
+  background: white;
+  text-align: center;
+  font-size: 0.75rem;
+  font-weight: 800;
+  color: rgb(15 23 42);
+}
+.dark .ko-pen-input {
+  background: rgb(2 6 23);
+  border-color: rgb(51 65 85);
+  color: rgb(248 250 252);
+}
+.ko-pen-decided {
+  text-align: center;
+  padding: 0.18rem 0.9rem;
+  font-size: 0.6rem;
+  font-weight: 800;
+  color: rgb(146 64 14);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  background: rgb(255 243 199 / 0.4);
+  border-top: 1px solid rgb(253 186 116 / 0.25);
+}
+.dark .ko-pen-decided {
+  color: rgb(253 186 116);
+  background: rgb(78 37 0 / 0.2);
+}
+
+/* Venue footer */
+.ko-card-venue {
+  padding: 0.4rem 0.9rem;
+  background: rgb(248 250 252 / 0.6);
+  border-top: 1px solid rgb(241 245 249);
+  font-size: 0.65rem;
+  font-weight: 600;
+  color: rgb(100 116 139);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.dark .ko-card-venue {
+  background: rgb(2 6 23 / 0.4);
+  border-top-color: rgb(30 41 59);
+  color: rgb(71 85 105);
+}
+
+/* Champion banner no mata-mata */
+#banner-campeao {
+  animation: none;
+  background: linear-gradient(135deg, rgb(120 53 15) 0%, rgb(217 119 6) 40%, rgb(245 158 11) 60%, rgb(253 186 116) 100%);
+  border: 2px solid rgb(253 186 116 / 0.6);
+  box-shadow: 0 0 0 4px rgb(245 158 11 / 0.2), 0 20px 60px rgb(245 158 11 / 0.25);
+  border-radius: 1.5rem;
+  padding: 2.5rem 2rem;
+}
+
+/* Responsividade */
+@media (max-width: 640px) {
+  .ko-phase-grid {
+    grid-template-columns: 1fr;
+  }
+  .ko-phase-header {
+    padding: 0.8rem 1rem;
+  }
+  .ko-phase-title {
+    font-size: 0.85rem;
+  }
+  .ko-card-teams {
+    padding: 0.5rem 0.6rem 0.55rem;
+  }
+}
+
+@media (min-width: 768px) and (max-width: 1279px) {
+  .ko-phase-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 1280px) {
+  .ko-phase-grid[data-phase="round32"] {
+    grid-template-columns: repeat(4, 1fr);
+  }
+  .ko-phase-grid[data-phase="round16"] {
+    grid-template-columns: repeat(4, 1fr);
+  }
+  .ko-phase-grid[data-phase="quarterFinals"] {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .ko-phase-grid[data-phase="semiFinals"] {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* Focus ring global */
+.ko-score:focus-visible,
+.ko-pen-input:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px rgb(96 165 250 / 0.3);
+  border-color: rgb(96 165 250 / 0.7);
+}
+
+/* Flag sizing in new knockout cards */
+.ko-team-identity img {
+  width: 28px;
+  height: 19px;
+  border-radius: 3px;
+  border-color: rgb(226 232 240 / 0.7) !important;
+}
+.dark .ko-team-identity img {
+  border-color: rgb(51 65 85 / 0.5) !important;
 }
