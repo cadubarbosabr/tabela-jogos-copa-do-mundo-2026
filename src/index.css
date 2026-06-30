@@ -1176,6 +1176,69 @@ input[type=number] { -moz-appearance: textfield; }
   width: 162px;
 }
 
+/* =========================================================
+   RADIAL KNOCKOUT VIEW
+   ========================================================= */
+.knockout-radial-shell {
+  display: grid;
+  gap: 1rem;
+  padding: 1rem 0 0.5rem;
+}
+
+.knockout-radial-hint {
+  justify-self: center;
+  max-width: 32rem;
+  padding: 0.7rem 1rem;
+  border-radius: 999px;
+  text-align: center;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: rgb(71 85 105);
+  background: rgba(255, 255, 255, 0.72);
+  border: 1px solid rgba(255, 255, 255, 0.55);
+  box-shadow: 0 12px 35px rgba(15, 23, 42, 0.08);
+  backdrop-filter: blur(16px);
+}
+
+.dark .knockout-radial-hint {
+  color: rgb(226 232 240);
+  background: rgba(15, 23, 42, 0.72);
+  border-color: rgba(51, 65, 85, 0.65);
+  box-shadow: 0 16px 38px rgba(2, 6, 23, 0.22);
+}
+
+.knockout-radial-stage {
+  position: relative;
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 0.75rem;
+  border-radius: 2rem;
+  background: linear-gradient(145deg, rgba(255,255,255,0.78), rgba(248,250,252,0.58));
+  border: 1px solid rgba(255,255,255,0.65);
+  box-shadow: 0 28px 70px rgba(15, 23, 42, 0.16);
+  backdrop-filter: blur(24px);
+  cursor: grab;
+  touch-action: none;
+  overflow: hidden;
+}
+
+.knockout-radial-stage.is-dragging {
+  cursor: grabbing;
+}
+
+.dark .knockout-radial-stage {
+  background: linear-gradient(145deg, rgba(15, 23, 42, 0.86), rgba(2, 6, 23, 0.6));
+  border-color: rgba(51, 65, 85, 0.65);
+  box-shadow: 0 30px 80px rgba(2, 6, 23, 0.36);
+}
+
+.knockout-radial-svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 1 / 1;
+}
+
 /* ============================================================
    KOB — Responsive: fallback to list on narrow screens
    ============================================================ */
@@ -1198,5 +1261,16 @@ input[type=number] { -moz-appearance: textfield; }
   .knockout-bilateral-track {
     grid-template-columns: 1fr;
     min-width: 0;
+  }
+
+  .knockout-radial-hint {
+    font-size: 0.72rem;
+    padding: 0.6rem 0.8rem;
+    border-radius: 999px;
+  }
+
+  .knockout-radial-stage {
+    padding: 0.4rem;
+    border-radius: 1.25rem;
   }
 }
