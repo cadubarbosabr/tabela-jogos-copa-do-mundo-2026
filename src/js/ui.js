@@ -408,7 +408,7 @@ function shouldAnimateAdvancedTeam(origin, teamName) {
     return isResolvedTeamName(teamName);
 }
 
-function ScoreBadge(options = {}) {
+function renderScoreBadge(options = {}) {
     const {
         variant = 'mini',
         matchId,
@@ -444,7 +444,7 @@ function ScoreBadge(options = {}) {
     `;
 }
 
-function TeamRow(options = {}) {
+function renderTeamRow(options = {}) {
     const {
         variant = 'mini',
         matchId,
@@ -467,7 +467,7 @@ function TeamRow(options = {}) {
             <div class="knockout-team-row ${winner ? 'team-winner' : ''} ${advanced ? 'team-advanced' : ''}">
                 ${flagTag}
                 <span class="knockout-team-name">${teamName}</span>
-                ${ScoreBadge({
+                ${renderScoreBadge({
                     variant: 'full',
                     matchId,
                     team: teamKey,
@@ -486,7 +486,7 @@ function TeamRow(options = {}) {
             <div class="kob-mini-team-grid">
                 ${flagTag}
                 <span class="kob-mini-name">${teamName}</span>
-                ${ScoreBadge({
+                ${renderScoreBadge({
                     variant: 'mini',
                     matchId,
                     team: teamKey,
@@ -508,7 +508,7 @@ function getMiniCardPhaseAccentClass(phaseKey) {
     return '';
 }
 
-function buildKnockoutMatchCard(match, options = {}) {
+function renderKnockoutMatchCard(match, options = {}) {
     const {
         phaseKey = 'round32',
         side = 'A',
@@ -558,7 +558,7 @@ function buildKnockoutMatchCard(match, options = {}) {
                 <span class="match-badge ${badgeClass}">${badgeLabel}</span>
             </div>
             <div class="knockout-match-teams">
-                ${TeamRow({
+                ${renderTeamRow({
                     variant: 'full',
                     matchId: match.id,
                     teamKey: 'home',
@@ -571,7 +571,7 @@ function buildKnockoutMatchCard(match, options = {}) {
                     lockedClasses,
                     ariaLabel: `${t.tableVs} ${homeDisplayName}`
                 })}
-                ${TeamRow({
+                ${renderTeamRow({
                     variant: 'full',
                     matchId: match.id,
                     teamKey: 'away',
@@ -593,7 +593,7 @@ function buildKnockoutMatchCard(match, options = {}) {
     `;
 }
 
-function MatchCard(match, options = {}) {
+function renderMatchCard(match, options = {}) {
     const { phaseKey = 'round32', side = 'A' } = options;
     const t = translations.pt;
     const dadosCalculados = mapaMataMataCalculado[match.id] || { home: 'A definir', away: 'A definir' };
@@ -613,15 +613,21 @@ function MatchCard(match, options = {}) {
         : '';
     const sideClass = side === 'B' ? ' kob-mini-side-b' : side === 'final' ? ' kob-mini-side-final' : '';
     const matchShortDate = match.data ? match.data.slice(0, 5) + '/26' : '';
+    const cardClass = [
+        'kob-mini-card',
+        winnerInfo.winner ? 'kob-mini-resolved' : '',
+        getMiniCardPhaseAccentClass(phaseKey).trim(),
+        sideClass.trim()
+    ].filter(Boolean).join(' ');
 
     return `
-        <article class="kob-mini-card${winnerInfo.winner ? ' kob-mini-resolved' : ''}${getMiniCardPhaseAccentClass(phaseKey)}${sideClass}">
+        <article class="${cardClass}">
             <div class="kob-mini-header">
                 <span class="kob-mini-date">${matchShortDate} · ${match.hora}</span>
                 <span class="kob-mini-local">${match.local || ''}</span>
             </div>
             <div class="kob-mini-teams">
-                ${TeamRow({
+                ${renderTeamRow({
                     matchId: match.id,
                     teamKey: 'home',
                     teamName: homeDisplayName,
@@ -633,7 +639,7 @@ function MatchCard(match, options = {}) {
                     lockedClasses,
                     ariaLabel: `${t.tableVs} ${homeDisplayName}`
                 })}
-                ${TeamRow({
+                ${renderTeamRow({
                     matchId: match.id,
                     teamKey: 'away',
                     teamName: awayDisplayName,
@@ -650,11 +656,6 @@ function MatchCard(match, options = {}) {
         </article>
     `;
 }
-
-function buildMiniMatchCard(match, options = {}) {
-    return MatchCard(match, options);
-}
-
 
 function ensureKnockoutViewMode() {
     if (knockoutViewMode === 'bracket' || knockoutViewMode === 'list') return;
@@ -699,7 +700,7 @@ function renderKnockoutListView() {
                             <span class="bk-phase-count">${count} jogo${count > 1 ? 's' : ''}</span>
                         </div>
                         <div class="bk-phase-grid" style="--bk-cols: ${Math.min(count, 4)}">
-                            ${fase.jogos.map((match) => buildMiniMatchCard(match, { phaseKey, compact: true })).join('')}
+                            ${fase.jogos.map((match) => renderMatchCard(match, { phaseKey, compact: true })).join('')}
                         </div>
                     </div>
                 `;
@@ -708,7 +709,7 @@ function renderKnockoutListView() {
     `;
 }
 
-function BracketColumn(options = {}) {
+function renderBracketColumn(options = {}) {
     const { side = 'left', phaseKey = '', slotGroups = [], cardRenderer, centerContent = '' } = options;
     const baseClass = side === 'center' ? 'wcb-col wcb-center-col' : 'wcb-col';
     if (side === 'center') {
@@ -731,12 +732,13 @@ function BracketColumn(options = {}) {
 }
 
 function renderKnockoutBracketView() {
+    const CENTER_COLUMN_INDEX = 4;
     const t = translations.pt;
     const allMatchesById = new Map(estruturaNosMataMata.flatMap((fase) => fase.jogos.map((jogo) => [jogo.id, jogo])));
     const m = (id) => allMatchesById.get(id);
     const card = (id, phaseKey, side) => {
         const match = m(id);
-        return match ? buildMiniMatchCard(match, { phaseKey, side }) : '';
+        return match ? renderMatchCard(match, { phaseKey, side }) : '';
     };
 
     const phaseLabels = [
@@ -778,10 +780,10 @@ function renderKnockoutBracketView() {
     return `
         <div class="wcb-scroll">
             <div class="wcb-phase-bar">
-                ${phaseLabels.map((label, index) => `<span class="wcb-phase-label ${index === 4 ? 'wcb-phase-label-center' : ''}">${label}</span>`).join('')}
+                ${phaseLabels.map((label, index) => `<span class="wcb-phase-label ${index === CENTER_COLUMN_INDEX ? 'wcb-phase-label-center' : ''}">${label}</span>`).join('')}
             </div>
             <div class="wcb-bracket">
-                ${columns.map((column) => BracketColumn({ ...column, cardRenderer: card })).join('')}
+                ${columns.map((column) => renderBracketColumn({ ...column, cardRenderer: card })).join('')}
             </div>
         </div>
     `;

@@ -2,7 +2,6 @@
   inline-size: min(100%, var(--card-width-max));
   width: 100%;
   min-width: 0;
-  max-width: var(--card-width-max);
   border-radius: var(--card-radius);
   overflow: clip;
 }
@@ -38,11 +37,10 @@
 }
 
 .kob-mini-name {
-  font-size: var(--team-font-size);
+  font-size: var(--team-name-font-size);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  overflow-wrap: normal;
   word-break: keep-all;
 }
 
@@ -53,6 +51,14 @@
 .kob-mini-score {
   width: var(--score-input-size);
   height: var(--score-input-size);
+}
+
+.kob-mini-card.kob-mini-qf {
+  background: linear-gradient(135deg, rgb(244 114 182 / 0.06), rgb(236 72 153 / 0.05));
+}
+
+.dark .kob-mini-card.kob-mini-qf {
+  background: linear-gradient(135deg, rgb(80 7 36 / 0.32), rgb(76 5 25 / 0.3));
 }
 
 .knockout-match-card {
@@ -90,12 +96,18 @@
 }
 
 .knockout-team-name {
+  font-size: 0.76rem;
+  font-weight: 700;
+  color: rgb(51 65 85);
   min-width: 0;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  overflow-wrap: normal;
   word-break: keep-all;
+}
+
+.dark .knockout-team-name {
+  color: rgb(226 232 240);
 }
 
 .knockout-score-wrap {
