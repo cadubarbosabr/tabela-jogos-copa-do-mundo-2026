@@ -800,37 +800,41 @@ async function main() {
     }
   }
 
-  const resultKeys = Object.keys(results);
-  const resultCount = resultKeys.length;
   results._meta = {
     lastFetch: lastSuccessfulDate ? yyyymmddToIso(lastSuccessfulDate) : null,
     source: 'espn',
     slug: lastSuccessfulSlug,
   };
 
-  const newContent = JSON.stringify(results, null, 2) + '\n';
-  if (newContent === previousContent) {
-    console.log('Nenhuma alteração nos resultados.');
-  } else {
-    writeFileSync(RESULTS_PATH, newContent, 'utf8');
-    console.log(`✅ public/results.json atualizado com ${resultCount} resultado(s).`);
-  }
-
   // ---------------------------------------------------------------------------
-  // Verificação de consistência: detectar jogos da fase de grupos de datas já
-  // passadas que não receberam resultado (falha parcial silenciosa).
+  // Verificação de consistência: detectar jogos da fase de grupos e do mata-mata
+  // de datas já passadas que não receberam resultado (falha parcial silenciosa).
   // Apenas datas estritamente anteriores a hoje são verificadas, evitando
   // falsos positivos para jogos de hoje ainda não iniciados.
   // ---------------------------------------------------------------------------
-  const pastGroupGapsIds = GROUP_MATCHES
-    .filter(m => m.date < today && results[String(m.id)] === undefined)
-    .map(m => m.id);
+  const validationCutoff = lastSuccessfulDate || today;
 
-  if (pastGroupGapsIds.length > 0) {
-    const missing = GROUP_MATCHES.filter(m => pastGroupGapsIds.includes(m.id));
-    console.error(`\n❌ ${missing.length} jogo(s) da fase de grupos sem resultado (datas já encerradas):`);
-    for (const m of missing) {
-      console.error(`  #${m.id} ${m.home} × ${m.away} [${m.date}]`);
+  const pastGroupGaps = GROUP_MATCHES.filter(
+    m => m.date < validationCutoff && results[String(m.id)] === undefined
+  );
+
+  const pastKnockoutGaps = KNOCKOUT_MATCHES.filter(
+    m => m.date < validationCutoff && results[String(m.id)] === undefined
+  );
+
+  if (pastGroupGaps.length > 0 || pastKnockoutGaps.length > 0) {
+    if (pastGroupGaps.length > 0) {
+      console.error(`\n❌ ${pastGroupGaps.length} jogo(s) da fase de grupos sem resultado (datas já encerradas):`);
+      for (const m of pastGroupGaps) {
+        console.error(`  #${m.id} ${m.home} × ${m.away} [${m.date}]`);
+      }
+    }
+
+    if (pastKnockoutGaps.length > 0) {
+      console.error(`\n❌ ${pastKnockoutGaps.length} jogo(s) da eliminatória sem resultado (datas já encerradas):`);
+      for (const m of pastKnockoutGaps) {
+        console.error(`  #${m.id} [${m.date}]`);
+      }
     }
 
     if (unmatchedEvents.length > 0) {
@@ -847,7 +851,17 @@ async function main() {
     }
 
     console.error('\nVerifique os logs acima e, se necessário, ajuste o mapeamento de nomes em EN_TO_PT.');
+    console.error('A publicação foi abortada para não sobrescrever public/results.json com dados incompletos.');
     process.exit(1);
+  }
+
+  const resultCount = Object.keys(results).filter(key => key !== '_meta').length;
+  const newContent = JSON.stringify(results, null, 2) + '\n';
+  if (newContent === previousContent) {
+    console.log('Nenhuma alteração nos resultados.');
+  } else {
+    writeFileSync(RESULTS_PATH, newContent, 'utf8');
+    console.log(`✅ public/results.json atualizado com ${resultCount} resultado(s).`);
   }
 }
 
