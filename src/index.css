@@ -1214,7 +1214,7 @@ input[type=number] { -moz-appearance: textfield; }
   .kob-track {
     gap: 16px;
     justify-content: center;
-    min-width: auto;
+    min-width: 0;
   }
 
   .kob-center {
@@ -1247,7 +1247,7 @@ input[type=number] { -moz-appearance: textfield; }
   .kob-track {
     gap: 24px;
     justify-content: center;
-    min-width: auto;
+    min-width: 0;
   }
 
   .kob-center {
