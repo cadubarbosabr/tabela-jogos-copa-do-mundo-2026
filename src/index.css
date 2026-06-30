@@ -688,7 +688,6 @@ input[type=number] { -moz-appearance: textfield; }
   .bk-phase-header { gap: 0.6rem; }
   .bk-phase-title { font-size: 0.92rem; }
   .kob-mini-team-info { align-items: flex-start; }
-  .kob-mini-name { white-space: normal; text-overflow: clip; overflow-wrap: break-word; }
 }
 
 /* ============================================================
