@@ -178,6 +178,10 @@ const GROUP_MATCHES = [
   { id: 721, date: '20260703', home: 'Suíça',             away: 'Argélia'                },
 ];
 
+const GROUP_MATCHES_BY_ID = new Map(GROUP_MATCHES.map(match => [String(match.id), match]));
+
+// Placar fixo para casos em que a ESPN não retorna o evento concluído.
+// Novas entradas devem ser adicionadas apenas para jogos já cadastrados em GROUP_MATCHES.
 const MANUAL_RESULTS = {
   '721': { home: 2, away: 0 },
 };
@@ -841,8 +845,9 @@ async function main() {
 
   for (const [matchId, score] of Object.entries(MANUAL_RESULTS)) {
     if (results[matchId] === undefined) {
+      const manualMatch = GROUP_MATCHES_BY_ID.get(matchId);
       results[matchId] = score;
-      console.log(`  #${matchId} ${GROUP_MATCHES.find(m => String(m.id) === matchId)?.home ?? 'Time A'} ${score.home}–${score.away} ${GROUP_MATCHES.find(m => String(m.id) === matchId)?.away ?? 'Time B'} (hardcoded)`);
+      console.log(`  #${matchId} ${manualMatch?.home ?? 'Time A'} ${score.home}–${score.away} ${manualMatch?.away ?? 'Time B'} (hardcoded)`);
     }
   }
 
