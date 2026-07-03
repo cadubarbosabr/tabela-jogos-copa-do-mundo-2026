@@ -90,7 +90,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     renderTablesGrid();
     renderGroupStage();
-    switchTab('grupos');
+    switchTab('mata-mata');
 
     const loadingOverlay = document.getElementById('loading-overlay');
     if (loadingOverlay) loadingOverlay.remove();
