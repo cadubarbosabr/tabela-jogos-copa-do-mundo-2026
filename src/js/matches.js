@@ -89,7 +89,7 @@ export const estruturaNosMataMata = [
             { id: 82, data: "01/07 (Qua)", hora: "17h00", local: "Seattle", origHome: { tipo: "grupo", pos: 1, grp: "G" }, origAway: { tipo: "terceiro", idx: 5, grps: ["A","E","H","I","J"] } },
             { id: 83, data: "02/07 (Qui)", hora: "20h00", local: "Toronto", origHome: { tipo: "grupo", pos: 2, grp: "K" }, origAway: { tipo: "grupo", pos: 2, grp: "L" } },
             { id: 84, data: "02/07 (Qui)", hora: "22h00", local: "Los Angeles", origHome: { tipo: "grupo", pos: 1, grp: "H" }, origAway: { tipo: "grupo", pos: 2, grp: "J" } },
-            { id: 85, data: "02/07 (Qui)", hora: "16h00", local: "Vancouver", origHome: { tipo: "grupo", pos: 1, grp: "B" }, origAway: { tipo: "terceiro", idx: 6, grps: ["E","F","G","I","J"] } },
+            { id: 85, data: "03/07 (Sex)", hora: "00h00", local: "Vancouver", origHome: { tipo: "grupo", pos: 1, grp: "B" }, origAway: { tipo: "terceiro", idx: 6, grps: ["E","F","G","I","J"] } },
             { id: 86, data: "03/07 (Sex)", hora: "18h00", local: "Miami", origHome: { tipo: "grupo", pos: 1, grp: "J" }, origAway: { tipo: "grupo", pos: 2, grp: "H" } },
             { id: 87, data: "03/07 (Sex)", hora: "21h00", local: "Kansas City", origHome: { tipo: "grupo", pos: 1, grp: "K" }, origAway: { tipo: "terceiro", idx: 7, grps: ["D","E","I","J","L"] } },
             { id: 88, data: "03/07 (Sex)", hora: "20h00", local: "Dallas", origHome: { tipo: "grupo", pos: 2, grp: "D" }, origAway: { tipo: "grupo", pos: 2, grp: "G" } }
