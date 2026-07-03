@@ -175,7 +175,12 @@ const GROUP_MATCHES = [
   { id: 70, date: '20260627', home: 'RD Congo',           away: 'Uzbequistão'            },
   { id: 71, date: '20260627', home: 'Argélia',            away: 'Áustria'                },
   { id: 72, date: '20260627', home: 'Jordânia',           away: 'Argentina'              },
+  { id: 721, date: '20260703', home: 'Suíça',             away: 'Argélia'                },
 ];
+
+const MANUAL_RESULTS = {
+  '721': { home: 2, away: 0 },
+};
 
 // ---------------------------------------------------------------------------
 // Jogos do mata-mata — IDs por data YYYYMMDD (mesma ordem de matches.js)
@@ -831,6 +836,13 @@ async function main() {
           results[String(knockoutId)] = result;
         }
       }
+    }
+  }
+
+  for (const [matchId, score] of Object.entries(MANUAL_RESULTS)) {
+    if (results[matchId] === undefined) {
+      results[matchId] = score;
+      console.log(`  #${matchId} ${GROUP_MATCHES.find(m => String(m.id) === matchId)?.home ?? 'Time A'} ${score.home}–${score.away} ${GROUP_MATCHES.find(m => String(m.id) === matchId)?.away ?? 'Time B'} (hardcoded)`);
     }
   }
 

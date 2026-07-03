@@ -70,7 +70,8 @@ export const jogosGrupos = [
     { id: 69, data: "27/06 (Sáb) - 20h30", grupo: "K", home: "Colômbia", away: "Portugal", local: "Miami (EUA)" },
     { id: 70, data: "27/06 (Sáb) - 20h30", grupo: "K", home: "RD Congo", away: "Uzbequistão", local: "Atlanta (EUA)" },
     { id: 71, data: "27/06 (Sáb) - 23h00", grupo: "J", home: "Argélia", away: "Áustria", local: "Kansas City (EUA)" },
-    { id: 72, data: "27/06 (Sáb) - 23h00", grupo: "J", home: "Jordânia", away: "Argentina", local: "Dallas (EUA)" }
+    { id: 72, data: "27/06 (Sáb) - 23h00", grupo: "J", home: "Jordânia", away: "Argentina", local: "Dallas (EUA)" },
+    { id: 721, data: "03/07 (Sex) - 00h00", grupo: "X", home: "Suíça", away: "Argélia", local: "Vancouver (CAN)" }
 ];
 
 export const estruturaNosMataMata = [
