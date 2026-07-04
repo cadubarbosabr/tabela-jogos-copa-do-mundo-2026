@@ -4,7 +4,7 @@ on:
   schedule:
   # Atualiza de hora em hora entre 14:00 e 04:00 BRT
   # Horário UTC: 17:00 até 07:00
-  - cron: '0 16-20 * * *'  
+  - cron: '0 16-0,1 * * *'
   workflow_dispatch: # Permite execução manual pelo painel do GitHub Actions
 
 permissions:
