@@ -369,8 +369,12 @@
     "home": 1,
     "away": 2
   },
+  "92": {
+    "home": 2,
+    "away": 3
+  },
   "_meta": {
-    "lastFetch": "2026-07-05T00:00:00Z",
+    "lastFetch": "2026-07-06T00:00:00Z",
     "source": "espn",
     "slug": "fifa.world"
   }
