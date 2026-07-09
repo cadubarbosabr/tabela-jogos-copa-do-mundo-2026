@@ -3,220 +3,236 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tabela Copa do Mundo FIFA 2026</title>
+    <title>WC26 Table · Copa do Mundo FIFA 2026</title>
     <meta name="description" content="Tabela interativa da Copa do Mundo FIFA 2026 com classificação em tempo real e chaveamento automático.">
-    <meta name="theme-color" content="#0f172a">
+    <meta name="theme-color" content="#050814">
     <link rel="canonical" href="https://tabela-jogos-copa-do-mundo-2026.vercel.app/">
-    <meta property="og:title" content="Tabela Copa do Mundo FIFA 2026">
+    <meta property="og:title" content="WC26 Table · Copa do Mundo FIFA 2026">
     <meta property="og:description" content="Tabela interativa com classificação e chaveamento automáticos da Copa do Mundo FIFA 2026.">
     <meta property="og:image" content="https://upload.wikimedia.org/wikipedia/commons/thumb/8/88/2026_FIFA_World_Cup_emblem_%28horizontal%2C_with_wordmark%29.svg/960px-2026_FIFA_World_Cup_emblem_%28horizontal%2C_with_wordmark%29.svg.png">
     <meta property="og:url" content="https://tabela-jogos-copa-do-mundo-2026.vercel.app/">
     <meta property="og:type" content="website">
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="Tabela Copa do Mundo FIFA 2026">
+    <meta name="twitter:title" content="WC26 Table · Copa do Mundo FIFA 2026">
     <meta name="twitter:description" content="Tabela interativa com classificação e chaveamento automáticos da Copa do Mundo FIFA 2026.">
     <meta name="twitter:image" content="https://upload.wikimedia.org/wikipedia/commons/thumb/8/88/2026_FIFA_World_Cup_emblem_%28horizontal%2C_with_wordmark%29.svg/960px-2026_FIFA_World_Cup_emblem_%28horizontal%2C_with_wordmark%29.svg.png">
     <link rel="icon" type="image/svg+xml" href="/favicon.svg">
     <link rel="apple-touch-icon" href="/favicon.svg">
     <link rel="manifest" href="/manifest.json">
-    <!-- Fontes modernas via Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Syne:wght@700;800&display=swap" rel="stylesheet">
-    <!-- Folha de estilo compilada em tempo de build (Vite + Tailwind CLI) -->
     <link rel="stylesheet" href="/src/index.css">
     <script>
-        // Inicializa o tema escuro como padrão
         const theme = localStorage.getItem('wc2026_theme') || 'dark';
-        if (theme === 'dark') {
-            document.documentElement.classList.add('dark');
-        } else {
-            document.documentElement.classList.remove('dark');
-        }
+        if (theme === 'dark') document.documentElement.classList.add('dark');
+        else document.documentElement.classList.remove('dark');
     </script>
 </head>
-<body class="bg-slate-50 text-slate-900 dark:bg-slate-950 dark:text-slate-100 antialiased min-h-screen flex flex-col transition-colors duration-300">
+<body class="arena-app antialiased min-h-screen flex flex-col">
 
-    <!-- Header Principal -->
-    <header class="site-header text-white shadow-2xl relative">
-        <div class="max-w-7xl mx-auto px-4 py-4 md:py-8 flex flex-col items-center gap-3">
-            <!-- Botão de tema: flui no topo-direito no mobile, absoluto no desktop -->
-            <div class="self-end md:absolute md:top-4 md:right-6">
-                <button id="btn-theme" aria-label="Alternar tema claro/escuro" class="header-btn text-blue-200 hover:text-white px-4 py-2 md:py-2.5 rounded-2xl transition-all duration-300 text-xs font-bold backdrop-blur-sm min-h-[40px] md:min-h-[44px]">
-                    🌙 <span id="lbl-btn-theme">Modo Claro</span>
+    <!-- ═══ MOCKUP HEADER ═══ -->
+    <header class="arena-header">
+        <div class="arena-header-inner">
+            <div class="arena-brand">
+                <div class="arena-brand-mark" aria-hidden="true">
+                    <span class="arena-brand-year">2026</span>
+                    <span class="arena-brand-cup">🏆</span>
+                </div>
+                <div>
+                    <h1 id="title-app" class="arena-brand-title">WC26 Table</h1>
+                    <p id="subtitle-app" class="arena-brand-sub">Copa do Mundo FIFA 2026</p>
+                </div>
+            </div>
+
+            <div id="live-pill" class="arena-live-pill" data-state="live">
+                <span class="arena-live-dot" aria-hidden="true"></span>
+                <span id="official-status">LIVE · ESPN</span>
+            </div>
+
+            <div class="arena-header-right">
+                <button id="btn-goto-predictions" type="button" class="arena-pred-chip" title="Meus palpites">
+                    <span id="lbl-pred-chip">Meus Palpites</span>
+                    <strong id="pred-percent">—</strong>
+                </button>
+                <button id="btn-theme" type="button" class="arena-icon-btn" aria-label="Alternar tema">
+                    <span id="icon-btn-theme">🌙</span>
+                    <span id="lbl-btn-theme" class="sr-only">Modo Claro</span>
                 </button>
             </div>
-            <div class="hero-copy text-center w-full">
-                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/88/2026_FIFA_World_Cup_emblem_%28horizontal%2C_with_wordmark%29.svg/960px-2026_FIFA_World_Cup_emblem_%28horizontal%2C_with_wordmark%29.svg.png" alt="Logo da Copa do Mundo FIFA 2026" class="h-10 md:h-14 mx-auto drop-shadow-lg">
-                <h1 id="title-app" class="text-2xl sm:text-3xl md:text-5xl font-extrabold tracking-tight mt-2 drop-shadow-md header-title">COPA DO MUNDO FIFA 2026</h1>
-            </div>
         </div>
-        <!-- Borda decorativa inferior com gradiente das cores da Copa -->
-        <div class="header-border-bottom"></div>
+
+        <!-- Desktop / tablet nav -->
+        <nav class="arena-nav" aria-label="Seções">
+            <div class="arena-nav-track" role="tablist">
+                <button id="btn-grupos" type="button" role="tab" aria-selected="true" aria-controls="section-grupos" class="arena-nav-item is-active" data-tab="grupos">Grupos</button>
+                <button id="btn-mata-mata" type="button" role="tab" aria-selected="false" aria-controls="section-mata-mata" class="arena-nav-item" data-tab="mata-mata">Mata-mata</button>
+                <button id="btn-hoje" type="button" role="tab" aria-selected="false" aria-controls="section-hoje" class="arena-nav-item" data-tab="hoje">Calendário</button>
+                <button id="btn-palpites" type="button" role="tab" aria-selected="false" aria-controls="section-palpites" class="arena-nav-item" data-tab="palpites">Meus Palpites</button>
+            </div>
+        </nav>
     </header>
 
-    <!-- Conteúdo Principal -->
-    <main id="main-content" class="flex-grow max-w-[1680px] w-full mx-auto px-4 xl:px-8 2xl:px-12 pt-6 pb-28 md:py-8">
-        
-        <!-- Alternador de Abas - Centralizado -->
-        <div class="flex justify-center mb-6">
-            <div class="flex tab-switcher p-1.5 rounded-2xl shadow-inner backdrop-blur-sm">
-                <button id="btn-grupos" class="header-tab-btn is-active">Fase de Grupos</button>
-                <button id="btn-mata-mata" class="header-tab-btn">Mata-mata</button>
-            </div>
+    <main id="main-content" class="arena-main flex-grow">
+
+        <div id="loading-overlay" class="arena-loading">
+            <div class="loading-spinner" aria-hidden="true"></div>
+            <p id="loading-overlay-text">Carregando tabela oficial...</p>
         </div>
 
-        <div id="loading-overlay" class="flex flex-col items-center justify-center py-20 gap-4">
-            <div class="w-10 h-10 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin"></div>
-            <p id="loading-overlay-text" class="text-sm text-slate-500 dark:text-slate-400 font-medium"></p>
-        </div>
-        
-        <!-- SEÇÃO: FASE DE GRUPOS -->
-        <section id="section-grupos" class="space-y-8 transition-all duration-500">
-            
-            <!-- Painel de Filtros e Resumos -->
-            <div class="surface-panel flex flex-col xl:flex-row gap-5 xl:items-center xl:justify-between transition-colors duration-300">
-                <div class="flex flex-col sm:flex-row sm:items-center gap-3">
-                    <label id="lbl-filter-grupo" for="filter-grupo" class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-[0.24em]">Visualizar grupo</label>
-                    <div class="flex items-center gap-2">
-                        <button id="btn-prev-group" type="button" class="group-nav-btn md:hidden h-11 w-11 rounded-2xl border border-slate-300 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 text-slate-700 dark:text-slate-200 font-black text-lg leading-none" aria-label="Grupo anterior">‹</button>
-                        <select id="filter-grupo" class="surface-select">
-                            <option id="opt-all-groups" value="Todos">Todos os Grupos (A ao L)</option>
-                            <option value="A">Grupo A</option><option value="B">Grupo B</option><option value="C">Grupo C</option>
-                            <option value="D">Grupo D</option><option value="E">Grupo E</option><option value="F">Grupo F</option>
-                            <option value="G">Grupo G</option><option value="H">Grupo H</option><option value="I">Grupo I</option>
-                            <option value="J">Grupo J</option><option value="K">Grupo K</option><option value="L">Grupo L</option>
-                        </select>
-                        <button id="btn-next-group" type="button" class="group-nav-btn md:hidden h-11 w-11 rounded-2xl border border-slate-300 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 text-slate-700 dark:text-slate-200 font-black text-lg leading-none" aria-label="Próximo grupo">›</button>
+        <!-- ═══ GRUPOS (dashboard mockup) ═══ -->
+        <section id="section-grupos" class="arena-section" role="tabpanel" aria-labelledby="btn-grupos">
+            <div class="arena-dashboard">
+                <div class="arena-dashboard-main">
+                    <div class="arena-toolbar">
+                        <div class="arena-toolbar-left">
+                            <label id="lbl-filter-grupo" for="filter-grupo" class="arena-label">Grupo</label>
+                            <div class="arena-group-nav">
+                                <button id="btn-prev-group" type="button" class="arena-mini-btn" aria-label="Grupo anterior">‹</button>
+                                <select id="filter-grupo" class="arena-select">
+                                    <option id="opt-all-groups" value="Todos">Todos (A–L)</option>
+                                    <option value="A">Grupo A</option><option value="B">Grupo B</option><option value="C">Grupo C</option>
+                                    <option value="D">Grupo D</option><option value="E">Grupo E</option><option value="F">Grupo F</option>
+                                    <option value="G">Grupo G</option><option value="H">Grupo H</option><option value="I">Grupo I</option>
+                                    <option value="J">Grupo J</option><option value="K">Grupo K</option><option value="L">Grupo L</option>
+                                </select>
+                                <button id="btn-next-group" type="button" class="arena-mini-btn" aria-label="Próximo grupo">›</button>
+                            </div>
+                        </div>
+                        <div id="standings-legend" class="arena-legend" aria-label="Legenda">
+                            <span class="arena-legend-item"><i class="arena-swatch is-q"></i><span id="lbl-legend-qualified">1º–2º classificados</span></span>
+                            <span class="arena-legend-item"><i class="arena-swatch is-t"></i><span id="lbl-legend-third">3º disputa vaga</span></span>
+                            <span class="arena-legend-item"><i class="arena-swatch is-o"></i><span id="lbl-legend-out">4º eliminado</span></span>
+                        </div>
                     </div>
+                    <p id="lbl-group-info" class="arena-hint">Os 2 melhores de cada grupo + os 8 melhores 3º colocados avançam.</p>
+                    <div id="grid-tabelas-classificacao" aria-live="polite" class="arena-groups-grid"></div>
                 </div>
-                <div id="lbl-group-info" class="surface-callout transition-colors duration-300">
-                    Os 2 melhores de cada grupo + os 8 melhores 3º colocados avançam dinamicamente.
-                </div>
-                <button id="btn-reset-predictions" type="button" class="reset-btn">
-                    <span id="lbl-btn-reset"></span>
-                </button>
+
+                <!-- Side panel: Next match -->
+                <aside class="arena-side" aria-label="Próximo jogo">
+                    <div id="side-next-match" class="arena-side-card">
+                        <!-- filled by JS -->
+                    </div>
+                    <div id="side-upcoming" class="arena-side-upcoming">
+                        <!-- filled by JS -->
+                    </div>
+                </aside>
             </div>
 
-            <!-- Grid Dinâmico das Tabelas de Classificação -->
-            <div id="grid-tabelas-classificacao" aria-live="polite" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                <!-- Inserido dinamicamente via JS -->
-            </div>
-
-            <!-- Tabela Cronológica de Partidas do Grupo -->
-            <div class="surface-panel surface-panel-lg overflow-hidden mt-6 transition-colors duration-300">
-                <div class="p-5 md:p-6 bg-slate-50/90 dark:bg-slate-950/85 border-b border-slate-200/80 dark:border-slate-800/80 flex flex-col sm:flex-row gap-3 sm:justify-between sm:items-center transition-colors duration-300">
-                    <h2 id="lbl-fixtures-title" class="font-extrabold text-xl text-slate-900 dark:text-slate-100 tracking-tight">Jogos e Calendário da Fase de Grupos</h2>
-                    <span id="lbl-fixtures-count" class="surface-counter">72 PARTIDAS</span>
+            <!-- Fixtures under groups (collapsible feel) -->
+            <div class="arena-fixtures-block">
+                <div class="arena-fixtures-head">
+                    <h2 id="lbl-fixtures-title">Jogos da fase de grupos</h2>
+                    <span id="lbl-fixtures-count" class="arena-chip">72 PARTIDAS</span>
                 </div>
-                <div id="cards-body-grupos" class="md:hidden p-4 space-y-3">
-                    <!-- Renderizado via JS -->
-                </div>
+                <div id="cards-body-grupos" class="md:hidden arena-match-list"></div>
                 <div class="hidden md:block overflow-x-auto">
-                    <table class="w-full text-left border-collapse">
-                        <thead class="bg-slate-100/70 dark:bg-slate-950/70 text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-[0.22em] border-b border-slate-200 dark:border-slate-800">
+                    <table class="arena-table">
+                        <thead>
                             <tr>
-                                <th id="th-match" class="px-6 py-4">Jogo</th>
-                                <th id="th-datetime" class="px-6 py-4">Data / Hora (BRT)</th>
-                                <th id="th-group" class="px-6 py-4">Grupo</th>
-                                <th id="th-confront" class="px-6 py-4 text-center">Confronto & Placar</th>
-                                <th id="th-stadium" class="px-6 py-4">Estádio / Sede</th>
+                                <th id="th-match">Jogo</th>
+                                <th id="th-datetime">Data / Hora (BRT)</th>
+                                <th id="th-group">Grupo</th>
+                                <th id="th-confront" class="text-center">Confronto & Placar</th>
+                                <th id="th-stadium">Estádio / Sede</th>
                             </tr>
                         </thead>
-                        <tbody id="table-body-grupos" class="divide-y divide-slate-100 dark:divide-slate-800/50 text-sm">
-                            <!-- Renderizado via JS -->
-                        </tbody>
+                        <tbody id="table-body-grupos"></tbody>
                     </table>
                 </div>
             </div>
         </section>
 
-        <!-- SEÇÃO: MATA-MATA -->
-        <section id="section-mata-mata" class="hidden space-y-8 transition-all duration-500">
-            
-            <!-- BANNER DO CAMPEÃO DINÂMICO -->
-            <div id="banner-campeao" class="hidden bg-gradient-to-r from-amber-500 via-yellow-400 to-amber-600 p-6 rounded-3xl shadow-2xl text-white text-center border-2 border-amber-300 animate-bounce relative overflow-hidden">
-                <p id="lbl-champion-title" class="text-xs uppercase font-extrabold tracking-widest text-amber-950">🏆 Campeão do Mundo 🏆</p>
-                <h2 id="nome-campeao" class="text-3xl md:text-5xl font-black mt-2 drop-shadow-lg uppercase tracking-tight">---</h2>
-                <p id="lbl-champion-subtitle" class="text-sm font-bold text-amber-950/80 mt-1">VENCEDOR DA COPA DO MUNDO FIFA 2026</p>
+        <!-- ═══ MATA-MATA ═══ -->
+        <section id="section-mata-mata" class="arena-section hidden" role="tabpanel" aria-labelledby="btn-mata-mata">
+            <div id="banner-campeao" class="champion-banner hidden">
+                <p id="lbl-champion-title" class="champion-banner-kicker">🏆 Campeão do Mundo 🏆</p>
+                <h2 id="nome-campeao" class="champion-banner-name">---</h2>
+                <p id="lbl-champion-subtitle" class="champion-banner-sub">VENCEDOR DA COPA DO MUNDO FIFA 2026</p>
             </div>
-
-            <div id="container-mata-mata" aria-live="polite" class="space-y-10">
-                <!-- Renderizado via JS -->
-            </div>
+            <div id="container-mata-mata" aria-live="polite"></div>
         </section>
 
+        <!-- ═══ CALENDÁRIO / HOJE ═══ -->
+        <section id="section-hoje" class="arena-section hidden" role="tabpanel" aria-labelledby="btn-hoje">
+            <div class="arena-page-head">
+                <h2 id="lbl-hoje-title" class="arena-page-title">Calendário</h2>
+                <p id="lbl-hoje-sub" class="arena-page-sub">Todos os jogos da copa em ordem cronológica. Filtre por status.</p>
+            </div>
+            <div class="arena-filter-chips" id="hoje-filters" role="group" aria-label="Filtrar jogos">
+                <button type="button" class="arena-chip-btn is-active" data-filter="all">Todos</button>
+                <button type="button" class="arena-chip-btn" data-filter="open">Sem placar</button>
+                <button type="button" class="arena-chip-btn" data-filter="official">Oficiais</button>
+                <button type="button" class="arena-chip-btn" data-filter="prediction">Meus palpites</button>
+            </div>
+            <div id="hoje-list" class="arena-match-list arena-match-list-lg"></div>
+        </section>
+
+        <!-- ═══ MEUS PALPITES ═══ -->
+        <section id="section-palpites" class="arena-section hidden" role="tabpanel" aria-labelledby="btn-palpites">
+            <div class="arena-page-head arena-page-head-row">
+                <div>
+                    <h2 id="lbl-palpites-title" class="arena-page-title">Meus Palpites</h2>
+                    <p id="lbl-palpites-sub" class="arena-page-sub">Resumo dos placares que você preencheu. Oficiais da ESPN ficam travados.</p>
+                </div>
+                <button id="btn-reset-predictions" type="button" class="arena-danger-btn">
+                    <span id="lbl-btn-reset">Resetar palpites</span>
+                </button>
+            </div>
+            <div id="palpites-stats" class="arena-stats-row"></div>
+            <div id="palpites-list" class="arena-match-list arena-match-list-lg"></div>
+        </section>
     </main>
 
-    <!-- Footer com Seção de Contatos e PIX Customizada -->
-    <footer class="site-footer text-slate-400 py-10 mt-16">
-        <div class="max-w-7xl mx-auto px-4 flex flex-col md:flex-row justify-between items-center gap-6 text-sm">
-            
-            <!-- Créditos e Copy -->
-            <div class="text-center md:text-left">
-                <p id="lbl-footer-title" class="font-bold text-slate-300">© 2026 COPA DO MUNDO FIFA 2026</p>
-                <p id="lbl-footer-sub" class="text-xs text-slate-500 mt-0.5">Desenvolvido por Cadu Barbosa • Dados públicos • Copa do Mundo FIFA 2026</p>
+    <footer class="arena-footer">
+        <div class="arena-footer-inner">
+            <div>
+                <p id="lbl-footer-title" class="arena-footer-title">© 2026 WC26 Table</p>
+                <p id="lbl-footer-sub" class="arena-footer-sub">Desenvolvido por Cadu Barbosa · Dados públicos ESPN</p>
             </div>
-            
-            <!-- Bloco de Contatos, Redes Sociais e PIX -->
-            <div class="flex flex-col sm:flex-row sm:flex-wrap justify-center items-center gap-3 text-xs font-semibold">
-                <span id="last-update" class="text-slate-500 self-center"></span>
-                
-                <!-- Botão PIX Inteligente (Clique para Copiar) -->
-                <button id="btn-pix" 
-                        title="Chave: sicwnb@outlook.com"
-                        class="flex items-center gap-2 bg-emerald-950/40 border border-emerald-900/50 text-emerald-400 px-4 py-2 rounded-xl hover:bg-emerald-900/40 hover:text-emerald-300 hover:border-emerald-700 transition-all duration-300">
-                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+            <div class="arena-footer-actions">
+                <span id="last-update" class="arena-footer-meta"></span>
+                <span id="official-status-detail" class="sr-only"></span>
+                <button id="btn-pix" type="button" class="btn-pix" title="Chave: sicwnb@outlook.com">
+                    <span class="btn-pix-dot" aria-hidden="true"></span>
                     <span id="lbl-btn-pix">Contribuir via PIX</span>
                 </button>
-
-                <!-- Link X (Twitter) -->
-                <a href="https://x.com/CaduBarbosaBR" target="_blank" 
-                   class="footer-social-link flex items-center gap-2 bg-slate-900 border border-slate-800 text-slate-300 px-4 py-2 rounded-xl hover:bg-slate-800 hover:text-white hover:border-slate-600 transition-all duration-300">
-                    <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
-                    X (Twitter)
-                </a>
-
-                <!-- Link LinkedIn -->
-                <a href="https://linkedin.com/in/cbarbosa9" target="_blank" 
-                   class="footer-social-link flex items-center gap-2 bg-slate-900 border border-slate-800 text-slate-300 px-4 py-2 rounded-xl hover:bg-slate-800 hover:text-white hover:border-slate-600 transition-all duration-300">
-                    <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24"><path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/></svg>
-                    LinkedIn
-                </a>
+                <a href="https://x.com/CaduBarbosaBR" target="_blank" rel="noopener noreferrer" class="footer-social-link">X</a>
+                <a href="https://linkedin.com/in/cbarbosa9" target="_blank" rel="noopener noreferrer" class="footer-social-link">LinkedIn</a>
             </div>
         </div>
     </footer>
 
-    <!-- Bottom Navigation Mobile -->
-    <nav class="mobile-bottom-nav md:hidden fixed bottom-0 inset-x-0 z-40 px-3 py-2 border-t border-slate-200/70 dark:border-slate-800/80" aria-label="Navegação principal">
-        <div class="max-w-7xl mx-auto grid grid-cols-2 gap-2">
-            <button id="btn-grupos-mobile" class="mobile-tab-btn is-active" data-tab="grupos">
-                <span aria-hidden="true">🏟️</span>
-                <span id="lbl-btn-grupos-mobile">Fase de Grupos</span>
-            </button>
-            <button id="btn-mata-mata-mobile" class="mobile-tab-btn" data-tab="mata-mata">
-                <span aria-hidden="true">🏆</span>
-                <span id="lbl-btn-mata-mata-mobile">Mata-mata</span>
-            </button>
-        </div>
+    <!-- Mobile bottom nav — 4 items like mockup -->
+    <nav class="arena-bottom-nav" aria-label="Navegação principal">
+        <button type="button" class="arena-bottom-item is-active" data-tab="grupos" id="btn-grupos-mobile">
+            <span class="arena-bottom-icon" aria-hidden="true">▦</span>
+            <span id="lbl-btn-grupos-mobile">Grupos</span>
+        </button>
+        <button type="button" class="arena-bottom-item" data-tab="mata-mata" id="btn-mata-mata-mobile">
+            <span class="arena-bottom-icon" aria-hidden="true">⑂</span>
+            <span id="lbl-btn-mata-mata-mobile">Chave</span>
+        </button>
+        <button type="button" class="arena-bottom-item" data-tab="hoje" id="btn-hoje-mobile">
+            <span class="arena-bottom-icon" aria-hidden="true">▣</span>
+            <span id="lbl-btn-hoje-mobile">Hoje</span>
+        </button>
+        <button type="button" class="arena-bottom-item" data-tab="palpites" id="btn-palpites-mobile">
+            <span class="arena-bottom-icon" aria-hidden="true">◎</span>
+            <span id="lbl-btn-palpites-mobile">Palpites</span>
+        </button>
     </nav>
 
-    <!-- Botão Scroll to Top -->
-    <button id="btn-scroll-top" 
-            aria-label="Voltar ao topo"
-            class="scroll-top-btn fixed bottom-20 right-5 z-40 w-11 h-11 rounded-full shadow-lg flex items-center justify-center opacity-0 pointer-events-none transition-all duration-300">
-        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+    <button id="btn-scroll-top" aria-label="Voltar ao topo" class="scroll-top-btn">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
             <polyline points="18 15 12 9 6 15"></polyline>
         </svg>
     </button>
 
-    <!-- Container para Notificações Toast -->
-    <div id="toast-container" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2 pointer-events-none"></div>
+    <div id="toast-container" class="fixed bottom-24 md:bottom-5 right-5 z-50 flex flex-col gap-2 pointer-events-none"></div>
 
-    <!-- Script de Entrada Principal compilado via Vite -->
     <script type="module" src="/src/js/main.js"></script>
-    
-    <!-- Vercel Web Analytics -->
     <script type="module">
         import { inject } from '@vercel/analytics';
         inject();

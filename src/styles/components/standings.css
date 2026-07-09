@@ -1,3 +1,259 @@
+/* ============================================================
+   Group standings — WC26 Arena
+   ============================================================ */
+
+.standings-legend {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.55rem 1rem;
+  padding: 0.85rem 1.1rem;
+  border-radius: var(--radius-xl);
+  border: 1px solid var(--wc-border);
+  background: var(--wc-surface);
+  box-shadow: var(--shadow-sm);
+}
+
+.standings-legend-title {
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--wc-text-muted);
+  margin-right: 0.25rem;
+}
+
+.standings-legend-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--wc-text-secondary);
+}
+
+.standings-legend-swatch {
+  width: 0.7rem;
+  height: 0.7rem;
+  border-radius: 0.2rem;
+  flex-shrink: 0;
+}
+
+.standings-legend-swatch.is-qualified {
+  background: var(--wc-emerald);
+  box-shadow: 0 0 0 2px rgb(16 185 129 / 0.25);
+}
+
+.standings-legend-swatch.is-third {
+  background: var(--wc-amber);
+  box-shadow: 0 0 0 2px rgb(245 158 11 / 0.25);
+}
+
+.standings-legend-swatch.is-out {
+  background: rgb(148 163 184 / 0.45);
+  box-shadow: 0 0 0 2px rgb(148 163 184 / 0.15);
+}
+
 .group-standings-card {
+  position: relative;
   overflow: clip;
+  padding: 0;
+  border-radius: var(--radius-2xl);
+  background: var(--wc-surface);
+  border: 1px solid var(--wc-border);
+  box-shadow: var(--shadow-md);
+  transition: transform 0.22s ease, box-shadow 0.22s ease, border-color 0.22s ease;
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+}
+
+.group-standings-card:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-lg);
+  border-color: rgb(47 107 255 / 0.28);
+}
+
+.group-standings-accent {
+  height: 4px;
+  width: 100%;
+  background: var(--group-accent, var(--wc-blue));
+}
+
+.group-standings-body {
+  padding: 1rem 1.1rem 1.05rem;
+}
+
+.group-standings-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 0.85rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid var(--wc-border);
+}
+
+.group-standings-title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 0.95rem;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--wc-text);
+}
+
+.group-standings-chip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 1.85rem;
+  height: 1.85rem;
+  padding: 0 0.45rem;
+  border-radius: var(--radius-pill);
+  background: color-mix(in srgb, var(--group-accent, var(--wc-blue)) 16%, transparent);
+  color: var(--group-accent, var(--wc-blue));
+  font-size: 0.72rem;
+  font-weight: 900;
+  letter-spacing: 0.04em;
+}
+
+.group-standings-table {
+  width: 100%;
+  text-align: left;
+  border-collapse: collapse;
+}
+
+.group-standings-table thead th {
+  padding-bottom: 0.45rem;
+  font-size: 0.62rem;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--wc-text-muted);
+}
+
+.group-standings-table tbody tr {
+  border-bottom: 1px solid rgb(226 232 240 / 0.55);
+}
+
+.dark .group-standings-table tbody tr {
+  border-bottom-color: rgb(51 65 85 / 0.45);
+}
+
+.group-standings-table tbody tr:last-child {
+  border-bottom: 0;
+}
+
+.group-standings-table td {
+  padding: 0.55rem 0.15rem;
+  vertical-align: middle;
+  font-size: 0.82rem;
+}
+
+.standings-pos {
+  width: 2.4rem;
+  text-align: center;
+  font-weight: 800;
+  color: var(--wc-text-secondary);
+  white-space: nowrap;
+}
+
+.standings-pos-inner {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.3rem;
+}
+
+.standings-team {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  min-width: 0;
+  font-weight: 700;
+  color: var(--wc-text);
+}
+
+.standings-team-name {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.standings-stat {
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+  color: var(--wc-text-muted);
+  font-weight: 600;
+  min-width: 1.6rem;
+}
+
+.standings-stat.is-pts {
+  font-weight: 900;
+  color: var(--wc-text);
+}
+
+.standings-stat.is-gd {
+  font-weight: 700;
+  color: var(--wc-text-secondary);
+}
+
+/* Qualification zones */
+.standings-row-qualified {
+  background: var(--zone-qualified-bg);
+}
+
+.standings-row-qualified .standings-pos {
+  color: var(--wc-emerald-deep);
+}
+
+.dark .standings-row-qualified .standings-pos {
+  color: #34d399;
+}
+
+.standings-row-qualified .standings-team-name {
+  font-weight: 800;
+}
+
+.standings-row-third {
+  background: var(--zone-third-bg);
+}
+
+.standings-row-third .standings-pos {
+  color: var(--wc-amber-deep);
+}
+
+.dark .standings-row-third .standings-pos {
+  color: #fbbf24;
+}
+
+.standings-row-out {
+  opacity: 0.88;
+}
+
+.standings-zone-bar {
+  display: inline-block;
+  width: 3px;
+  height: 1rem;
+  border-radius: 999px;
+  background: transparent;
+  flex-shrink: 0;
+}
+
+.standings-row-qualified .standings-zone-bar {
+  background: var(--zone-qualified-border);
+}
+
+.standings-row-third .standings-zone-bar {
+  background: var(--zone-third-border);
+}
+
+.standings-row-out .standings-zone-bar {
+  background: rgb(148 163 184 / 0.35);
+}
+
+/* Keep legacy class working if referenced elsewhere */
+.standings-row-highlight {
+  background: var(--zone-qualified-bg);
 }

@@ -9,6 +9,11 @@ import {
     renderTablesGrid,
     renderGroupStage,
     renderKnockoutStage,
+    renderSidePanel,
+    renderCalendarView,
+    renderPredictionsView,
+    setCalendarFilter,
+    updatePredictionBadge,
     switchTab,
     showToast,
     initToggles
@@ -29,23 +34,31 @@ function formatStatusDate(rawTimestamp) {
 function updateOfficialStatusLabel() {
     const statusTitle = document.getElementById('official-status');
     const statusDetail = document.getElementById('official-status-detail');
+    const livePill = document.getElementById('live-pill');
     const footerUpdate = document.getElementById('last-update');
     const status = getOfficialResultsStatus();
     const t = translations.pt;
     const formattedDate = formatStatusDate(status.lastFetch);
     const hasOfficialData = status.entryCount > 0;
 
+    let state = 'live';
+    let title = t.officialStatusLive;
+
+    if (status.hasError && hasOfficialData) {
+        state = 'fallback';
+        title = t.officialStatusFallback;
+    } else if (status.hasError) {
+        state = 'error';
+        title = t.officialStatusUnavailable;
+    }
+
     if (statusTitle) {
-        if (status.hasError && hasOfficialData) {
-            statusTitle.textContent = t.officialStatusFallback;
-            statusTitle.dataset.state = 'fallback';
-        } else if (status.hasError) {
-            statusTitle.textContent = t.officialStatusUnavailable;
-            statusTitle.dataset.state = 'error';
-        } else {
-            statusTitle.textContent = t.officialStatusLive;
-            statusTitle.dataset.state = 'live';
-        }
+        statusTitle.textContent = title;
+        statusTitle.dataset.state = state;
+    }
+
+    if (livePill) {
+        livePill.dataset.state = state;
     }
 
     if (statusDetail) {
@@ -63,12 +76,34 @@ function updateOfficialStatusLabel() {
 
     if (footerUpdate) {
         if (formattedDate) {
-            footerUpdate.textContent = `Resultados oficiais ${status.hasError && hasOfficialData ? 'em cache' : 'atualizados'} em ${formattedDate}`;
+            footerUpdate.textContent = `ESPN ${state === 'fallback' ? 'cache' : 'live'} · ${formattedDate}`;
         } else if (status.hasError) {
-            footerUpdate.textContent = 'Resultados oficiais indisponíveis no momento.';
+            footerUpdate.textContent = 'Resultados oficiais indisponíveis.';
         } else {
             footerUpdate.textContent = 'Aguardando primeira atualização oficial.';
         }
+    }
+}
+
+function refreshVisibleViews() {
+    renderTablesGrid();
+    renderGroupStage();
+    renderSidePanel();
+    updatePredictionBadge();
+
+    const sectionMataMata = document.getElementById('section-mata-mata');
+    if (sectionMataMata && !sectionMataMata.classList.contains('hidden')) {
+        renderKnockoutStage();
+    }
+
+    const sectionHoje = document.getElementById('section-hoje');
+    if (sectionHoje && !sectionHoje.classList.contains('hidden')) {
+        renderCalendarView();
+    }
+
+    const sectionPalpites = document.getElementById('section-palpites');
+    if (sectionPalpites && !sectionPalpites.classList.contains('hidden')) {
+        renderPredictionsView();
     }
 }
 
@@ -87,45 +122,40 @@ document.addEventListener('DOMContentLoaded', async () => {
     updateOfficialStatusLabel();
 
     recalcularTorneioCompleto();
-
     renderTablesGrid();
     renderGroupStage();
-    switchTab('mata-mata');
+    renderSidePanel();
+    updatePredictionBadge();
+    switchTab('grupos');
 
     const loadingOverlay = document.getElementById('loading-overlay');
     if (loadingOverlay) loadingOverlay.remove();
 
     addUpdateListener(() => {
-        renderTablesGrid();
-
-        const sectionMataMata = document.getElementById('section-mata-mata');
-        if (sectionMataMata && !sectionMataMata.classList.contains('hidden')) {
-            renderKnockoutStage();
-        }
+        refreshVisibleViews();
     });
 
-    const btnGrupos = document.getElementById('btn-grupos');
-    const btnMataMata = document.getElementById('btn-mata-mata');
-    const btnGruposMobile = document.getElementById('btn-grupos-mobile');
-    const btnMataMataMobile = document.getElementById('btn-mata-mata-mobile');
+    // Desktop + mobile tab buttons
+    document.querySelectorAll('[data-tab]').forEach((btn) => {
+        btn.addEventListener('click', () => {
+            const tab = btn.getAttribute('data-tab');
+            if (tab) switchTab(tab);
+        });
+    });
+
+    const btnGotoPredictions = document.getElementById('btn-goto-predictions');
+    if (btnGotoPredictions) {
+        btnGotoPredictions.addEventListener('click', () => switchTab('palpites'));
+    }
+
+    // Calendar filters
+    document.querySelectorAll('#hoje-filters .arena-chip-btn').forEach((btn) => {
+        btn.addEventListener('click', () => {
+            setCalendarFilter(btn.getAttribute('data-filter') || 'all');
+        });
+    });
+
     const btnResetPredictions = document.getElementById('btn-reset-predictions');
-
-    if (btnGrupos) {
-        btnGrupos.addEventListener('click', () => switchTab('grupos'));
-    }
-
-    if (btnMataMata) {
-        btnMataMata.addEventListener('click', () => switchTab('mata-mata'));
-    }
-
-    if (btnGruposMobile) {
-        btnGruposMobile.addEventListener('click', () => switchTab('grupos'));
-    }
-
-    if (btnMataMataMobile) {
-        btnMataMataMobile.addEventListener('click', () => switchTab('mata-mata'));
-    }
-
     if (btnResetPredictions) {
         btnResetPredictions.addEventListener('click', () => {
             const t = translations.pt;
@@ -139,14 +169,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             });
 
             recalcularTorneioCompleto();
-            renderTablesGrid();
-            renderGroupStage();
-
-            const sectionMataMata = document.getElementById('section-mata-mata');
-            if (sectionMataMata && !sectionMataMata.classList.contains('hidden')) {
-                renderKnockoutStage();
-            }
-
+            refreshVisibleViews();
             showToast(t.resetDone);
         });
     }
@@ -171,13 +194,8 @@ document.addEventListener('DOMContentLoaded', async () => {
             renderGroupStage();
         };
 
-        if (btnPrevGroup) {
-            btnPrevGroup.addEventListener('click', () => navegarGrupo(-1));
-        }
-
-        if (btnNextGroup) {
-            btnNextGroup.addEventListener('click', () => navegarGrupo(1));
-        }
+        if (btnPrevGroup) btnPrevGroup.addEventListener('click', () => navegarGrupo(-1));
+        if (btnNextGroup) btnNextGroup.addEventListener('click', () => navegarGrupo(1));
     }
 
     const btnPix = document.getElementById('btn-pix');
@@ -192,11 +210,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     const btnScrollTop = document.getElementById('btn-scroll-top');
     if (btnScrollTop) {
         window.addEventListener('scroll', () => {
-            if (window.scrollY > 300) {
-                btnScrollTop.classList.add('visible');
-            } else {
-                btnScrollTop.classList.remove('visible');
-            }
+            if (window.scrollY > 300) btnScrollTop.classList.add('visible');
+            else btnScrollTop.classList.remove('visible');
         }, { passive: true });
 
         btnScrollTop.addEventListener('click', () => {

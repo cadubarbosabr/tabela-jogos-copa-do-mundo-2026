@@ -9,3 +9,5 @@
 @import "./styles/components/buttons.css";
 @import "./styles/components/standings.css";
 @import "./styles/responsive.css";
+/* Mockup redesign — last so it wins over legacy chrome */
+@import "./styles/arena.css";

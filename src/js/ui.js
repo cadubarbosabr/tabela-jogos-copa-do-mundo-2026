@@ -43,122 +43,132 @@ export function initToggles() {
 export function applyTheme() {
     const htmlEl = document.documentElement;
     const lblBtnTheme = document.getElementById('lbl-btn-theme');
-    
+    const iconBtnTheme = document.getElementById('icon-btn-theme');
+    const t = translations.pt;
+
     if (currentTheme === 'dark') {
         htmlEl.classList.add('dark');
-        if (lblBtnTheme) lblBtnTheme.textContent = 'Modo Claro';
+        if (lblBtnTheme) lblBtnTheme.textContent = t.themeLight;
+        if (iconBtnTheme) iconBtnTheme.textContent = '🌙';
     } else {
         htmlEl.classList.remove('dark');
-        if (lblBtnTheme) lblBtnTheme.textContent = 'Modo Escuro';
+        if (lblBtnTheme) lblBtnTheme.textContent = t.themeDark;
+        if (iconBtnTheme) iconBtnTheme.textContent = '☀️';
     }
 }
 
 export function applyLanguage() {
     const t = translations.pt;
     document.documentElement.lang = 'pt-BR';
-    
-    // Header
+
     const titleApp = document.getElementById('title-app');
     const subtitleApp = document.getElementById('subtitle-app');
     const loadingOverlayText = document.getElementById('loading-overlay-text');
-    if (titleApp) titleApp.textContent = t.title;
-    if (subtitleApp) subtitleApp.textContent = t.subtitle;
+    if (titleApp) titleApp.textContent = t.brandTitle || 'WC26 Table';
+    if (subtitleApp) subtitleApp.textContent = t.brandSubtitle || t.subtitle;
     if (loadingOverlayText) loadingOverlayText.textContent = t.loadingTable;
 
-    // Tabs
-    const btnGrupos = document.getElementById('btn-grupos');
-    const btnMataMata = document.getElementById('btn-mata-mata');
-    const lblBtnGruposMobile = document.getElementById('lbl-btn-grupos-mobile');
-    const lblBtnMataMataMobile = document.getElementById('lbl-btn-mata-mata-mobile');
-    
-    if (btnGrupos) btnGrupos.textContent = t.tabGroups;
-    if (btnMataMata) btnMataMata.textContent = t.tabKnockout;
-    if (lblBtnGruposMobile) lblBtnGruposMobile.textContent = t.tabGroups;
-    if (lblBtnMataMataMobile) lblBtnMataMataMobile.textContent = t.tabKnockout;
+    const setText = (id, value) => {
+        const el = document.getElementById(id);
+        if (el && value != null) el.textContent = value;
+    };
 
-    // Botão de Tema
+    setText('btn-grupos', t.tabGroupsShort || t.tabGroups);
+    setText('btn-mata-mata', t.tabKnockoutShort || t.tabKnockout);
+    setText('btn-hoje', t.tabCalendar || 'Calendário');
+    setText('btn-palpites', t.tabPredictions || 'Meus Palpites');
+    setText('lbl-btn-grupos-mobile', t.tabGroupsShort || 'Grupos');
+    setText('lbl-btn-mata-mata-mobile', t.tabBracketShort || 'Chave');
+    setText('lbl-btn-hoje-mobile', t.tabTodayShort || 'Hoje');
+    setText('lbl-btn-palpites-mobile', t.tabPredictionsShort || 'Palpites');
+    setText('lbl-pred-chip', t.tabPredictions || 'Meus Palpites');
+
     applyTheme();
 
-    // Filtros
-    const lblFilter = document.getElementById('lbl-filter-grupo');
-    const optAll = document.getElementById('opt-all-groups');
-    const lblGroupInfo = document.getElementById('lbl-group-info');
-    if (lblFilter) lblFilter.textContent = t.filterLabel;
-    if (optAll) optAll.textContent = t.filterAll;
-    if (lblGroupInfo) lblGroupInfo.textContent = t.groupInfo;
-
-    // Tabela calendário
-    const lblFixturesTitle = document.getElementById('lbl-fixtures-title');
-    const lblFixturesCount = document.getElementById('lbl-fixtures-count');
-    if (lblFixturesTitle) lblFixturesTitle.textContent = t.fixturesTitle;
-    if (lblFixturesCount) lblFixturesCount.textContent = t.fixturesCount;
-
-    const thMatch = document.getElementById('th-match');
-    const thDateTime = document.getElementById('th-datetime');
-    const thGroup = document.getElementById('th-group');
-    const thConfront = document.getElementById('th-confront');
-    const thStadium = document.getElementById('th-stadium');
-    
-    if (thMatch) thMatch.textContent = t.tableMatch;
-    if (thDateTime) thDateTime.textContent = t.tableDateTime;
-    if (thGroup) thGroup.textContent = t.tableGroup;
-    if (thConfront) thConfront.textContent = t.tableVs;
-    if (thStadium) thStadium.textContent = t.tableStadium;
-
-    // Banner do Campeão
-    const lblChampTitle = document.getElementById('lbl-champion-title');
-    const lblChampSub = document.getElementById('lbl-champion-subtitle');
-    if (lblChampTitle) lblChampTitle.textContent = t.championTitle;
-    if (lblChampSub) lblChampSub.textContent = t.championSubtitle;
-
-    // Footer
-    const lblFooterTitle = document.getElementById('lbl-footer-title');
-    const lblFooterSub = document.getElementById('lbl-footer-sub');
-    const lblBtnPix = document.getElementById('lbl-btn-pix');
-    const lblBtnReset = document.getElementById('lbl-btn-reset');
-    if (lblFooterTitle) lblFooterTitle.textContent = `© 2026 ${t.title}`;
-    if (lblFooterSub) lblFooterSub.textContent = "Desenvolvido por Cadu Barbosa • Dados públicos • Copa do Mundo FIFA 2026";
-    if (lblBtnPix) lblBtnPix.textContent = t.contribPix;
-    if (lblBtnReset) lblBtnReset.textContent = t.resetPredictions;
+    setText('lbl-filter-grupo', t.filterLabel);
+    setText('opt-all-groups', t.filterAllShort || t.filterAll);
+    setText('lbl-group-info', t.groupInfo);
+    setText('lbl-legend-qualified', t.legendQualified);
+    setText('lbl-legend-third', t.legendThird);
+    setText('lbl-legend-out', t.legendOut);
+    setText('lbl-fixtures-title', t.fixturesTitle);
+    setText('lbl-fixtures-count', t.fixturesCount);
+    setText('th-match', t.tableMatch);
+    setText('th-datetime', t.tableDateTime);
+    setText('th-group', t.tableGroup);
+    setText('th-confront', t.tableVs);
+    setText('th-stadium', t.tableStadium);
+    setText('lbl-champion-title', t.championTitle);
+    setText('lbl-champion-subtitle', t.championSubtitle);
+    setText('lbl-hoje-title', t.tabCalendar || 'Calendário');
+    setText('lbl-hoje-sub', t.calendarSub || '');
+    setText('lbl-palpites-title', t.tabPredictions || 'Meus Palpites');
+    setText('lbl-palpites-sub', t.predictionsSub || '');
+    setText('lbl-footer-title', `© 2026 ${t.brandTitle || 'WC26 Table'}`);
+    setText('lbl-footer-sub', 'Desenvolvido por Cadu Barbosa · Dados públicos ESPN');
+    setText('lbl-btn-pix', t.contribPix);
+    setText('lbl-btn-reset', t.resetPredictions);
 }
 
-function getTabButtonClassName(isActive) {
-    return `header-tab-btn${isActive ? ' is-active' : ''}`;
-}
+const VALID_TABS = ['grupos', 'mata-mata', 'hoje', 'palpites'];
 
 export function switchTab(tab) {
-    const btnGrupos = document.getElementById('btn-grupos');
-    const btnMataMata = document.getElementById('btn-mata-mata');
-    const sectionGrupos = document.getElementById('section-grupos');
-    const sectionMataMata = document.getElementById('section-mata-mata');
+    const normalizedTab = VALID_TABS.includes(tab) ? tab : 'grupos';
 
-    if (!btnGrupos || !btnMataMata || !sectionGrupos || !sectionMataMata) return;
+    const sectionMap = {
+        grupos: 'section-grupos',
+        'mata-mata': 'section-mata-mata',
+        hoje: 'section-hoje',
+        palpites: 'section-palpites'
+    };
 
-    const t = translations.pt;
-    const normalizedTab = tab === 'mata-mata' ? 'mata-mata' : 'grupos';
+    Object.entries(sectionMap).forEach(([key, sectionId]) => {
+        const section = document.getElementById(sectionId);
+        if (section) section.classList.toggle('hidden', key !== normalizedTab);
+    });
 
-    btnGrupos.className = getTabButtonClassName(normalizedTab === 'grupos');
-    btnMataMata.className = getTabButtonClassName(normalizedTab === 'mata-mata');
-    btnGrupos.textContent = t.tabGroups;
-    btnMataMata.textContent = t.tabKnockout;
-    
-    sectionGrupos.classList.toggle('hidden', normalizedTab !== 'grupos');
-    sectionMataMata.classList.toggle('hidden', normalizedTab !== 'mata-mata');
-
-    document.querySelectorAll('.mobile-tab-btn').forEach((btn) => {
+    document.querySelectorAll('.arena-nav-item, .arena-bottom-item').forEach((btn) => {
         const isActive = btn.getAttribute('data-tab') === normalizedTab;
         btn.classList.toggle('is-active', isActive);
+        if (btn.getAttribute('role') === 'tab') {
+            btn.setAttribute('aria-selected', isActive ? 'true' : 'false');
+        }
         btn.setAttribute('aria-current', isActive ? 'page' : 'false');
     });
-    
-    if (normalizedTab === 'mata-mata') {
-        renderKnockoutStage();
+
+    if (normalizedTab === 'mata-mata') renderKnockoutStage();
+    if (normalizedTab === 'hoje') renderCalendarView();
+    if (normalizedTab === 'palpites') renderPredictionsView();
+    if (normalizedTab === 'grupos') {
+        renderTablesGrid();
+        renderSidePanel();
     }
 
     const mainContent = document.getElementById('main-content');
     if (mainContent) {
         mainContent.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
+}
+
+const GROUP_ACCENT_VARS = {
+    A: 'var(--group-a)',
+    B: 'var(--group-b)',
+    C: 'var(--group-c)',
+    D: 'var(--group-d)',
+    E: 'var(--group-e)',
+    F: 'var(--group-f)',
+    G: 'var(--group-g)',
+    H: 'var(--group-h)',
+    I: 'var(--group-i)',
+    J: 'var(--group-j)',
+    K: 'var(--group-k)',
+    L: 'var(--group-l)'
+};
+
+function getStandingsRowClass(index) {
+    if (index < 2) return 'standings-row-qualified';
+    if (index === 2) return 'standings-row-third';
+    return 'standings-row-out';
 }
 
 export function renderTablesGrid() {
@@ -172,50 +182,312 @@ export function renderTablesGrid() {
     const gruposParaMostrar = filtro === 'Todos' ? Object.keys(gruposClassificacao) : [filtro];
     const t = translations.pt;
 
-    gruposParaMostrar.forEach(g => {
+    gruposParaMostrar.forEach((g) => {
+        const teams = gruposClassificacao[g] || [];
+        const leadTeam = teams[0];
         const div = document.createElement('div');
-        div.className = "group-standings-card";
+        div.className = 'group-standings-card';
+        div.style.setProperty('--group-accent', GROUP_ACCENT_VARS[g] || 'var(--wc-blue)');
 
-        let rowsHtml = gruposClassificacao[g].map((teamObj, idx) => {
-            let rowBg = "text-slate-700 dark:text-slate-300";
-            if (idx < 2) rowBg = "standings-row-highlight text-emerald-900 dark:text-emerald-300 font-bold";
-            
+        const rowsHtml = teams.map((teamObj, idx) => {
+            const zoneClass = getStandingsRowClass(idx);
             const localizedTeamName = translateTeam(teamObj.name, currentLang);
-            
+            const gdDisplay = teamObj.SG > 0 ? `+${teamObj.SG}` : String(teamObj.SG);
+
             return `
-                <tr class="text-sm ${rowBg} border-b border-slate-100 dark:border-slate-800/50 last:border-0">
-                    <td class="py-3 font-bold text-center w-8">${idx + 1}º</td>
-                    <td class="py-3 font-semibold flex items-center gap-2 min-w-0">
-                        ${getFlagTag(teamObj.name)} <span class="whitespace-nowrap text-sm truncate">${localizedTeamName}</span>
+                <tr class="${zoneClass}">
+                    <td class="standings-pos">
+                        <span class="standings-rank-badge">${idx + 1}</span>
                     </td>
-                    <td class="py-3 font-bold text-center">${teamObj.P}</td>
-                    <td class="py-3 text-center text-slate-400 dark:text-slate-500">${teamObj.J}</td>
-                    <td class="py-3 text-center font-medium">${teamObj.SG > 0 ? '+' + teamObj.SG : teamObj.SG}</td>
-                    <td class="py-3 text-center text-slate-400 dark:text-slate-500">${teamObj.GP}</td>
+                    <td>
+                        <div class="standings-team">
+                            ${getFlagTag(teamObj.name)}
+                            <span class="standings-team-name">${localizedTeamName}</span>
+                        </div>
+                    </td>
+                    <td class="standings-stat">${teamObj.J}</td>
+                    <td class="standings-stat">${teamObj.V}</td>
+                    <td class="standings-stat">${teamObj.E}</td>
+                    <td class="standings-stat">${teamObj.D}</td>
+                    <td class="standings-stat is-gd">${gdDisplay}</td>
+                    <td class="standings-stat is-pts">${teamObj.P}</td>
                 </tr>
             `;
         }).join('');
 
         div.innerHTML = `
-            <h3 class="text-base font-extrabold text-slate-950 dark:text-slate-100 uppercase tracking-[0.24em] mb-4 border-b border-slate-200/80 dark:border-slate-800/80 pb-3 flex justify-between items-center gap-3">
-                <span>${t.groupTitle} ${g}</span>
-            </h3>
-            <table class="w-full text-left">
-                <thead>
-                    <tr class="text-[11px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-[0.18em] border-b border-slate-200/80 dark:border-slate-800/80">
-                        <th class="pb-2 text-center">${t.tablePos}</th>
-                        <th class="pb-2">${t.tableTeam}</th>
-                        <th class="pb-2 text-center">${t.tablePts}</th>
-                        <th class="pb-2 text-center">${t.tablePl}</th>
-                        <th class="pb-2 text-center">${t.tableGd}</th>
-                        <th class="pb-2 text-center">${t.tableGf}</th>
-                    </tr>
-                </thead>
-                <tbody>${rowsHtml}</tbody>
-            </table>
+            <div class="group-standings-accent" aria-hidden="true"></div>
+            <div class="group-standings-body">
+                <div class="group-standings-header">
+                    <h3 class="group-standings-title">
+                        ${t.groupTitle.toUpperCase()} ${g}
+                        ${leadTeam ? getFlagTag(leadTeam.name) : ''}
+                    </h3>
+                </div>
+                <table class="group-standings-table">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>${t.tableTeam}</th>
+                            <th>J</th>
+                            <th>V</th>
+                            <th>E</th>
+                            <th>D</th>
+                            <th>SG</th>
+                            <th>Pts</th>
+                        </tr>
+                    </thead>
+                    <tbody>${rowsHtml}</tbody>
+                </table>
+            </div>
         `;
         container.appendChild(div);
     });
+
+    renderSidePanel();
+    updatePredictionBadge();
+}
+
+function parseMatchDateKey(dataStr) {
+    // "11/06 (Qui) - 16h00" → day/month
+    const m = String(dataStr || '').match(/(\d{2})\/(\d{2})/);
+    if (!m) return null;
+    return `${m[2]}-${m[1]}`;
+}
+
+function getMatchTimeLabel(dataStr) {
+    const m = String(dataStr || '').match(/(\d{1,2}h\d{2})/);
+    return m ? m[1] : '';
+}
+
+function getFilledGroupMatches() {
+    return jogosGrupos.filter((j) => {
+        const sh = getScoreInput(j.id, 'home');
+        const sa = getScoreInput(j.id, 'away');
+        return sh !== '' && sa !== '';
+    });
+}
+
+export function updatePredictionBadge() {
+    const el = document.getElementById('pred-percent');
+    if (!el) return;
+
+    const total = jogosGrupos.length;
+    const filled = getFilledGroupMatches().length;
+    const pct = total ? Math.round((filled / total) * 100) : 0;
+    el.textContent = `${pct}%`;
+}
+
+export function renderSidePanel() {
+    const card = document.getElementById('side-next-match');
+    const upcoming = document.getElementById('side-upcoming');
+    if (!card) return;
+
+    const t = translations.pt;
+
+    // Prefer first match without full score; else last played with score
+    const openMatch = jogosGrupos.find((j) => {
+        const sh = getScoreInput(j.id, 'home');
+        const sa = getScoreInput(j.id, 'away');
+        return sh === '' || sa === '';
+    });
+    const featured = openMatch || jogosGrupos[jogosGrupos.length - 1];
+    if (!featured) {
+        card.innerHTML = `<p class="side-kicker">🔥 ${t.nextMatchTitle || 'Próximo jogo'}</p><p class="side-venue">Sem partidas.</p>`;
+        return;
+    }
+
+    const sh = getScoreInput(featured.id, 'home');
+    const sa = getScoreInput(featured.id, 'away');
+    const { lockedAttrs, lockedClasses, badgeLabel, badgeClass } = getMatchLockState(featured.id);
+    const homeName = translateTeam(featured.home, currentLang);
+    const awayName = translateTeam(featured.away, currentLang);
+    const scoreDisplay = sh !== '' && sa !== '' ? `${sh} – ${sa}` : '– : –';
+    const statusLabel = openMatch ? (t.nextMatchTitle || 'Próximo jogo do dia') : (t.lastMatchTitle || 'Último jogo em destaque');
+
+    card.innerHTML = `
+        <p class="side-kicker">🔥 ${statusLabel}</p>
+        <p class="side-venue">📍 ${featured.local}<br><span>${featured.data}</span></p>
+        <div class="side-matchup">
+            <div class="side-team">
+                ${getFlagTag(featured.home)}
+                <span class="side-team-name">${homeName}</span>
+            </div>
+            <div class="side-scoreboard">
+                <span class="side-score-line">${scoreDisplay}</span>
+                <span class="side-score-meta">${t.groupTitle} ${featured.grupo}</span>
+            </div>
+            <div class="side-team">
+                ${getFlagTag(featured.away)}
+                <span class="side-team-name">${awayName}</span>
+            </div>
+        </div>
+        <div class="side-inputs">
+            <input type="number" min="0" placeholder="-" value="${sh}"
+                oninput="window.setScoreInput(${featured.id}, 'home', this.value)"
+                aria-label="${homeName}"
+                ${lockedAttrs}
+                class="side-score-input${lockedClasses}">
+            <input type="number" min="0" placeholder="-" value="${sa}"
+                oninput="window.setScoreInput(${featured.id}, 'away', this.value)"
+                aria-label="${awayName}"
+                ${lockedAttrs}
+                class="side-score-input${lockedClasses}">
+        </div>
+        <div class="side-meta-row">
+            <span class="side-badge ${badgeClass}">${badgeLabel}</span>
+            <span>#${featured.id}</span>
+        </div>
+    `;
+
+    if (upcoming) {
+        const list = jogosGrupos
+            .filter((j) => j.id !== featured.id)
+            .filter((j) => {
+                const a = getScoreInput(j.id, 'home');
+                const b = getScoreInput(j.id, 'away');
+                return a === '' || b === '';
+            })
+            .slice(0, 4);
+
+        upcoming.innerHTML = `
+            <p class="upcoming-title">${t.upcomingTitle || 'A seguir'}</p>
+            ${list.length === 0
+                ? `<div class="upcoming-item"><span>${t.noUpcoming || 'Nenhum jogo pendente'}</span></div>`
+                : list.map((j) => `
+                    <div class="upcoming-item">
+                        <span>${translateTeam(j.home, currentLang)} × ${translateTeam(j.away, currentLang)}</span>
+                        <span class="upcoming-time">${getMatchTimeLabel(j.data) || j.data.slice(0, 5)}</span>
+                    </div>
+                `).join('')}
+        `;
+    }
+}
+
+let calendarFilter = 'all';
+
+export function setCalendarFilter(filter) {
+    calendarFilter = filter || 'all';
+    document.querySelectorAll('#hoje-filters .arena-chip-btn').forEach((btn) => {
+        btn.classList.toggle('is-active', btn.getAttribute('data-filter') === calendarFilter);
+    });
+    renderCalendarView();
+}
+
+function matchPassesFilter(match, filter) {
+    const sh = getScoreInput(match.id, 'home');
+    const sa = getScoreInput(match.id, 'away');
+    const filled = sh !== '' && sa !== '';
+    const official = hasOfficialResult(match.id);
+    const hasLocalPrediction =
+        localStorage.getItem(`wc2026_score_${match.id}_home`) != null ||
+        localStorage.getItem(`wc2026_score_${match.id}_away`) != null;
+
+    if (filter === 'open') return !filled;
+    if (filter === 'official') return official;
+    if (filter === 'prediction') return hasLocalPrediction && !official;
+    return true;
+}
+
+function renderMatchCardCompact(match) {
+    const t = translations.pt;
+    const sh = getScoreInput(match.id, 'home');
+    const sa = getScoreInput(match.id, 'away');
+    const { lockedAttrs, lockedClasses, badgeLabel, badgeClass } = getMatchLockState(match.id);
+    const homeName = translateTeam(match.home, currentLang);
+    const awayName = translateTeam(match.away, currentLang);
+
+    return `
+        <article class="arena-match-card${match.destaque ? ' is-highlight' : ''}">
+            <div class="flex items-center justify-between gap-2 text-xs font-bold text-slate-400">
+                <span>${match.data}</span>
+                <span class="match-group-pill">${t.groupTitle} ${match.grupo}</span>
+            </div>
+            <div class="flex items-center justify-between gap-2">
+                <span class="text-[11px] font-bold text-slate-500">#${match.id}</span>
+                <span class="match-badge ${badgeClass}">${badgeLabel}</span>
+            </div>
+            <div class="space-y-2">
+                <div class="flex items-center justify-between gap-2">
+                    <div class="flex items-center gap-2 min-w-0">
+                        ${getFlagTag(match.home)}
+                        <span class="font-semibold text-sm truncate">${homeName}</span>
+                    </div>
+                    <input type="number" min="0" placeholder="-" value="${sh}"
+                        oninput="window.setScoreInput(${match.id}, 'home', this.value)"
+                        ${lockedAttrs}
+                        class="score-input-lg${lockedClasses}">
+                </div>
+                <div class="flex items-center justify-between gap-2">
+                    <div class="flex items-center gap-2 min-w-0">
+                        ${getFlagTag(match.away)}
+                        <span class="font-semibold text-sm truncate">${awayName}</span>
+                    </div>
+                    <input type="number" min="0" placeholder="-" value="${sa}"
+                        oninput="window.setScoreInput(${match.id}, 'away', this.value)"
+                        ${lockedAttrs}
+                        class="score-input-lg${lockedClasses}">
+                </div>
+            </div>
+            <div class="text-[11px] text-slate-500 truncate">${match.local}</div>
+        </article>
+    `;
+}
+
+export function renderCalendarView() {
+    const list = document.getElementById('hoje-list');
+    if (!list) return;
+
+    const matches = jogosGrupos.filter((m) => matchPassesFilter(m, calendarFilter));
+    list.innerHTML = matches.length
+        ? matches.map(renderMatchCardCompact).join('')
+        : `<p class="arena-hint" style="padding:1rem">Nenhum jogo neste filtro.</p>`;
+}
+
+export function renderPredictionsView() {
+    const stats = document.getElementById('palpites-stats');
+    const list = document.getElementById('palpites-list');
+    if (!stats || !list) return;
+
+    const t = translations.pt;
+    const total = jogosGrupos.length;
+    const filled = getFilledGroupMatches();
+    const officialCount = jogosGrupos.filter((j) => hasOfficialResult(j.id)).length;
+    const localOnly = jogosGrupos.filter((j) => {
+        if (hasOfficialResult(j.id)) return false;
+        return (
+            localStorage.getItem(`wc2026_score_${j.id}_home`) != null ||
+            localStorage.getItem(`wc2026_score_${j.id}_away`) != null
+        );
+    });
+
+    const pct = total ? Math.round((filled.length / total) * 100) : 0;
+
+    stats.innerHTML = `
+        <div class="arena-stat-card">
+            <p class="arena-stat-label">${t.statFilled || 'Preenchidos'}</p>
+            <p class="arena-stat-value">${filled.length}/${total}</p>
+        </div>
+        <div class="arena-stat-card">
+            <p class="arena-stat-label">${t.statCoverage || 'Cobertura'}</p>
+            <p class="arena-stat-value">${pct}%</p>
+        </div>
+        <div class="arena-stat-card">
+            <p class="arena-stat-label">${t.statOfficial || 'Oficiais ESPN'}</p>
+            <p class="arena-stat-value">${officialCount}</p>
+        </div>
+        <div class="arena-stat-card">
+            <p class="arena-stat-label">${t.statYours || 'Só palpites'}</p>
+            <p class="arena-stat-value">${localOnly.length}</p>
+        </div>
+    `;
+
+    const toShow = localOnly.length ? localOnly : filled.slice(0, 24);
+    list.innerHTML = toShow.length
+        ? toShow.map(renderMatchCardCompact).join('')
+        : `<p class="arena-hint" style="padding:1rem">${t.noPredictions || 'Você ainda não registrou palpites. Preencha placares nos jogos da fase de grupos.'}</p>`;
+
+    updatePredictionBadge();
 }
 
 export function renderGroupStage() {
@@ -332,6 +604,17 @@ export function renderGroupStage() {
 const fifaWorldCupTrophyImageUrl = 'https://www.edigitalagency.com.au/wp-content/uploads/new-FIFA-World-Cup-2026-logo-white-PNG-small-size.png';
 
 let knockoutViewMode = localStorage.getItem('wc2026_knockout_view');
+let selectedKnockoutPhase = localStorage.getItem('wc2026_knockout_phase') || '';
+
+/** Fases no estilo Apple Sports (seletor horizontal ativo) */
+const KNOCKOUT_PHASE_NAV = [
+    { key: 'round32', short: '16º', pill: '16-avos' },
+    { key: 'round16', short: 'Oitavas', pill: 'Oitavas' },
+    { key: 'quarterFinals', short: 'Quartas', pill: 'Quartas' },
+    { key: 'semiFinals', short: 'Semi', pill: 'Semis' },
+    { key: 'thirdPlace', short: '3º', pill: '3º lugar' },
+    { key: 'final', short: 'Final', pill: 'Final' }
+];
 
 function getKnockoutPhaseKey(faseNome) {
     if (faseNome.includes('Dezesseis-avos')) return 'round32';
@@ -345,12 +628,147 @@ function getKnockoutPhaseKey(faseNome) {
 
 function getLocalizedKnockoutPhaseLabel(faseNome, t) {
     const key = getKnockoutPhaseKey(faseNome);
+    return getPhaseLabelByKey(key, t);
+}
+
+function getPhaseLabelByKey(key, t) {
     if (key === 'round32') return t.round32;
     if (key === 'round16') return t.round16;
     if (key === 'quarterFinals') return t.quarterFinals;
     if (key === 'semiFinals') return t.semiFinals;
     if (key === 'thirdPlace') return t.thirdPlace;
     return t.final;
+}
+
+function getMatchesForPhaseKey(phaseKey) {
+    if (phaseKey === 'thirdPlace') {
+        return estruturaNosMataMata.flatMap((f) => f.jogos).filter((j) => j.id === 103);
+    }
+    if (phaseKey === 'final') {
+        return estruturaNosMataMata.flatMap((f) => f.jogos).filter((j) => j.id === 104);
+    }
+
+    // Fases “normais” — exclui o bloco Finais (ids 103/104)
+    return estruturaNosMataMata
+        .filter((f) => getKnockoutPhaseKey(f.fase) === phaseKey && !/^Finais$/i.test(f.fase.trim()))
+        .flatMap((f) => f.jogos);
+}
+
+function isMatchDecided(match) {
+    const dados = mapaMataMataCalculado[match.id] || { home: 'A definir', away: 'A definir' };
+    return Boolean(getWinnerInfo(match, dados).winner);
+}
+
+function getPhaseProgress(phaseKey) {
+    const matches = getMatchesForPhaseKey(phaseKey);
+    if (!matches.length) return { total: 0, decided: 0, started: 0, complete: false, inProgress: false };
+
+    let decided = 0;
+    let started = 0;
+    matches.forEach((match) => {
+        const sh = getScoreInput(match.id, 'home');
+        const sa = getScoreInput(match.id, 'away');
+        if (sh !== '' || sa !== '') started += 1;
+        if (isMatchDecided(match)) decided += 1;
+    });
+
+    return {
+        total: matches.length,
+        decided,
+        started,
+        complete: decided === matches.length && matches.length > 0,
+        inProgress: started > 0 && decided < matches.length
+    };
+}
+
+function ensureSelectedKnockoutPhase() {
+    const validKeys = KNOCKOUT_PHASE_NAV.map((p) => p.key);
+    if (validKeys.includes(selectedKnockoutPhase)) return;
+
+    // Apple Sports: foca a primeira fase incompleta (ou a final se tudo ok)
+    const firstOpen = KNOCKOUT_PHASE_NAV.find((p) => !getPhaseProgress(p.key).complete);
+    selectedKnockoutPhase = firstOpen ? firstOpen.key : 'final';
+    localStorage.setItem('wc2026_knockout_phase', selectedKnockoutPhase);
+}
+
+function renderKnockoutPhasePicker(t) {
+    ensureSelectedKnockoutPhase();
+
+    const items = KNOCKOUT_PHASE_NAV.map((phase, index) => {
+        const progress = getPhaseProgress(phase.key);
+        const isActive = selectedKnockoutPhase === phase.key;
+        const stateClass = [
+            isActive ? 'is-active' : '',
+            progress.complete ? 'is-complete' : '',
+            progress.inProgress ? 'is-live' : ''
+        ].filter(Boolean).join(' ');
+
+        const fullLabel = getPhaseLabelByKey(phase.key, t);
+        const countLabel = progress.total
+            ? `${progress.decided}/${progress.total}`
+            : '';
+
+        return `
+            <button
+                type="button"
+                class="ko-phase-btn ${stateClass}"
+                data-knockout-phase="${phase.key}"
+                aria-pressed="${isActive ? 'true' : 'false'}"
+                title="${fullLabel}"
+            >
+                <span class="ko-phase-btn-index" aria-hidden="true">${index + 1}</span>
+                <span class="ko-phase-btn-label">${phase.pill}</span>
+                <span class="ko-phase-btn-meta">
+                    ${progress.complete
+                        ? '<span class="ko-phase-check" aria-hidden="true">✓</span>'
+                        : `<span class="ko-phase-count">${countLabel}</span>`}
+                </span>
+            </button>
+        `;
+    }).join('');
+
+    return `
+        <div class="ko-phase-picker-wrap">
+            <div class="ko-phase-picker" role="tablist" aria-label="${t.knockoutPhasePickerLabel || 'Fases do mata-mata'}">
+                ${items}
+            </div>
+        </div>
+    `;
+}
+
+function bindKnockoutPhasePicker(container) {
+    container.querySelectorAll('[data-knockout-phase]').forEach((btn) => {
+        btn.addEventListener('click', () => {
+            const phase = btn.getAttribute('data-knockout-phase');
+            if (!phase || phase === selectedKnockoutPhase) {
+                // Re-clique: garante scroll na fase no modo chave
+                if (knockoutViewMode === 'bracket') scrollBracketToPhase(phase);
+                return;
+            }
+            selectedKnockoutPhase = phase;
+            localStorage.setItem('wc2026_knockout_phase', selectedKnockoutPhase);
+            renderKnockoutStage();
+        });
+    });
+
+    // Mantém o botão ativo visível no scroll horizontal (Apple-like)
+    const activeBtn = container.querySelector('.ko-phase-btn.is-active');
+    if (activeBtn && typeof activeBtn.scrollIntoView === 'function') {
+        requestAnimationFrame(() => {
+            activeBtn.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+        });
+    }
+}
+
+function scrollBracketToPhase(phaseKey) {
+    const target = document.querySelector(`.wcb-col[data-phase="${phaseKey}"], .wcb-center-col[data-focus-phase="${phaseKey}"]`);
+    const scroller = document.querySelector('.wcb-scroll');
+    if (!target || !scroller) return;
+
+    const scrollerRect = scroller.getBoundingClientRect();
+    const targetRect = target.getBoundingClientRect();
+    const offset = targetRect.left - scrollerRect.left - (scrollerRect.width / 2) + (targetRect.width / 2);
+    scroller.scrollBy({ left: offset, behavior: 'smooth' });
 }
 
 function normalizeMatchDate(matchDate) {
@@ -666,6 +1084,7 @@ function ensureKnockoutViewMode() {
 
 function renderKnockoutListView() {
     const t = translations.pt;
+    ensureSelectedKnockoutPhase();
 
     const phaseAccents = {
         round32: 'rgb(59 130 246)',
@@ -676,44 +1095,44 @@ function renderKnockoutListView() {
         final: 'rgb(212 175 55)',
     };
 
-    const phaseShortLabels = {
-        round32: '16 avos',
-        round16: 'Oitavas',
-        quarterFinals: 'Quartas',
-        semiFinals: 'Semi',
-        thirdPlace: '3º Lugar',
-        final: 'Final',
-    };
+    const phaseKey = selectedKnockoutPhase;
+    const matches = getMatchesForPhaseKey(phaseKey);
+    const localizedFase = getPhaseLabelByKey(phaseKey, t);
+    const accent = phaseAccents[phaseKey] || 'rgb(59 130 246)';
+    const progress = getPhaseProgress(phaseKey);
+    const count = matches.length;
 
     return `
-        <div class="bk-cascade">
-            ${estruturaNosMataMata.map((fase) => {
-                const phaseKey = getKnockoutPhaseKey(fase.fase);
-                const localizedFase = getLocalizedKnockoutPhaseLabel(fase.fase, t);
-                const accent = phaseAccents[phaseKey] || 'rgb(59 130 246)';
-                const count = fase.jogos.length;
-                return `
-                    <div class="bk-phase" data-phase-key="${phaseKey}" style="--bk-accent: ${accent}">
-                        <div class="bk-phase-header">
-                            <span class="bk-phase-badge">${phaseShortLabels[phaseKey] || localizedFase}</span>
-                            <h4 class="bk-phase-title">${localizedFase}</h4>
-                            <span class="bk-phase-count">${count} jogo${count > 1 ? 's' : ''}</span>
-                        </div>
-                        <div class="bk-phase-grid" style="--bk-cols: ${Math.min(count, 4)}">
-                            ${fase.jogos.map((match) => renderMatchCard(match, { phaseKey, compact: true })).join('')}
-                        </div>
-                    </div>
-                `;
-            }).join('')}
+        <div class="bk-cascade ko-phase-focus">
+            <div class="bk-phase" data-phase-key="${phaseKey}" style="--bk-accent: ${accent}">
+                <div class="bk-phase-header">
+                    <span class="bk-phase-badge">${localizedFase}</span>
+                    <h4 class="bk-phase-title">${localizedFase}</h4>
+                    <span class="bk-phase-count">
+                        ${progress.decided}/${count} definido${count === 1 ? '' : 's'}
+                        · ${count} jogo${count > 1 ? 's' : ''}
+                    </span>
+                </div>
+                <div class="bk-phase-grid" style="--bk-cols: ${Math.min(Math.max(count, 1), 4)}">
+                    ${matches.map((match) => renderMatchCard(match, { phaseKey, compact: true })).join('')}
+                </div>
+            </div>
         </div>
     `;
 }
 
 function renderBracketColumn(options = {}) {
-    const { side = 'left', phaseKey = '', slotGroups = [], cardRenderer, centerContent = '' } = options;
+    const {
+        side = 'left',
+        phaseKey = '',
+        slotGroups = [],
+        cardRenderer,
+        centerContent = '',
+        focusClass = ''
+    } = options;
     const baseClass = side === 'center' ? 'wcb-col wcb-center-col' : 'wcb-col';
     if (side === 'center') {
-        return `<div class="${baseClass}" data-side="center">${centerContent}</div>`;
+        return `<div class="${baseClass}${focusClass}" data-side="center">${centerContent}</div>`;
     }
 
     const groupsHtml = slotGroups.map((group) => {
@@ -728,12 +1147,14 @@ function renderBracketColumn(options = {}) {
         `;
     }).join('');
 
-    return `<div class="${baseClass}" data-side="${side}" data-phase="${phaseKey}">${groupsHtml}</div>`;
+    return `<div class="${baseClass}${focusClass}" data-side="${side}" data-phase="${phaseKey}">${groupsHtml}</div>`;
 }
 
 function renderKnockoutBracketView() {
     const CENTER_COLUMN_INDEX = 4;
     const t = translations.pt;
+    ensureSelectedKnockoutPhase();
+
     const allMatchesById = new Map(estruturaNosMataMata.flatMap((fase) => fase.jogos.map((jogo) => [jogo.id, jogo])));
     const m = (id) => allMatchesById.get(id);
     const card = (id, phaseKey, side) => {
@@ -753,6 +1174,9 @@ function renderKnockoutBracketView() {
         t.round32
     ];
 
+    const focusKey = selectedKnockoutPhase;
+    const colFocus = (phaseKey) => (phaseKey === focusKey ? ' is-phase-focus' : ' is-phase-dim');
+
     const columns = [
         { side: 'left', phaseKey: 'round32', slotGroups: [[73, 75], [74, 77], [81, 82], [83, 84]] },
         { side: 'left', phaseKey: 'round16', slotGroups: [[89, 90], [93, 94]] },
@@ -760,12 +1184,13 @@ function renderKnockoutBracketView() {
         { side: 'left', phaseKey: 'semiFinals', slotGroups: [[101]] },
         {
             side: 'center',
+            phaseKey: focusKey === 'thirdPlace' ? 'thirdPlace' : 'final',
             centerContent: `
-                <div class="wcb-center-final">
+                <div class="wcb-center-final${focusKey === 'final' ? ' is-phase-focus' : ' is-phase-dim'}" data-focus-phase="final">
                     <span class="wcb-center-label">🏆 ${t.final}</span>
                     ${card(104, 'final', 'final')}
                 </div>
-                <div class="wcb-center-third">
+                <div class="wcb-center-third${focusKey === 'thirdPlace' ? ' is-phase-focus' : ' is-phase-dim'}" data-focus-phase="thirdPlace">
                     <span class="wcb-center-label">🥉 ${t.thirdPlace}</span>
                     ${card(103, 'thirdPlace', 'final')}
                 </div>
@@ -780,10 +1205,24 @@ function renderKnockoutBracketView() {
     return `
         <div class="wcb-scroll">
             <div class="wcb-phase-bar">
-                ${phaseLabels.map((label, index) => `<span class="wcb-phase-label ${index === CENTER_COLUMN_INDEX ? 'wcb-phase-label-center' : ''}">${label}</span>`).join('')}
+                ${phaseLabels.map((label, index) => {
+                    const colPhase = columns[index]?.phaseKey;
+                    const isFocus = colPhase === focusKey
+                        || (index === CENTER_COLUMN_INDEX && (focusKey === 'final' || focusKey === 'thirdPlace'));
+                    return `<span class="wcb-phase-label ${index === CENTER_COLUMN_INDEX ? 'wcb-phase-label-center' : ''} ${isFocus ? 'is-focus' : ''}">${label}</span>`;
+                }).join('')}
             </div>
-            <div class="wcb-bracket">
-                ${columns.map((column) => renderBracketColumn({ ...column, cardRenderer: card })).join('')}
+            <div class="wcb-bracket" data-focus-phase="${focusKey}">
+                ${columns.map((column) => {
+                    if (column.side === 'center') {
+                        return `<div class="wcb-col wcb-center-col" data-side="center" data-focus-phase="${column.phaseKey}">${column.centerContent}</div>`;
+                    }
+                    return renderBracketColumn({
+                        ...column,
+                        cardRenderer: card,
+                        focusClass: colFocus(column.phaseKey)
+                    });
+                }).join('')}
             </div>
         </div>
     `;
@@ -794,22 +1233,26 @@ export function renderKnockoutStage() {
     if (!container) return;
 
     ensureKnockoutViewMode();
+    ensureSelectedKnockoutPhase();
 
     const t = translations.pt;
+    const activeLabel = getPhaseLabelByKey(selectedKnockoutPhase, t);
+
     container.innerHTML = `
         <div class="knockout-header-copy">
             <div>
                 <p class="knockout-kicker">Mata-Mata · Copa do Mundo FIFA 2026</p>
-                <h3 class="knockout-headline">Chave eliminatória</h3>
-                <p class="knockout-subheadline">Acompanhe todos os confrontos oficiais, progresso de fases, pênaltis e o caminho até a grande final.</p>
+                <h3 class="knockout-headline">${activeLabel}</h3>
+                <p class="knockout-subheadline">${t.knockoutPhaseHint || 'Toque em uma fase para focar os jogos — no estilo Apple Sports.'}</p>
             </div>
             <div class="knockout-controls">
                 <div class="knockout-view-toggle" role="tablist" aria-label="${t.knockoutViewLabel}">
-                    <button class="knockout-view-btn ${knockoutViewMode === 'bracket' ? 'is-active' : ''}" data-knockout-view="bracket">🏆 ${t.knockoutBracketMode}</button>
                     <button class="knockout-view-btn ${knockoutViewMode === 'list' ? 'is-active' : ''}" data-knockout-view="list">📋 ${t.knockoutListMode}</button>
+                    <button class="knockout-view-btn ${knockoutViewMode === 'bracket' ? 'is-active' : ''}" data-knockout-view="bracket">🏆 ${t.knockoutBracketMode}</button>
                 </div>
             </div>
         </div>
+        ${renderKnockoutPhasePicker(t)}
         <div class="knockout-content">
             ${knockoutViewMode === 'bracket' ? renderKnockoutBracketView() : renderKnockoutListView()}
         </div>
@@ -825,6 +1268,11 @@ export function renderKnockoutStage() {
         });
     });
 
+    bindKnockoutPhasePicker(container);
+
+    if (knockoutViewMode === 'bracket') {
+        requestAnimationFrame(() => scrollBracketToPhase(selectedKnockoutPhase));
+    }
 }
 
 function isResolvedTeamName(teamName) {

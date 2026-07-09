@@ -1,4 +1,61 @@
+/* ============================================================
+   WC26 Arena — Design tokens
+   ============================================================ */
+
 :root {
+  /* Brand / host-nations inspired palette */
+  --wc-navy: #070b18;
+  --wc-navy-elevated: #0f172a;
+  --wc-surface: #ffffff;
+  --wc-surface-muted: #f8fafc;
+  --wc-border: rgb(226 232 240 / 0.95);
+  --wc-border-strong: rgb(203 213 225);
+
+  --wc-text: #0f172a;
+  --wc-text-secondary: #475569;
+  --wc-text-muted: #94a3b8;
+
+  --wc-blue: #2f6bff;
+  --wc-blue-soft: rgb(47 107 255 / 0.12);
+  --wc-indigo: #6366f1;
+  --wc-red: #e11d48;
+  --wc-gold: #d4af37;
+  --wc-gold-rgb: 212, 175, 55;
+  --wc-emerald: #10b981;
+  --wc-emerald-deep: #059669;
+  --wc-amber: #f59e0b;
+  --wc-amber-deep: #d97706;
+
+  /* Semantic zones (group standings) */
+  --zone-qualified-bg: linear-gradient(90deg, rgb(236 253 245), rgb(240 253 250 / 0.55));
+  --zone-qualified-border: #10b981;
+  --zone-third-bg: linear-gradient(90deg, rgb(255 251 235), rgb(254 252 232 / 0.5));
+  --zone-third-border: #f59e0b;
+  --zone-out-bg: transparent;
+  --zone-out-border: transparent;
+
+  /* Layout metrics */
+  --radius-sm: 0.5rem;
+  --radius-md: 0.75rem;
+  --radius-lg: 1rem;
+  --radius-xl: 1.25rem;
+  --radius-2xl: 1.5rem;
+  --radius-pill: 9999px;
+
+  --shadow-sm: 0 4px 14px rgb(15 23 42 / 0.06);
+  --shadow-md: 0 14px 36px rgb(15 23 42 / 0.08);
+  --shadow-lg: 0 22px 52px rgb(15 23 42 / 0.12);
+  --shadow-glow-blue: 0 10px 28px rgb(47 107 255 / 0.22);
+
+  --header-height: auto;
+  --nav-height: 3.25rem;
+  --mobile-nav-height: 4.25rem;
+  --content-max: 1680px;
+
+  --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+  --font-display: 'Syne', 'Inter', system-ui, sans-serif;
+
+  /* Legacy card metrics (knockout) */
   --card-width-min: 11.25rem;
   --card-width: clamp(11.25rem, 16vw, 13.75rem);
   --card-width-max: 13.75rem;
@@ -8,4 +65,39 @@
   --bracket-column-min: 9.25rem;
   --score-input-size: 1.5rem;
   --knockout-score-size: 2.1rem;
+
+  /* Group accent colors A–L */
+  --group-a: #ef4444;
+  --group-b: #f97316;
+  --group-c: #eab308;
+  --group-d: #22c55e;
+  --group-e: #14b8a6;
+  --group-f: #06b6d4;
+  --group-g: #3b82f6;
+  --group-h: #6366f1;
+  --group-i: #8b5cf6;
+  --group-j: #d946ef;
+  --group-k: #ec4899;
+  --group-l: #f43f5e;
+}
+
+.dark {
+  --wc-navy: #020617;
+  --wc-navy-elevated: #0b1224;
+  --wc-surface: rgb(15 23 42 / 0.88);
+  --wc-surface-muted: rgb(2 6 23 / 0.72);
+  --wc-border: rgb(51 65 85 / 0.85);
+  --wc-border-strong: rgb(71 85 105 / 0.9);
+
+  --wc-text: #f1f5f9;
+  --wc-text-secondary: #94a3b8;
+  --wc-text-muted: #64748b;
+
+  --zone-qualified-bg: linear-gradient(90deg, rgb(6 78 59 / 0.38), rgb(2 44 34 / 0.18));
+  --zone-third-bg: linear-gradient(90deg, rgb(120 53 15 / 0.32), rgb(69 26 3 / 0.14));
+
+  --shadow-sm: 0 4px 18px rgb(0 0 0 / 0.28);
+  --shadow-md: 0 18px 44px rgb(0 0 0 / 0.35);
+  --shadow-lg: 0 28px 64px rgb(0 0 0 / 0.45);
+  --shadow-glow-blue: 0 12px 32px rgb(47 107 255 / 0.28);
 }
