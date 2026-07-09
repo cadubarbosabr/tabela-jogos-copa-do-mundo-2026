@@ -2,7 +2,8 @@ import {
     gruposClassificacao, 
     mapaMataMataCalculado, 
     getScoreInput, 
-    getPenaltiesInput 
+    getPenaltiesInput,
+    calcularVencedorMataMata
 } from './engine.js';
 import { hasOfficialResult } from './officialResults.js';
 import { getFlagTag } from './teams.js';
@@ -364,10 +365,112 @@ export function renderSidePanel() {
     }
 }
 
-let calendarFilter = 'all';
+let calendarFilter = 'today';
+
+/** Data de referência no fuso BRT (America/Sao_Paulo) */
+function getBrazilNowParts(date = new Date()) {
+    const parts = new Intl.DateTimeFormat('en-CA', {
+        timeZone: 'America/Sao_Paulo',
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit'
+    }).formatToParts(date);
+
+    const get = (type) => parts.find((p) => p.type === type)?.value;
+    return {
+        year: Number(get('year')),
+        month: Number(get('month')),
+        day: Number(get('day'))
+    };
+}
+
+function formatBrazilDateLong(date = new Date()) {
+    return new Intl.DateTimeFormat('pt-BR', {
+        timeZone: 'America/Sao_Paulo',
+        weekday: 'long',
+        day: '2-digit',
+        month: 'long',
+        year: 'numeric'
+    }).format(date);
+}
+
+/** Extrai dia/mês de strings como "11/06 (Qui) - 16h00" ou "28/06 (Dom)" */
+function parseMatchDayMonth(dataStr) {
+    const m = String(dataStr || '').match(/(\d{1,2})\/(\d{1,2})/);
+    if (!m) return null;
+    return { day: Number(m[1]), month: Number(m[2]) };
+}
+
+function isMatchOnBrazilDay(dataStr, refDate = new Date()) {
+    const parsed = parseMatchDayMonth(dataStr);
+    if (!parsed) return false;
+    const now = getBrazilNowParts(refDate);
+    // Copa 2026: datas do calendário usam ano 2026
+    return parsed.day === now.day && parsed.month === now.month && now.year === 2026;
+}
+
+function getChampionTeamName() {
+    const winner = calcularVencedorMataMata(104);
+    if (winner && isResolvedTeamName(winner)) return winner;
+    return null;
+}
+
+function isWorldCupFinished(refDate = new Date()) {
+    if (getChampionTeamName()) return true;
+
+    // Após o dia da final (19/07/2026) em BRT
+    const now = getBrazilNowParts(refDate);
+    if (now.year > 2026) return true;
+    if (now.year < 2026) return false;
+    if (now.month > 7) return true;
+    if (now.month < 7) return false;
+    return now.day > 19;
+}
+
+function getAllTournamentMatchesForToday() {
+    const groupMatches = jogosGrupos
+        .filter((j) => isMatchOnBrazilDay(j.data))
+        .map((j) => ({
+            ...j,
+            kind: 'group',
+            homeDisplay: j.home,
+            awayDisplay: j.away,
+            pill: `${translations.pt.groupTitle} ${j.grupo}`
+        }));
+
+    const knockoutMatches = estruturaNosMataMata.flatMap((fase) => {
+        const phaseKey = getKnockoutPhaseKey(fase.fase);
+        return fase.jogos
+            .filter((j) => isMatchOnBrazilDay(j.data))
+            .map((j) => {
+                const calc = mapaMataMataCalculado[j.id] || { home: 'A definir', away: 'A definir' };
+                const timeLabel = j.hora ? `${j.data} - ${j.hora}` : j.data;
+                return {
+                    id: j.id,
+                    data: timeLabel,
+                    local: j.local,
+                    destaque: j.destaque,
+                    kind: 'knockout',
+                    home: calc.home,
+                    away: calc.away,
+                    homeDisplay: calc.home,
+                    awayDisplay: calc.away,
+                    grupo: null,
+                    pill: getPhaseLabelByKey(phaseKey, translations.pt),
+                    phaseKey
+                };
+            });
+    });
+
+    return [...groupMatches, ...knockoutMatches].sort((a, b) => {
+        const ta = getMatchTimeLabel(a.data) || a.data;
+        const tb = getMatchTimeLabel(b.data) || b.data;
+        return String(ta).localeCompare(String(tb), 'pt-BR');
+    });
+}
 
 export function setCalendarFilter(filter) {
-    calendarFilter = filter || 'all';
+    calendarFilter = filter || 'today';
     document.querySelectorAll('#hoje-filters .arena-chip-btn').forEach((btn) => {
         btn.classList.toggle('is-active', btn.getAttribute('data-filter') === calendarFilter);
     });
@@ -375,6 +478,8 @@ export function setCalendarFilter(filter) {
 }
 
 function matchPassesFilter(match, filter) {
+    if (filter === 'today' || filter === 'all') return true;
+
     const sh = getScoreInput(match.id, 'home');
     const sa = getScoreInput(match.id, 'away');
     const filled = sh !== '' && sa !== '';
@@ -394,14 +499,18 @@ function renderMatchCardCompact(match) {
     const sh = getScoreInput(match.id, 'home');
     const sa = getScoreInput(match.id, 'away');
     const { lockedAttrs, lockedClasses, badgeLabel, badgeClass } = getMatchLockState(match.id);
-    const homeName = translateTeam(match.home, currentLang);
-    const awayName = translateTeam(match.away, currentLang);
+    const homeRaw = match.homeDisplay || match.home;
+    const awayRaw = match.awayDisplay || match.away;
+    const homeName = translateTeam(translatePlaceholder(homeRaw, currentLang), currentLang);
+    const awayName = translateTeam(translatePlaceholder(awayRaw, currentLang), currentLang);
+    const pill = match.pill
+        || (match.grupo ? `${t.groupTitle} ${match.grupo}` : t.tabKnockoutShort || 'Mata-mata');
 
     return `
         <article class="arena-match-card${match.destaque ? ' is-highlight' : ''}">
             <div class="flex items-center justify-between gap-2 text-xs font-bold text-slate-400">
                 <span>${match.data}</span>
-                <span class="match-group-pill">${t.groupTitle} ${match.grupo}</span>
+                <span class="match-group-pill">${pill}</span>
             </div>
             <div class="flex items-center justify-between gap-2">
                 <span class="text-[11px] font-bold text-slate-500">#${match.id}</span>
@@ -410,7 +519,7 @@ function renderMatchCardCompact(match) {
             <div class="space-y-2">
                 <div class="flex items-center justify-between gap-2">
                     <div class="flex items-center gap-2 min-w-0">
-                        ${getFlagTag(match.home)}
+                        ${getFlagTag(homeRaw)}
                         <span class="font-semibold text-sm truncate">${homeName}</span>
                     </div>
                     <input type="number" min="0" placeholder="-" value="${sh}"
@@ -420,7 +529,7 @@ function renderMatchCardCompact(match) {
                 </div>
                 <div class="flex items-center justify-between gap-2">
                     <div class="flex items-center gap-2 min-w-0">
-                        ${getFlagTag(match.away)}
+                        ${getFlagTag(awayRaw)}
                         <span class="font-semibold text-sm truncate">${awayName}</span>
                     </div>
                     <input type="number" min="0" placeholder="-" value="${sa}"
@@ -429,19 +538,72 @@ function renderMatchCardCompact(match) {
                         class="score-input-lg${lockedClasses}">
                 </div>
             </div>
-            <div class="text-[11px] text-slate-500 truncate">${match.local}</div>
+            <div class="text-[11px] text-slate-500 truncate">${match.local || ''}</div>
         </article>
     `;
 }
 
 export function renderCalendarView() {
     const list = document.getElementById('hoje-list');
+    const titleEl = document.getElementById('lbl-hoje-title');
+    const subEl = document.getElementById('lbl-hoje-sub');
+    const filtersEl = document.getElementById('hoje-filters');
     if (!list) return;
 
-    const matches = jogosGrupos.filter((m) => matchPassesFilter(m, calendarFilter));
-    list.innerHTML = matches.length
-        ? matches.map(renderMatchCardCompact).join('')
-        : `<p class="arena-hint" style="padding:1rem">Nenhum jogo neste filtro.</p>`;
+    const t = translations.pt;
+    const todayLabel = formatBrazilDateLong();
+
+    if (titleEl) titleEl.textContent = t.tabToday || t.tabTodayShort || 'Hoje';
+
+    // Copa encerrada: mensagem de campeão
+    if (isWorldCupFinished()) {
+        const champion = getChampionTeamName();
+        const championLabel = champion
+            ? translateTeam(champion, currentLang)
+            : (t.championUnknown || 'campeã');
+
+        if (filtersEl) filtersEl.classList.add('hidden');
+        if (subEl) subEl.textContent = t.cupFinishedSub || 'Obrigado por acompanhar a Copa do Mundo FIFA 2026.';
+
+        list.innerHTML = `
+            <div class="hoje-empty-state hoje-champion-state">
+                <div class="hoje-empty-icon" aria-hidden="true">🏆</div>
+                <p class="hoje-empty-title">${t.cupSuccessTitle || 'A Copa foi um sucesso'}</p>
+                <p class="hoje-empty-text">
+                    ${champion
+                        ? (t.cupChampionMessage || 'A Copa foi um sucesso e a seleção da {team} sagrou-se campeã.')
+                            .replace('{team}', championLabel)
+                        : (t.cupFinishedGeneric || 'A Copa do Mundo FIFA 2026 chegou ao fim.')}
+                </p>
+                ${champion ? `<div class="hoje-champion-flag">${getFlagTag(champion)} <strong>${championLabel}</strong></div>` : ''}
+            </div>
+        `;
+        return;
+    }
+
+    if (filtersEl) filtersEl.classList.remove('hidden');
+    if (subEl) {
+        subEl.textContent = `${t.todaySub || 'Jogos de hoje'} · ${todayLabel}`;
+    }
+
+    const todayMatches = getAllTournamentMatchesForToday()
+        .filter((m) => matchPassesFilter(m, calendarFilter));
+
+    if (!todayMatches.length) {
+        list.innerHTML = `
+            <div class="hoje-empty-state">
+                <div class="hoje-empty-icon" aria-hidden="true">📅</div>
+                <p class="hoje-empty-title">${t.noGamesToday || 'Sem jogos hoje'}</p>
+                <p class="hoje-empty-text">${t.noGamesTodayHint || 'Não há partidas programadas para esta data no calendário da Copa 2026.'}</p>
+            </div>
+        `;
+        return;
+    }
+
+    list.innerHTML = `
+        <p class="hoje-count-label">${todayMatches.length} jogo${todayMatches.length > 1 ? 's' : ''} hoje</p>
+        ${todayMatches.map(renderMatchCardCompact).join('')}
+    `;
 }
 
 export function renderPredictionsView() {
@@ -741,8 +903,8 @@ function bindKnockoutPhasePicker(container) {
         btn.addEventListener('click', () => {
             const phase = btn.getAttribute('data-knockout-phase');
             if (!phase || phase === selectedKnockoutPhase) {
-                // Re-clique: garante scroll na fase no modo chave
-                if (knockoutViewMode === 'bracket') scrollBracketToPhase(phase);
+                // Re-clique: recentra a fase no modo chave
+                if (knockoutViewMode === 'bracket') centerBracketPhase(phase);
                 return;
             }
             selectedKnockoutPhase = phase;
@@ -760,15 +922,69 @@ function bindKnockoutPhasePicker(container) {
     }
 }
 
-function scrollBracketToPhase(phaseKey) {
-    const target = document.querySelector(`.wcb-col[data-phase="${phaseKey}"], .wcb-center-col[data-focus-phase="${phaseKey}"]`);
+function scrollBracketToPhase(phaseKey, behavior = 'smooth') {
     const scroller = document.querySelector('.wcb-scroll');
-    if (!target || !scroller) return;
+    if (!scroller) return;
+
+    let targets = [];
+    if (phaseKey === 'final') {
+        targets = [...scroller.querySelectorAll('[data-focus-phase="final"], .wcb-center-final')];
+    } else if (phaseKey === 'thirdPlace') {
+        targets = [...scroller.querySelectorAll('[data-focus-phase="thirdPlace"], .wcb-center-third')];
+    } else {
+        // Preferir o lado esquerdo (primeiro na ordem DOM) para fases bilaterais
+        targets = [...scroller.querySelectorAll(`.wcb-col[data-phase="${phaseKey}"]`)];
+    }
+
+    if (!targets.length) {
+        const center = scroller.querySelector('.wcb-center-col');
+        if (center) targets = [center];
+    }
+    if (!targets.length) return;
 
     const scrollerRect = scroller.getBoundingClientRect();
-    const targetRect = target.getBoundingClientRect();
-    const offset = targetRect.left - scrollerRect.left - (scrollerRect.width / 2) + (targetRect.width / 2);
-    scroller.scrollBy({ left: offset, behavior: 'smooth' });
+
+    // Se as colunas da fase estão distantes (esquerda + direita da chave),
+    // centraliza a primeira (esquerda) para o conteúdo ficar legível no viewport.
+    let focusTargets = targets;
+    if (targets.length > 1) {
+        const first = targets[0].getBoundingClientRect();
+        const last = targets[targets.length - 1].getBoundingClientRect();
+        const span = last.right - first.left;
+        if (span > scrollerRect.width * 0.75) {
+            focusTargets = [targets[0]];
+        }
+    }
+
+    let minLeft = Infinity;
+    let maxRight = -Infinity;
+    focusTargets.forEach((el) => {
+        const rect = el.getBoundingClientRect();
+        if (!rect.width && !rect.height) return;
+        minLeft = Math.min(minLeft, rect.left);
+        maxRight = Math.max(maxRight, rect.right);
+    });
+
+    if (!Number.isFinite(minLeft) || !Number.isFinite(maxRight)) return;
+
+    const targetMid = (minLeft + maxRight) / 2;
+    const scrollerMid = scrollerRect.left + scrollerRect.width / 2;
+    const delta = targetMid - scrollerMid;
+    const maxScroll = Math.max(0, scroller.scrollWidth - scroller.clientWidth);
+    const nextLeft = Math.min(maxScroll, Math.max(0, scroller.scrollLeft + delta));
+
+    scroller.scrollTo({ left: nextLeft, behavior });
+}
+
+function centerBracketPhase(phaseKey) {
+    // Duplo frame + timeout curto: layout do grid e imagens de bandeira
+    requestAnimationFrame(() => {
+        scrollBracketToPhase(phaseKey, 'auto');
+        requestAnimationFrame(() => {
+            scrollBracketToPhase(phaseKey, 'smooth');
+            setTimeout(() => scrollBracketToPhase(phaseKey, 'smooth'), 120);
+        });
+    });
 }
 
 function normalizeMatchDate(matchDate) {
@@ -1271,7 +1487,7 @@ export function renderKnockoutStage() {
     bindKnockoutPhasePicker(container);
 
     if (knockoutViewMode === 'bracket') {
-        requestAnimationFrame(() => scrollBracketToPhase(selectedKnockoutPhase));
+        centerBracketPhase(selectedKnockoutPhase);
     }
 }
 

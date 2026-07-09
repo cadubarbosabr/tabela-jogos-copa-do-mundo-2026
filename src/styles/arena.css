@@ -1659,12 +1659,18 @@ html:not(.dark) .ko-phase-btn.is-complete:not(.is-active) {
 }
 
 /* Bracket dim/focus when filtering by phase */
+.wcb-scroll {
+  scroll-behavior: smooth;
+  scroll-padding-inline: 40%;
+}
+
 .wcb-col.is-phase-dim,
 .wcb-center-final.is-phase-dim,
 .wcb-center-third.is-phase-dim {
-  opacity: 0.32;
-  filter: grayscale(0.25);
-  transition: opacity 0.25s ease, filter 0.25s ease;
+  opacity: 0.28;
+  filter: grayscale(0.3);
+  transition: opacity 0.28s ease, filter 0.28s ease, transform 0.28s ease;
+  pointer-events: none;
 }
 
 .wcb-col.is-phase-focus,
@@ -1674,12 +1680,14 @@ html:not(.dark) .ko-phase-btn.is-complete:not(.is-active) {
   filter: none;
   position: relative;
   z-index: 2;
+  pointer-events: auto;
+  transform: scale(1.02);
 }
 
 .wcb-col.is-phase-focus .kob-mini-card,
 .wcb-center-final.is-phase-focus .kob-mini-card,
 .wcb-center-third.is-phase-focus .kob-mini-card {
-  box-shadow: 0 0 0 1px rgb(47 107 255 / 0.35), 0 12px 28px rgb(47 107 255 / 0.18);
+  box-shadow: 0 0 0 1px rgb(47 107 255 / 0.4), 0 14px 32px rgb(47 107 255 / 0.22);
 }
 
 .wcb-phase-label.is-focus {
@@ -1688,6 +1696,88 @@ html:not(.dark) .ko-phase-btn.is-complete:not(.is-active) {
 
 .ko-phase-focus .bk-phase-header {
   margin-top: 0.15rem;
+}
+
+.ko-phase-focus .bk-phase-grid {
+  max-width: 72rem;
+  margin-inline: auto;
+  justify-content: center;
+}
+
+/* —— Hoje empty / champion states —— */
+.hoje-empty-state {
+  display: grid;
+  justify-items: center;
+  text-align: center;
+  gap: 0.55rem;
+  padding: 2.5rem 1.25rem;
+  border-radius: 1.15rem;
+  border: 1px solid rgb(255 255 255 / 0.08);
+  background:
+    radial-gradient(ellipse 70% 60% at 50% 0%, rgb(47 107 255 / 0.12) 0%, transparent 55%),
+    rgb(12 18 36 / 0.85);
+}
+
+html:not(.dark) .hoje-empty-state {
+  background: linear-gradient(180deg, #fff, #f8fafc);
+  border-color: rgb(15 23 42 / 0.08);
+}
+
+.hoje-champion-state {
+  border-color: rgb(212 175 55 / 0.4);
+  background:
+    radial-gradient(ellipse 70% 60% at 50% 0%, rgb(245 158 11 / 0.18) 0%, transparent 55%),
+    rgb(20 16 8 / 0.9);
+}
+
+.hoje-empty-icon {
+  font-size: 2.4rem;
+  line-height: 1;
+  filter: drop-shadow(0 6px 16px rgb(0 0 0 / 0.35));
+}
+
+.hoje-empty-title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 1.35rem;
+  font-weight: 800;
+  color: #f8fafc;
+  letter-spacing: -0.02em;
+}
+
+html:not(.dark) .hoje-empty-title {
+  color: #0f172a;
+}
+
+.hoje-empty-text {
+  margin: 0;
+  max-width: 28rem;
+  font-size: 0.95rem;
+  font-weight: 600;
+  line-height: 1.55;
+  color: rgb(148 163 184);
+}
+
+.hoje-champion-flag {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  margin-top: 0.65rem;
+  padding: 0.55rem 1rem;
+  border-radius: 9999px;
+  border: 1px solid rgb(212 175 55 / 0.45);
+  background: rgb(212 175 55 / 0.12);
+  color: #fde68a;
+  font-size: 1.05rem;
+}
+
+.hoje-count-label {
+  margin: 0 0 0.35rem;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgb(100 116 139);
 }
 
 @media (prefers-reduced-motion: reduce) {

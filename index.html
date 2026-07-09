@@ -67,7 +67,7 @@
             <div class="arena-nav-track" role="tablist">
                 <button id="btn-grupos" type="button" role="tab" aria-selected="true" aria-controls="section-grupos" class="arena-nav-item is-active" data-tab="grupos">Grupos</button>
                 <button id="btn-mata-mata" type="button" role="tab" aria-selected="false" aria-controls="section-mata-mata" class="arena-nav-item" data-tab="mata-mata">Mata-mata</button>
-                <button id="btn-hoje" type="button" role="tab" aria-selected="false" aria-controls="section-hoje" class="arena-nav-item" data-tab="hoje">Calendário</button>
+                <button id="btn-hoje" type="button" role="tab" aria-selected="false" aria-controls="section-hoje" class="arena-nav-item" data-tab="hoje">Hoje</button>
                 <button id="btn-palpites" type="button" role="tab" aria-selected="false" aria-controls="section-palpites" class="arena-nav-item" data-tab="palpites">Meus Palpites</button>
             </div>
         </nav>
@@ -154,14 +154,14 @@
             <div id="container-mata-mata" aria-live="polite"></div>
         </section>
 
-        <!-- ═══ CALENDÁRIO / HOJE ═══ -->
+        <!-- ═══ HOJE ═══ -->
         <section id="section-hoje" class="arena-section hidden" role="tabpanel" aria-labelledby="btn-hoje">
             <div class="arena-page-head">
-                <h2 id="lbl-hoje-title" class="arena-page-title">Calendário</h2>
-                <p id="lbl-hoje-sub" class="arena-page-sub">Todos os jogos da copa em ordem cronológica. Filtre por status.</p>
+                <h2 id="lbl-hoje-title" class="arena-page-title">Hoje</h2>
+                <p id="lbl-hoje-sub" class="arena-page-sub">Jogos de hoje no fuso de Brasília (BRT).</p>
             </div>
-            <div class="arena-filter-chips" id="hoje-filters" role="group" aria-label="Filtrar jogos">
-                <button type="button" class="arena-chip-btn is-active" data-filter="all">Todos</button>
+            <div class="arena-filter-chips" id="hoje-filters" role="group" aria-label="Filtrar jogos de hoje">
+                <button type="button" class="arena-chip-btn is-active" data-filter="today">Todos de hoje</button>
                 <button type="button" class="arena-chip-btn" data-filter="open">Sem placar</button>
                 <button type="button" class="arena-chip-btn" data-filter="official">Oficiais</button>
                 <button type="button" class="arena-chip-btn" data-filter="prediction">Meus palpites</button>
