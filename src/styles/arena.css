@@ -60,6 +60,7 @@ html:not(.dark) .arena-header {
   padding: 0.75rem 1rem;
   display: flex;
   align-items: center;
+  justify-content: space-between;
   gap: 0.75rem 1.25rem;
   flex-wrap: wrap;
 }
@@ -1126,6 +1127,12 @@ html:not(.dark) .arena-page-title {
   cursor: pointer;
 }
 
+.arena-danger-btn-sm {
+  padding: 0.45rem 0.75rem;
+  font-size: 0.7rem;
+  white-space: nowrap;
+}
+
 .arena-danger-btn:hover {
   box-shadow: 0 8px 22px rgb(244 63 94 / 0.2);
 }
@@ -1227,7 +1234,7 @@ html:not(.dark) .arena-footer {
   inset-inline: 0;
   z-index: 45;
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(3, 1fr);
   gap: 0.25rem;
   padding: 0.45rem 0.5rem calc(0.45rem + env(safe-area-inset-bottom, 0px));
   background: rgb(5 8 20 / 0.94);

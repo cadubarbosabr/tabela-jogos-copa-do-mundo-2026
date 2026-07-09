@@ -76,13 +76,10 @@ export function applyLanguage() {
 
     setText('btn-grupos', t.tabGroupsShort || t.tabGroups);
     setText('btn-mata-mata', t.tabKnockoutShort || t.tabKnockout);
-    setText('btn-hoje', t.tabCalendar || 'Calendário');
-    setText('btn-palpites', t.tabPredictions || 'Meus Palpites');
+    setText('btn-hoje', t.tabToday || t.tabTodayShort || 'Hoje');
     setText('lbl-btn-grupos-mobile', t.tabGroupsShort || 'Grupos');
     setText('lbl-btn-mata-mata-mobile', t.tabBracketShort || 'Chave');
     setText('lbl-btn-hoje-mobile', t.tabTodayShort || 'Hoje');
-    setText('lbl-btn-palpites-mobile', t.tabPredictionsShort || 'Palpites');
-    setText('lbl-pred-chip', t.tabPredictions || 'Meus Palpites');
 
     applyTheme();
 
@@ -101,17 +98,15 @@ export function applyLanguage() {
     setText('th-stadium', t.tableStadium);
     setText('lbl-champion-title', t.championTitle);
     setText('lbl-champion-subtitle', t.championSubtitle);
-    setText('lbl-hoje-title', t.tabCalendar || 'Calendário');
+    setText('lbl-hoje-title', t.tabToday || 'Hoje');
     setText('lbl-hoje-sub', t.calendarSub || '');
-    setText('lbl-palpites-title', t.tabPredictions || 'Meus Palpites');
-    setText('lbl-palpites-sub', t.predictionsSub || '');
     setText('lbl-footer-title', `© 2026 ${t.brandTitle || 'WC26 Table'}`);
     setText('lbl-footer-sub', 'Desenvolvido por Cadu Barbosa · Dados públicos ESPN');
     setText('lbl-btn-pix', t.contribPix);
     setText('lbl-btn-reset', t.resetPredictions);
 }
 
-const VALID_TABS = ['grupos', 'mata-mata', 'hoje', 'palpites'];
+const VALID_TABS = ['grupos', 'mata-mata', 'hoje'];
 
 export function switchTab(tab) {
     const normalizedTab = VALID_TABS.includes(tab) ? tab : 'grupos';
@@ -119,8 +114,7 @@ export function switchTab(tab) {
     const sectionMap = {
         grupos: 'section-grupos',
         'mata-mata': 'section-mata-mata',
-        hoje: 'section-hoje',
-        palpites: 'section-palpites'
+        hoje: 'section-hoje'
     };
 
     Object.entries(sectionMap).forEach(([key, sectionId]) => {
@@ -139,7 +133,6 @@ export function switchTab(tab) {
 
     if (normalizedTab === 'mata-mata') renderKnockoutStage();
     if (normalizedTab === 'hoje') renderCalendarView();
-    if (normalizedTab === 'palpites') renderPredictionsView();
     if (normalizedTab === 'grupos') {
         renderTablesGrid();
         renderSidePanel();
@@ -246,37 +239,11 @@ export function renderTablesGrid() {
     });
 
     renderSidePanel();
-    updatePredictionBadge();
-}
-
-function parseMatchDateKey(dataStr) {
-    // "11/06 (Qui) - 16h00" → day/month
-    const m = String(dataStr || '').match(/(\d{2})\/(\d{2})/);
-    if (!m) return null;
-    return `${m[2]}-${m[1]}`;
 }
 
 function getMatchTimeLabel(dataStr) {
     const m = String(dataStr || '').match(/(\d{1,2}h\d{2})/);
     return m ? m[1] : '';
-}
-
-function getFilledGroupMatches() {
-    return jogosGrupos.filter((j) => {
-        const sh = getScoreInput(j.id, 'home');
-        const sa = getScoreInput(j.id, 'away');
-        return sh !== '' && sa !== '';
-    });
-}
-
-export function updatePredictionBadge() {
-    const el = document.getElementById('pred-percent');
-    if (!el) return;
-
-    const total = jogosGrupos.length;
-    const filled = getFilledGroupMatches().length;
-    const pct = total ? Math.round((filled / total) * 100) : 0;
-    el.textContent = `${pct}%`;
 }
 
 export function renderSidePanel() {
@@ -604,52 +571,6 @@ export function renderCalendarView() {
         <p class="hoje-count-label">${todayMatches.length} jogo${todayMatches.length > 1 ? 's' : ''} hoje</p>
         ${todayMatches.map(renderMatchCardCompact).join('')}
     `;
-}
-
-export function renderPredictionsView() {
-    const stats = document.getElementById('palpites-stats');
-    const list = document.getElementById('palpites-list');
-    if (!stats || !list) return;
-
-    const t = translations.pt;
-    const total = jogosGrupos.length;
-    const filled = getFilledGroupMatches();
-    const officialCount = jogosGrupos.filter((j) => hasOfficialResult(j.id)).length;
-    const localOnly = jogosGrupos.filter((j) => {
-        if (hasOfficialResult(j.id)) return false;
-        return (
-            localStorage.getItem(`wc2026_score_${j.id}_home`) != null ||
-            localStorage.getItem(`wc2026_score_${j.id}_away`) != null
-        );
-    });
-
-    const pct = total ? Math.round((filled.length / total) * 100) : 0;
-
-    stats.innerHTML = `
-        <div class="arena-stat-card">
-            <p class="arena-stat-label">${t.statFilled || 'Preenchidos'}</p>
-            <p class="arena-stat-value">${filled.length}/${total}</p>
-        </div>
-        <div class="arena-stat-card">
-            <p class="arena-stat-label">${t.statCoverage || 'Cobertura'}</p>
-            <p class="arena-stat-value">${pct}%</p>
-        </div>
-        <div class="arena-stat-card">
-            <p class="arena-stat-label">${t.statOfficial || 'Oficiais ESPN'}</p>
-            <p class="arena-stat-value">${officialCount}</p>
-        </div>
-        <div class="arena-stat-card">
-            <p class="arena-stat-label">${t.statYours || 'Só palpites'}</p>
-            <p class="arena-stat-value">${localOnly.length}</p>
-        </div>
-    `;
-
-    const toShow = localOnly.length ? localOnly : filled.slice(0, 24);
-    list.innerHTML = toShow.length
-        ? toShow.map(renderMatchCardCompact).join('')
-        : `<p class="arena-hint" style="padding:1rem">${t.noPredictions || 'Você ainda não registrou palpites. Preencha placares nos jogos da fase de grupos.'}</p>`;
-
-    updatePredictionBadge();
 }
 
 export function renderGroupStage() {

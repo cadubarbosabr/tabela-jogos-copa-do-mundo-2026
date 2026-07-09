@@ -45,16 +45,7 @@
                 </div>
             </div>
 
-            <div id="live-pill" class="arena-live-pill" data-state="live">
-                <span class="arena-live-dot" aria-hidden="true"></span>
-                <span id="official-status">LIVE · ESPN</span>
-            </div>
-
             <div class="arena-header-right">
-                <button id="btn-goto-predictions" type="button" class="arena-pred-chip" title="Meus palpites">
-                    <span id="lbl-pred-chip">Meus Palpites</span>
-                    <strong id="pred-percent">—</strong>
-                </button>
                 <button id="btn-theme" type="button" class="arena-icon-btn" aria-label="Alternar tema">
                     <span id="icon-btn-theme">🌙</span>
                     <span id="lbl-btn-theme" class="sr-only">Modo Claro</span>
@@ -68,7 +59,6 @@
                 <button id="btn-grupos" type="button" role="tab" aria-selected="true" aria-controls="section-grupos" class="arena-nav-item is-active" data-tab="grupos">Grupos</button>
                 <button id="btn-mata-mata" type="button" role="tab" aria-selected="false" aria-controls="section-mata-mata" class="arena-nav-item" data-tab="mata-mata">Mata-mata</button>
                 <button id="btn-hoje" type="button" role="tab" aria-selected="false" aria-controls="section-hoje" class="arena-nav-item" data-tab="hoje">Hoje</button>
-                <button id="btn-palpites" type="button" role="tab" aria-selected="false" aria-controls="section-palpites" class="arena-nav-item" data-tab="palpites">Meus Palpites</button>
             </div>
         </nav>
     </header>
@@ -104,6 +94,9 @@
                             <span class="arena-legend-item"><i class="arena-swatch is-t"></i><span id="lbl-legend-third">3º disputa vaga</span></span>
                             <span class="arena-legend-item"><i class="arena-swatch is-o"></i><span id="lbl-legend-out">4º eliminado</span></span>
                         </div>
+                        <button id="btn-reset-predictions" type="button" class="arena-danger-btn arena-danger-btn-sm">
+                            <span id="lbl-btn-reset">Resetar palpites</span>
+                        </button>
                     </div>
                     <p id="lbl-group-info" class="arena-hint">Os 2 melhores de cada grupo + os 8 melhores 3º colocados avançam.</p>
                     <div id="grid-tabelas-classificacao" aria-live="polite" class="arena-groups-grid"></div>
@@ -164,24 +157,8 @@
                 <button type="button" class="arena-chip-btn is-active" data-filter="today">Todos de hoje</button>
                 <button type="button" class="arena-chip-btn" data-filter="open">Sem placar</button>
                 <button type="button" class="arena-chip-btn" data-filter="official">Oficiais</button>
-                <button type="button" class="arena-chip-btn" data-filter="prediction">Meus palpites</button>
             </div>
             <div id="hoje-list" class="arena-match-list arena-match-list-lg"></div>
-        </section>
-
-        <!-- ═══ MEUS PALPITES ═══ -->
-        <section id="section-palpites" class="arena-section hidden" role="tabpanel" aria-labelledby="btn-palpites">
-            <div class="arena-page-head arena-page-head-row">
-                <div>
-                    <h2 id="lbl-palpites-title" class="arena-page-title">Meus Palpites</h2>
-                    <p id="lbl-palpites-sub" class="arena-page-sub">Resumo dos placares que você preencheu. Oficiais da ESPN ficam travados.</p>
-                </div>
-                <button id="btn-reset-predictions" type="button" class="arena-danger-btn">
-                    <span id="lbl-btn-reset">Resetar palpites</span>
-                </button>
-            </div>
-            <div id="palpites-stats" class="arena-stats-row"></div>
-            <div id="palpites-list" class="arena-match-list arena-match-list-lg"></div>
         </section>
     </main>
 
@@ -193,7 +170,6 @@
             </div>
             <div class="arena-footer-actions">
                 <span id="last-update" class="arena-footer-meta"></span>
-                <span id="official-status-detail" class="sr-only"></span>
                 <button id="btn-pix" type="button" class="btn-pix" title="Chave: sicwnb@outlook.com">
                     <span class="btn-pix-dot" aria-hidden="true"></span>
                     <span id="lbl-btn-pix">Contribuir via PIX</span>
@@ -204,7 +180,7 @@
         </div>
     </footer>
 
-    <!-- Mobile bottom nav — 4 items like mockup -->
+    <!-- Mobile bottom nav -->
     <nav class="arena-bottom-nav" aria-label="Navegação principal">
         <button type="button" class="arena-bottom-item is-active" data-tab="grupos" id="btn-grupos-mobile">
             <span class="arena-bottom-icon" aria-hidden="true">▦</span>
@@ -217,10 +193,6 @@
         <button type="button" class="arena-bottom-item" data-tab="hoje" id="btn-hoje-mobile">
             <span class="arena-bottom-icon" aria-hidden="true">▣</span>
             <span id="lbl-btn-hoje-mobile">Hoje</span>
-        </button>
-        <button type="button" class="arena-bottom-item" data-tab="palpites" id="btn-palpites-mobile">
-            <span class="arena-bottom-icon" aria-hidden="true">◎</span>
-            <span id="lbl-btn-palpites-mobile">Palpites</span>
         </button>
     </nav>
 

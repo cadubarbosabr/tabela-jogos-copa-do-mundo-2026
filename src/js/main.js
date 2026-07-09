@@ -11,9 +11,7 @@ import {
     renderKnockoutStage,
     renderSidePanel,
     renderCalendarView,
-    renderPredictionsView,
     setCalendarFilter,
-    updatePredictionBadge,
     switchTab,
     showToast,
     initToggles
@@ -32,56 +30,20 @@ function formatStatusDate(rawTimestamp) {
 }
 
 function updateOfficialStatusLabel() {
-    const statusTitle = document.getElementById('official-status');
-    const statusDetail = document.getElementById('official-status-detail');
-    const livePill = document.getElementById('live-pill');
     const footerUpdate = document.getElementById('last-update');
     const status = getOfficialResultsStatus();
-    const t = translations.pt;
     const formattedDate = formatStatusDate(status.lastFetch);
     const hasOfficialData = status.entryCount > 0;
 
-    let state = 'live';
-    let title = t.officialStatusLive;
+    if (!footerUpdate) return;
 
-    if (status.hasError && hasOfficialData) {
-        state = 'fallback';
-        title = t.officialStatusFallback;
+    if (formattedDate) {
+        const mode = status.hasError && hasOfficialData ? 'cache' : 'atualizado';
+        footerUpdate.textContent = `Resultados ESPN ${mode} · ${formattedDate}`;
     } else if (status.hasError) {
-        state = 'error';
-        title = t.officialStatusUnavailable;
-    }
-
-    if (statusTitle) {
-        statusTitle.textContent = title;
-        statusTitle.dataset.state = state;
-    }
-
-    if (livePill) {
-        livePill.dataset.state = state;
-    }
-
-    if (statusDetail) {
-        if (status.hasError && hasOfficialData) {
-            statusDetail.textContent = `${t.officialStatusCached}${formattedDate ? ` ${t.officialStatusSnapshotPrefix} ${formattedDate}.` : ''}`;
-        } else if (status.hasError) {
-            statusDetail.textContent = t.officialStatusEmpty;
-        } else {
-            const qualityNote = status.droppedEntries > 0
-                ? ` ${status.droppedEntries} ${t.officialStatusDroppedEntries}`
-                : '';
-            statusDetail.textContent = `${t.officialStatusReady}${formattedDate ? ` Atualizado em ${formattedDate}.` : ''}${qualityNote}`;
-        }
-    }
-
-    if (footerUpdate) {
-        if (formattedDate) {
-            footerUpdate.textContent = `ESPN ${state === 'fallback' ? 'cache' : 'live'} · ${formattedDate}`;
-        } else if (status.hasError) {
-            footerUpdate.textContent = 'Resultados oficiais indisponíveis.';
-        } else {
-            footerUpdate.textContent = 'Aguardando primeira atualização oficial.';
-        }
+        footerUpdate.textContent = 'Resultados oficiais indisponíveis.';
+    } else {
+        footerUpdate.textContent = 'Aguardando primeira atualização oficial.';
     }
 }
 
@@ -89,7 +51,6 @@ function refreshVisibleViews() {
     renderTablesGrid();
     renderGroupStage();
     renderSidePanel();
-    updatePredictionBadge();
 
     const sectionMataMata = document.getElementById('section-mata-mata');
     if (sectionMataMata && !sectionMataMata.classList.contains('hidden')) {
@@ -99,11 +60,6 @@ function refreshVisibleViews() {
     const sectionHoje = document.getElementById('section-hoje');
     if (sectionHoje && !sectionHoje.classList.contains('hidden')) {
         renderCalendarView();
-    }
-
-    const sectionPalpites = document.getElementById('section-palpites');
-    if (sectionPalpites && !sectionPalpites.classList.contains('hidden')) {
-        renderPredictionsView();
     }
 }
 
@@ -125,7 +81,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     renderTablesGrid();
     renderGroupStage();
     renderSidePanel();
-    updatePredictionBadge();
     switchTab('grupos');
 
     const loadingOverlay = document.getElementById('loading-overlay');
@@ -135,7 +90,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         refreshVisibleViews();
     });
 
-    // Desktop + mobile tab buttons
     document.querySelectorAll('[data-tab]').forEach((btn) => {
         btn.addEventListener('click', () => {
             const tab = btn.getAttribute('data-tab');
@@ -143,15 +97,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
     });
 
-    const btnGotoPredictions = document.getElementById('btn-goto-predictions');
-    if (btnGotoPredictions) {
-        btnGotoPredictions.addEventListener('click', () => switchTab('palpites'));
-    }
-
-    // Calendar filters
     document.querySelectorAll('#hoje-filters .arena-chip-btn').forEach((btn) => {
         btn.addEventListener('click', () => {
-            setCalendarFilter(btn.getAttribute('data-filter') || 'all');
+            setCalendarFilter(btn.getAttribute('data-filter') || 'today');
         });
     });
 
