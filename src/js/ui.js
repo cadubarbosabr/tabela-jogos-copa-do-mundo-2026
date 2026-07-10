@@ -844,66 +844,22 @@ function bindKnockoutPhasePicker(container) {
 }
 
 function scrollBracketToPhase(phaseKey, behavior = 'smooth') {
-    const scroller = document.querySelector('.wcb-scroll');
-    if (!scroller) return;
+    // Board vertical: foca a seção da fase na página (sem scroll horizontal)
+    const target = document.querySelector(`.wcb-round[data-phase="${phaseKey}"]`);
+    if (!target || typeof target.scrollIntoView !== 'function') return;
 
-    let targets = [];
-    if (phaseKey === 'final') {
-        targets = [...scroller.querySelectorAll('[data-focus-phase="final"], .wcb-center-final')];
-    } else if (phaseKey === 'thirdPlace') {
-        targets = [...scroller.querySelectorAll('[data-focus-phase="thirdPlace"], .wcb-center-third')];
-    } else {
-        // Preferir o lado esquerdo (primeiro na ordem DOM) para fases bilaterais
-        targets = [...scroller.querySelectorAll(`.wcb-col[data-phase="${phaseKey}"]`)];
-    }
-
-    if (!targets.length) {
-        const center = scroller.querySelector('.wcb-center-col');
-        if (center) targets = [center];
-    }
-    if (!targets.length) return;
-
-    const scrollerRect = scroller.getBoundingClientRect();
-
-    // Se as colunas da fase estão distantes (esquerda + direita da chave),
-    // centraliza a primeira (esquerda) para o conteúdo ficar legível no viewport.
-    let focusTargets = targets;
-    if (targets.length > 1) {
-        const first = targets[0].getBoundingClientRect();
-        const last = targets[targets.length - 1].getBoundingClientRect();
-        const span = last.right - first.left;
-        if (span > scrollerRect.width * 0.75) {
-            focusTargets = [targets[0]];
-        }
-    }
-
-    let minLeft = Infinity;
-    let maxRight = -Infinity;
-    focusTargets.forEach((el) => {
-        const rect = el.getBoundingClientRect();
-        if (!rect.width && !rect.height) return;
-        minLeft = Math.min(minLeft, rect.left);
-        maxRight = Math.max(maxRight, rect.right);
+    target.scrollIntoView({
+        behavior,
+        block: 'start',
+        inline: 'nearest'
     });
-
-    if (!Number.isFinite(minLeft) || !Number.isFinite(maxRight)) return;
-
-    const targetMid = (minLeft + maxRight) / 2;
-    const scrollerMid = scrollerRect.left + scrollerRect.width / 2;
-    const delta = targetMid - scrollerMid;
-    const maxScroll = Math.max(0, scroller.scrollWidth - scroller.clientWidth);
-    const nextLeft = Math.min(maxScroll, Math.max(0, scroller.scrollLeft + delta));
-
-    scroller.scrollTo({ left: nextLeft, behavior });
 }
 
 function centerBracketPhase(phaseKey) {
-    // Duplo frame + timeout curto: layout do grid e imagens de bandeira
     requestAnimationFrame(() => {
         scrollBracketToPhase(phaseKey, 'auto');
         requestAnimationFrame(() => {
             scrollBracketToPhase(phaseKey, 'smooth');
-            setTimeout(() => scrollBracketToPhase(phaseKey, 'smooth'), 120);
         });
     });
 }
@@ -1258,108 +1214,152 @@ function renderKnockoutListView() {
     `;
 }
 
-function renderBracketColumn(options = {}) {
-    const {
-        side = 'left',
-        phaseKey = '',
-        slotGroups = [],
-        cardRenderer,
-        centerContent = '',
-        focusClass = ''
-    } = options;
-    const baseClass = side === 'center' ? 'wcb-col wcb-center-col' : 'wcb-col';
-    if (side === 'center') {
-        return `<div class="${baseClass}${focusClass}" data-side="center">${centerContent}</div>`;
-    }
+/** Card de confronto em linha — visão Chave moderna (sem mini-colunas) */
+function renderBracketMatchRow(match, phaseKey) {
+    const t = translations.pt;
+    const dados = mapaMataMataCalculado[match.id] || { home: 'A definir', away: 'A definir' };
+    const sh = getScoreInput(match.id, 'home');
+    const sa = getScoreInput(match.id, 'away');
+    const penH = getPenaltiesInput(match.id, 'home');
+    const penA = getPenaltiesInput(match.id, 'away');
+    const { lockedAttrs, lockedClasses, badgeLabel, badgeClass } = getMatchLockState(match.id);
+    const homeName = translateTeam(translatePlaceholder(dados.home, currentLang), currentLang);
+    const awayName = translateTeam(translatePlaceholder(dados.away, currentLang), currentLang);
+    const winnerInfo = getWinnerInfo(match, dados);
+    const isEmpate = sh !== '' && sa !== '' && parseInt(sh, 10) === parseInt(sa, 10);
+    const homeWinner = winnerInfo.winner === 'home';
+    const awayWinner = winnerInfo.winner === 'away';
+    const decided = Boolean(winnerInfo.winner);
+    const timeLabel = match.hora || '';
+    const dateLabel = match.data ? String(match.data).slice(0, 5) : '';
 
-    const groupsHtml = slotGroups.map((group) => {
-        if (group.length <= 1) {
-            return `<div class="wcb-slot">${cardRenderer(group[0], phaseKey, side === 'right' ? 'B' : 'A')}</div>`;
-        }
+    const penBlock = isEmpate
+        ? `<div class="wcb-row-pens">
+                <span>${t.penalties}</span>
+                <input type="number" min="0" placeholder="P" value="${penH}"
+                    oninput="window.setPenaltiesInput(${match.id}, 'home', this.value)"
+                    aria-label="${t.penalties} ${homeName}" ${lockedAttrs}
+                    class="kob-mini-pen-input${lockedClasses}">
+                <span>–</span>
+                <input type="number" min="0" placeholder="P" value="${penA}"
+                    oninput="window.setPenaltiesInput(${match.id}, 'away', this.value)"
+                    aria-label="${t.penalties} ${awayName}" ${lockedAttrs}
+                    class="kob-mini-pen-input${lockedClasses}">
+           </div>`
+        : (winnerInfo.decidedByPenalties ? '<span class="knockout-pen-badge">P</span>' : '');
 
-        return `
-            <div class="wcb-bracket-pair">
-                ${group.map((matchId) => `<div class="wcb-slot">${cardRenderer(matchId, phaseKey, side === 'right' ? 'B' : 'A')}</div>`).join('')}
+    return `
+        <article class="wcb-row${decided ? ' is-decided' : ''}${match.destaque ? ' is-highlight' : ''}${homeWinner || awayWinner ? ' has-winner' : ''}" data-match-id="${match.id}" data-phase="${phaseKey}">
+            <div class="wcb-row-meta">
+                <span class="wcb-row-when">
+                    <strong>${dateLabel}</strong>
+                    ${timeLabel ? `<span>${timeLabel}</span>` : ''}
+                </span>
+                <span class="wcb-row-id">#${match.id}</span>
             </div>
-        `;
-    }).join('');
 
-    return `<div class="${baseClass}${focusClass}" data-side="${side}" data-phase="${phaseKey}">${groupsHtml}</div>`;
+            <div class="wcb-row-teams" role="group" aria-label="${homeName} versus ${awayName}">
+                <div class="wcb-row-team is-home${homeWinner ? ' is-winner' : ''}${awayWinner ? ' is-loser' : ''}">
+                    ${getFlagTag(dados.home)}
+                    <span class="wcb-row-name" title="${homeName}">${homeName}</span>
+                </div>
+                <div class="wcb-row-score">
+                    <input type="number" min="0" inputmode="numeric" placeholder="–" value="${sh}"
+                        oninput="window.setScoreInput(${match.id}, 'home', this.value)"
+                        aria-label="Gols ${homeName}" ${lockedAttrs}
+                        class="score-input-lg wcb-row-input${lockedClasses}">
+                    <span class="wcb-row-sep" aria-hidden="true">×</span>
+                    <input type="number" min="0" inputmode="numeric" placeholder="–" value="${sa}"
+                        oninput="window.setScoreInput(${match.id}, 'away', this.value)"
+                        aria-label="Gols ${awayName}" ${lockedAttrs}
+                        class="score-input-lg wcb-row-input${lockedClasses}">
+                </div>
+                <div class="wcb-row-team is-away${awayWinner ? ' is-winner' : ''}${homeWinner ? ' is-loser' : ''}">
+                    ${getFlagTag(dados.away)}
+                    <span class="wcb-row-name" title="${awayName}">${awayName}</span>
+                </div>
+            </div>
+
+            <div class="wcb-row-aside">
+                <span class="match-badge ${badgeClass}">${badgeLabel}</span>
+                ${penBlock}
+                <span class="wcb-row-venue" title="${match.local || ''}">${match.local || ''}</span>
+            </div>
+        </article>
+    `;
 }
 
 function renderKnockoutBracketView() {
-    const CENTER_COLUMN_INDEX = 4;
     const t = translations.pt;
     ensureSelectedKnockoutPhase();
+    const focusKey = selectedKnockoutPhase;
 
-    const allMatchesById = new Map(estruturaNosMataMata.flatMap((fase) => fase.jogos.map((jogo) => [jogo.id, jogo])));
-    const m = (id) => allMatchesById.get(id);
-    const card = (id, phaseKey, side) => {
-        const match = m(id);
-        return match ? renderMatchCard(match, { phaseKey, side }) : '';
+    const phaseAccents = {
+        round32: 'rgb(59 130 246)',
+        round16: 'rgb(139 92 246)',
+        quarterFinals: 'rgb(236 72 153)',
+        semiFinals: 'rgb(245 158 11)',
+        thirdPlace: 'rgb(148 163 184)',
+        final: 'rgb(212 175 55)'
     };
 
-    const phaseLabels = [
-        t.round32,
-        t.round16,
-        t.quarterFinals,
-        t.semiFinals,
-        `🏆 ${t.final}`,
-        t.semiFinals,
-        t.quarterFinals,
-        t.round16,
-        t.round32
-    ];
+    const rounds = KNOCKOUT_PHASE_NAV.map((phase, index) => {
+        const phaseKey = phase.key;
+        const matches = getMatchesForPhaseKey(phaseKey);
+        const progress = getPhaseProgress(phaseKey);
+        const label = getPhaseLabelByKey(phaseKey, t);
+        const accent = phaseAccents[phaseKey] || 'rgb(59 130 246)';
+        const isFocus = phaseKey === focusKey;
+        const icon = phaseKey === 'final' ? '🏆' : phaseKey === 'thirdPlace' ? '🥉' : '';
+        const colsClass = matches.length <= 1
+            ? 'is-cols-1'
+            : matches.length <= 2
+                ? 'is-cols-2'
+                : matches.length <= 4
+                    ? 'is-cols-2'
+                    : 'is-cols-2-lg';
 
-    const focusKey = selectedKnockoutPhase;
-    const colFocus = (phaseKey) => (phaseKey === focusKey ? ' is-phase-focus' : ' is-phase-dim');
-
-    const columns = [
-        { side: 'left', phaseKey: 'round32', slotGroups: [[73, 75], [74, 77], [81, 82], [83, 84]] },
-        { side: 'left', phaseKey: 'round16', slotGroups: [[89, 90], [93, 94]] },
-        { side: 'left', phaseKey: 'quarterFinals', slotGroups: [[97, 99]] },
-        { side: 'left', phaseKey: 'semiFinals', slotGroups: [[101]] },
-        {
-            side: 'center',
-            phaseKey: focusKey === 'thirdPlace' ? 'thirdPlace' : 'final',
-            centerContent: `
-                <div class="wcb-center-final${focusKey === 'final' ? ' is-phase-focus' : ' is-phase-dim'}" data-focus-phase="final">
-                    <span class="wcb-center-label">🏆 ${t.final}</span>
-                    ${card(104, 'final', 'final')}
+        return `
+            <section
+                class="wcb-round${isFocus ? ' is-phase-focus' : ' is-phase-dim'}"
+                data-phase="${phaseKey}"
+                id="wcb-phase-${phaseKey}"
+                style="--wcb-accent: ${accent}"
+                aria-label="${label}"
+            >
+                <header class="wcb-round-head">
+                    <div class="wcb-round-title-wrap">
+                        <span class="wcb-round-index" aria-hidden="true">${index + 1}</span>
+                        <div class="wcb-round-copy">
+                            <h4 class="wcb-round-title">${icon ? `${icon} ` : ''}${label}</h4>
+                            <p class="wcb-round-meta">
+                                ${progress.decided}/${progress.total} definido${progress.total === 1 ? '' : 's'}
+                                · ${progress.total} jogo${progress.total === 1 ? '' : 's'}
+                            </p>
+                        </div>
+                    </div>
+                    <div class="wcb-round-progress" aria-hidden="true">
+                        <span class="wcb-round-progress-label">${progress.decided}/${progress.total}</span>
+                        <span class="wcb-round-progress-track">
+                            <span class="wcb-round-progress-fill" style="width: ${progress.total ? (progress.decided / progress.total) * 100 : 0}%"></span>
+                        </span>
+                    </div>
+                </header>
+                <div class="wcb-round-list ${colsClass}">
+                    ${matches.map((match) => renderBracketMatchRow(match, phaseKey)).join('')}
                 </div>
-                <div class="wcb-center-third${focusKey === 'thirdPlace' ? ' is-phase-focus' : ' is-phase-dim'}" data-focus-phase="thirdPlace">
-                    <span class="wcb-center-label">🥉 ${t.thirdPlace}</span>
-                    ${card(103, 'thirdPlace', 'final')}
-                </div>
-            `
-        },
-        { side: 'right', phaseKey: 'semiFinals', slotGroups: [[102]] },
-        { side: 'right', phaseKey: 'quarterFinals', slotGroups: [[98, 100]] },
-        { side: 'right', phaseKey: 'round16', slotGroups: [[91, 92], [95, 96]] },
-        { side: 'right', phaseKey: 'round32', slotGroups: [[76, 78], [79, 80], [85, 87], [86, 88]] }
-    ];
+            </section>
+        `;
+    }).join('');
 
     return `
-        <div class="wcb-scroll">
-            <div class="wcb-phase-bar">
-                ${phaseLabels.map((label, index) => {
-                    const colPhase = columns[index]?.phaseKey;
-                    const isFocus = colPhase === focusKey
-                        || (index === CENTER_COLUMN_INDEX && (focusKey === 'final' || focusKey === 'thirdPlace'));
-                    return `<span class="wcb-phase-label ${index === CENTER_COLUMN_INDEX ? 'wcb-phase-label-center' : ''} ${isFocus ? 'is-focus' : ''}">${label}</span>`;
-                }).join('')}
+        <div class="wcb-board" data-focus-phase="${focusKey}">
+            <div class="wcb-board-intro">
+                <p class="wcb-board-kicker">Chave completa</p>
+                <p class="wcb-board-hint">Todas as fases em lista moderna — sem rolagem horizontal. Toque numa fase acima para focar.</p>
             </div>
-            <div class="wcb-bracket" data-focus-phase="${focusKey}">
-                ${columns.map((column) => {
-                    if (column.side === 'center') {
-                        return `<div class="wcb-col wcb-center-col" data-side="center" data-focus-phase="${column.phaseKey}">${column.centerContent}</div>`;
-                    }
-                    return renderBracketColumn({
-                        ...column,
-                        cardRenderer: card,
-                        focusClass: colFocus(column.phaseKey)
-                    });
-                }).join('')}
+            <div class="wcb-board-stack">
+                ${rounds}
             </div>
         </div>
     `;

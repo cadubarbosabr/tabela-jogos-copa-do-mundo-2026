@@ -1665,42 +1665,7 @@ html:not(.dark) .ko-phase-btn.is-complete:not(.is-active) {
   background: rgb(0 0 0 / 0.12);
 }
 
-/* Bracket dim/focus when filtering by phase */
-.wcb-scroll {
-  scroll-behavior: smooth;
-  scroll-padding-inline: 40%;
-}
-
-.wcb-col.is-phase-dim,
-.wcb-center-final.is-phase-dim,
-.wcb-center-third.is-phase-dim {
-  opacity: 0.28;
-  filter: grayscale(0.3);
-  transition: opacity 0.28s ease, filter 0.28s ease, transform 0.28s ease;
-  pointer-events: none;
-}
-
-.wcb-col.is-phase-focus,
-.wcb-center-final.is-phase-focus,
-.wcb-center-third.is-phase-focus {
-  opacity: 1;
-  filter: none;
-  position: relative;
-  z-index: 2;
-  pointer-events: auto;
-  transform: scale(1.02);
-}
-
-.wcb-col.is-phase-focus .kob-mini-card,
-.wcb-center-final.is-phase-focus .kob-mini-card,
-.wcb-center-third.is-phase-focus .kob-mini-card {
-  box-shadow: 0 0 0 1px rgb(47 107 255 / 0.4), 0 14px 32px rgb(47 107 255 / 0.22);
-}
-
-.wcb-phase-label.is-focus {
-  color: #fbbf24 !important;
-}
-
+/* List mode focus polish */
 .ko-phase-focus .bk-phase-header {
   margin-top: 0.15rem;
 }
@@ -1709,6 +1674,27 @@ html:not(.dark) .ko-phase-btn.is-complete:not(.is-active) {
   max-width: 72rem;
   margin-inline: auto;
   justify-content: center;
+}
+
+/* Bracket board (modo Chave) — tema arena */
+.wcb-board-kicker {
+  color: #93c5fd !important;
+}
+
+html:not(.dark) .wcb-board-kicker {
+  color: #2563eb !important;
+}
+
+.wcb-row .score-input-lg {
+  border-color: rgb(212 175 55 / 0.35) !important;
+  background: rgb(2 6 23 / 0.7) !important;
+  color: #fde68a !important;
+}
+
+html:not(.dark) .wcb-row .score-input-lg {
+  background: #fff !important;
+  color: #0f172a !important;
+  border-color: rgb(15 23 42 / 0.15) !important;
 }
 
 /* —— Hoje empty / champion states —— */
