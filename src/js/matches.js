@@ -111,10 +111,11 @@ export const estruturaNosMataMata = [
     {
         fase: "Quartas de Final",
         jogos: [
-            { id: 97, data: "09/07 (Qui)", hora: "17h00", local: "Boston", origHome: { tipo: "venc", j: 89 }, origAway: { tipo: "venc", j: 90 } },
-            { id: 98, data: "10/07 (Sex)", hora: "17h00", local: "Los Angeles", origHome: { tipo: "venc", j: 91 }, origAway: { tipo: "venc", j: 92 } },
-            { id: 99, data: "11/07 (Sáb)", hora: "17h00", local: "Miami", origHome: { tipo: "venc", j: 93 }, origAway: { tipo: "venc", j: 94 } },
-            { id: 100, data: "11/07 (Sáb)", hora: "14h00", local: "Kansas City", origHome: { tipo: "venc", j: 95 }, origAway: { tipo: "venc", j: 96 } }
+            // Datas/locais/home-away alinhados à API ESPN (scoreboard fifa.world)
+            { id: 97, data: "09/07 (Qui)", hora: "17h00", local: "Boston", origHome: { tipo: "venc", j: 90 }, origAway: { tipo: "venc", j: 89 } },
+            { id: 98, data: "11/07 (Sáb)", hora: "18h00", local: "Miami", origHome: { tipo: "venc", j: 91 }, origAway: { tipo: "venc", j: 92 } },
+            { id: 99, data: "10/07 (Sex)", hora: "16h00", local: "Los Angeles", origHome: { tipo: "venc", j: 94 }, origAway: { tipo: "venc", j: 93 } },
+            { id: 100, data: "11/07 (Sáb)", hora: "22h00", local: "Kansas City", origHome: { tipo: "venc", j: 96 }, origAway: { tipo: "venc", j: 95 } }
         ]
     },
     {

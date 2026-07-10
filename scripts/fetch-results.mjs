@@ -191,9 +191,10 @@ const KNOCKOUT_BY_DATE = {
   '20260705': [91, 92],
   '20260706': [93, 94],
   '20260707': [95, 96],
+  // Quartas: datas oficiais ESPN (não confundir #98 Noruega×Inglaterra com #99 Espanha×Bélgica)
   '20260709': [97],
-  '20260710': [98],
-  '20260711': [99, 100],
+  '20260710': [99],
+  '20260711': [98, 100],
   '20260714': [101],
   '20260715': [102],
   '20260718': [103],
@@ -257,11 +258,11 @@ const KNOCKOUT_MATCHES = [
   { id: 94,  origHome: { tipo: 'venc', j: 83 },  origAway: { tipo: 'venc', j: 84 } },
   { id: 95,  origHome: { tipo: 'venc', j: 85 },  origAway: { tipo: 'venc', j: 87 } },
   { id: 96,  origHome: { tipo: 'venc', j: 86 },  origAway: { tipo: 'venc', j: 88 } },
-  // Quartas de Final
-  { id: 97,  origHome: { tipo: 'venc', j: 89 },  origAway: { tipo: 'venc', j: 90 } },
+  // Quartas de Final (home/away e datas conforme ESPN)
+  { id: 97,  origHome: { tipo: 'venc', j: 90 },  origAway: { tipo: 'venc', j: 89 } },
   { id: 98,  origHome: { tipo: 'venc', j: 91 },  origAway: { tipo: 'venc', j: 92 } },
-  { id: 99,  origHome: { tipo: 'venc', j: 93 },  origAway: { tipo: 'venc', j: 94 } },
-  { id: 100, origHome: { tipo: 'venc', j: 95 },  origAway: { tipo: 'venc', j: 96 } },
+  { id: 99,  origHome: { tipo: 'venc', j: 94 },  origAway: { tipo: 'venc', j: 93 } },
+  { id: 100, origHome: { tipo: 'venc', j: 96 },  origAway: { tipo: 'venc', j: 95 } },
   // Semifinais
   { id: 101, origHome: { tipo: 'venc', j: 97 },  origAway: { tipo: 'venc', j: 99 } },
   { id: 102, origHome: { tipo: 'venc', j: 98 },  origAway: { tipo: 'venc', j: 100 } },
@@ -497,8 +498,18 @@ function resolveKnockoutTeam(orig, gruposClassificacao, terceirosQualificados, r
     if (!r || r.home == null || r.away == null) return null;
     const ko = KNOCKOUT_BY_ID.get(orig.j);
     if (!ko) return null;
-    const homeTeam = resolveKnockoutTeam(ko.origHome, gruposClassificacao, terceirosQualificados, results, allocated);
-    const awayTeam = resolveKnockoutTeam(ko.origAway, gruposClassificacao, terceirosQualificados, results, allocated);
+    // Resolver o jogo histórico com Set isolado + Anexo C (winnerGrp),
+    // para não corromper `allocated` do confronto atual e para acertar
+    // 3ºs colocados (ex.: Paraguai venceu a Alemanha no #74).
+    const historicalAllocated = new Set();
+    const homeWinnerGrp = ko.origHome.tipo === 'grupo' ? ko.origHome.grp : null;
+    const homeTeam = resolveKnockoutTeam(
+      ko.origHome, gruposClassificacao, terceirosQualificados, results, historicalAllocated
+    );
+    const awayTeam = resolveKnockoutTeam(
+      ko.origAway, gruposClassificacao, terceirosQualificados, results, historicalAllocated,
+      ko.origAway.tipo === 'terceiro' ? homeWinnerGrp : null
+    );
     if (!homeTeam || !awayTeam) return null;
     const h = parseInt(r.home, 10);
     const a = parseInt(r.away, 10);
@@ -775,23 +786,20 @@ async function main() {
         let swappedKnockout = false;
 
         if (knockoutNameMatch !== undefined) {
-          // Correspondência por times esperados — remover do queue para não reutilizar no fallback
+          // Correspondência por times esperados — remover do queue para não reutilizar
           knockoutId = knockoutNameMatch.id;
           swappedKnockout = knockoutNameMatch.swapped;
           const qi = knockoutQueue.indexOf(knockoutId);
           if (qi !== -1) knockoutQueue.splice(qi, 1);
-        } else if (knockoutQueue[knockoutCursor] !== undefined) {
-          // Fallback cronológico — pode ser impreciso se ESPN retornar fora de ordem
-          knockoutId = knockoutQueue[knockoutCursor++];
-          console.warn(
-            `  ⚠ Mata-mata #${knockoutId}: associado por ordem cronológica` +
-            ` (times não resolvidos para "${homePt}" vs "${awayPt}"). Verificar.`
-          );
         } else {
+          // NÃO usar fallback cronológico: datas erradas no mapa já associaram
+          // Espanha×Bélgica (#99) ao slot de Noruega×Inglaterra (#98).
+          // Sem match de times, deixar o evento como não identificado.
           console.warn(
-            `  ⚠ Jogo não identificado: "${homeEn}" vs "${awayEn}" (${date})` +
+            `  ⚠ Jogo de mata-mata não identificado por times: "${homeEn}" vs "${awayEn}" (${date})` +
             `\n    → PT: "${homePt}" vs "${awayPt}"` +
-            `\n    → Normalizado: "${normalizeName(homePt)}" vs "${normalizeName(awayPt)}"`
+            `\n    → Normalizado: "${normalizeName(homePt)}" vs "${normalizeName(awayPt)}"` +
+            `\n    → Fila do dia: [${knockoutQueue.join(', ')}]`
           );
           unmatchedEvents.push({
             date,
