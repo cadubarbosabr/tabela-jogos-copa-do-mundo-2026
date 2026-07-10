@@ -395,6 +395,10 @@
     "home": 0,
     "away": 2
   },
+  "98": {
+    "home": 1,
+    "away": 1
+  },
   "_meta": {
     "lastFetch": "2026-07-10T00:00:00Z",
     "source": "espn",
