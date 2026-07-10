@@ -1333,7 +1333,6 @@ function renderKnockoutBracketView() {
             centerContent: `
                 <div class="wcb-trophy-block" aria-hidden="true">
                     <span class="wcb-trophy-icon">🏆</span>
-                    <span class="wcb-trophy-caption">Road to the Trophy</span>
                 </div>
                 <div class="wcb-center-final${focusKey === 'final' ? ' is-phase-focus' : ' is-phase-dim'}" data-focus-phase="final">
                     <span class="wcb-center-label">🏆 ${t.final}</span>
@@ -1353,10 +1352,6 @@ function renderKnockoutBracketView() {
 
     return `
         <div class="wcb-road">
-            <div class="wcb-road-intro">
-                <p class="wcb-road-kicker">Road to the Trophy</p>
-                <p class="wcb-road-hint">Chave clássica · do 16-avos ao campeão. Use as fases acima para focar e centralizar o caminho.</p>
-            </div>
             <div class="wcb-scroll" tabindex="0" aria-label="Chaveamento clássico do mata-mata">
                 <div class="wcb-phase-bar">
                     ${phaseLabels.map((label, index) => {
@@ -1394,7 +1389,7 @@ export function renderKnockoutStage() {
     const activeLabel = getPhaseLabelByKey(selectedKnockoutPhase, t);
     const isBracket = knockoutViewMode === 'bracket';
     const subheadline = isBracket
-        ? 'Chave clássica — road to the trophy até a final.'
+        ? ''
         : 'Lista detalhada da fase selecionada (placar, sede e status).';
 
     container.innerHTML = `
@@ -1402,7 +1397,7 @@ export function renderKnockoutStage() {
             <div>
                 <p class="knockout-kicker">Mata-Mata · Copa do Mundo FIFA 2026</p>
                 <h3 class="knockout-headline">${isBracket ? `🏆 ${activeLabel}` : activeLabel}</h3>
-                <p class="knockout-subheadline">${subheadline}</p>
+                ${subheadline ? `<p class="knockout-subheadline">${subheadline}</p>` : ''}
             </div>
             <div class="knockout-controls">
                 <div class="knockout-view-toggle" role="tablist" aria-label="${t.knockoutViewLabel}">
