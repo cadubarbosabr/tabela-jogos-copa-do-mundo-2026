@@ -1676,25 +1676,68 @@ html:not(.dark) .ko-phase-btn.is-complete:not(.is-active) {
   justify-content: center;
 }
 
-/* Bracket board (modo Chave) — tema arena */
-.wcb-board-kicker {
-  color: #93c5fd !important;
+/* Road to the Trophy — tema arena */
+.wcb-road-kicker {
+  color: #fbbf24 !important;
 }
 
-html:not(.dark) .wcb-board-kicker {
-  color: #2563eb !important;
+.wcb-scroll {
+  scroll-behavior: smooth;
+  scroll-padding-inline: 35%;
+  border-radius: 1rem;
+  border: 1px solid rgb(255 255 255 / 0.06);
+  background:
+    radial-gradient(ellipse 40% 80% at 50% 50%, rgb(212 175 55 / 0.07) 0%, transparent 55%),
+    rgb(8 12 28 / 0.45);
+  padding-inline: 0.5rem;
 }
 
-.wcb-row .score-input-lg {
-  border-color: rgb(212 175 55 / 0.35) !important;
-  background: rgb(2 6 23 / 0.7) !important;
-  color: #fde68a !important;
+html:not(.dark) .wcb-scroll {
+  border-color: rgb(15 23 42 / 0.08);
+  background:
+    radial-gradient(ellipse 40% 80% at 50% 50%, rgb(212 175 55 / 0.08) 0%, transparent 55%),
+    #f8fafc;
 }
 
-html:not(.dark) .wcb-row .score-input-lg {
+.wcb-col.is-phase-dim,
+.wcb-center-final.is-phase-dim,
+.wcb-center-third.is-phase-dim {
+  opacity: 0.28;
+  filter: grayscale(0.3);
+  transition: opacity 0.28s ease, filter 0.28s ease, transform 0.28s ease;
+  pointer-events: none;
+}
+
+.wcb-col.is-phase-focus,
+.wcb-center-final.is-phase-focus,
+.wcb-center-third.is-phase-focus {
+  opacity: 1;
+  filter: none;
+  position: relative;
+  z-index: 2;
+  pointer-events: auto;
+  transform: scale(1.02);
+}
+
+.wcb-col.is-phase-focus .kob-mini-card,
+.wcb-center-final.is-phase-focus .kob-mini-card,
+.wcb-center-third.is-phase-focus .kob-mini-card {
+  box-shadow: 0 0 0 1px rgb(47 107 255 / 0.4), 0 14px 32px rgb(47 107 255 / 0.22);
+}
+
+.wcb-phase-label.is-focus {
+  color: #fbbf24 !important;
+}
+
+/* Lista detalhada no tema arena */
+.ko-list-view .knockout-match-card {
+  background: linear-gradient(165deg, rgb(18 28 52 / 0.95), rgb(12 18 36 / 0.98)) !important;
+  border-color: rgb(255 255 255 / 0.08) !important;
+}
+
+html:not(.dark) .ko-list-view .knockout-match-card {
   background: #fff !important;
-  color: #0f172a !important;
-  border-color: rgb(15 23 42 / 0.15) !important;
+  border-color: rgb(15 23 42 / 0.08) !important;
 }
 
 /* —— Hoje empty / champion states —— */
