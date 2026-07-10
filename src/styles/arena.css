@@ -1677,6 +1677,10 @@ html:not(.dark) .ko-phase-btn.is-complete:not(.is-active) {
 }
 
 /* Road to the Trophy — tema arena */
+.wcb-road-kicker {
+  color: #fbbf24 !important;
+}
+
 .wcb-scroll {
   scroll-behavior: smooth;
   scroll-padding-inline: 35%;
@@ -1721,6 +1725,10 @@ html:not(.dark) .wcb-scroll {
   box-shadow: 0 0 0 1px rgb(47 107 255 / 0.4), 0 14px 32px rgb(47 107 255 / 0.22);
 }
 
+.wcb-phase-label.is-focus {
+  color: #fbbf24 !important;
+}
+
 /* Lista detalhada no tema arena */
 .ko-list-view .knockout-match-card {
   background: linear-gradient(165deg, rgb(18 28 52 / 0.95), rgb(12 18 36 / 0.98)) !important;
@@ -1730,11 +1738,6 @@ html:not(.dark) .wcb-scroll {
 html:not(.dark) .ko-list-view .knockout-match-card {
   background: #fff !important;
   border-color: rgb(15 23 42 / 0.08) !important;
-}
-
-/* Mata-mata sem cabeçalho: só fases + conteúdo */
-#section-mata-mata .knockout-content {
-  margin-top: 0.35rem;
 }
 
 /* —— Hoje empty / champion states —— */

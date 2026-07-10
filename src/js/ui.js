@@ -684,16 +684,7 @@ export function renderGroupStage() {
     });
 }
 
-/**
- * Taça oficial FIFA World Cup (foto HD) via CDN Wikimedia Commons.
- * Testado (200 image/jpeg): width=480/640/960/1280.
- * Fonte: File:FIFA_World_Cup_Trophy_(Ank_Kumar,_Infosys_Limited)_01.jpg
- */
-const FIFA_TROPHY_CDN_BASE = 'https://commons.wikimedia.org/wiki/Special:FilePath/FIFA_World_Cup_Trophy_(Ank_Kumar,_Infosys_Limited)_01.jpg';
-const FIFA_TROPHY_CDN = {
-    src: `${FIFA_TROPHY_CDN_BASE}?width=640`,
-    srcset: [480, 640, 960, 1280].map((w) => `${FIFA_TROPHY_CDN_BASE}?width=${w} ${w}w`).join(', ')
-};
+const fifaWorldCupTrophyImageUrl = 'https://www.edigitalagency.com.au/wp-content/uploads/new-FIFA-World-Cup-2026-logo-white-PNG-small-size.png';
 
 let knockoutViewMode = localStorage.getItem('wc2026_knockout_view');
 let selectedKnockoutPhase = localStorage.getItem('wc2026_knockout_phase') || '';
@@ -1222,10 +1213,9 @@ function renderMatchCard(match, options = {}) {
 }
 
 function ensureKnockoutViewMode() {
-    // Cabeçalho/toggle removido: a visão principal é a chave Road to the Trophy.
-    // Mantém 'list' se já estiver salva (compat), senão força bracket.
     if (knockoutViewMode === 'bracket' || knockoutViewMode === 'list') return;
-    knockoutViewMode = 'bracket';
+    // Default to list on narrow screens for better readability
+    knockoutViewMode = window.innerWidth < 640 ? 'list' : 'bracket';
     localStorage.setItem('wc2026_knockout_view', knockoutViewMode);
 }
 
@@ -1305,6 +1295,7 @@ function renderBracketColumn(options = {}) {
  * Lado A → semi → FINAL ← semi ← Lado B
  */
 function renderKnockoutBracketView() {
+    const CENTER_COLUMN_INDEX = 4;
     const t = translations.pt;
     ensureSelectedKnockoutPhase();
 
@@ -1314,6 +1305,18 @@ function renderKnockoutBracketView() {
         const match = m(id);
         return match ? renderMatchCard(match, { phaseKey, side }) : '';
     };
+
+    const phaseLabels = [
+        t.round32,
+        t.round16,
+        t.quarterFinals,
+        t.semiFinals,
+        `🏆 ${t.final}`,
+        t.semiFinals,
+        t.quarterFinals,
+        t.round16,
+        t.round32
+    ];
 
     const focusKey = selectedKnockoutPhase;
     const colFocus = (phaseKey) => (phaseKey === focusKey ? ' is-phase-focus' : ' is-phase-dim');
@@ -1328,27 +1331,16 @@ function renderKnockoutBracketView() {
             side: 'center',
             phaseKey: focusKey === 'thirdPlace' ? 'thirdPlace' : 'final',
             centerContent: `
-                <div class="wcb-trophy-block">
-                    <img
-                        class="wcb-trophy-img"
-                        src="${FIFA_TROPHY_CDN.src}"
-                        srcset="${FIFA_TROPHY_CDN.srcset}"
-                        sizes="(max-width: 768px) 72px, 96px"
-                        width="96"
-                        height="160"
-                        alt="Taça oficial da Copa do Mundo FIFA"
-                        decoding="async"
-                        loading="eager"
-                        referrerpolicy="no-referrer"
-                    />
+                <div class="wcb-trophy-block" aria-hidden="true">
+                    <span class="wcb-trophy-icon">🏆</span>
                     <span class="wcb-trophy-caption">Road to the Trophy</span>
                 </div>
                 <div class="wcb-center-final${focusKey === 'final' ? ' is-phase-focus' : ' is-phase-dim'}" data-focus-phase="final">
-                    <span class="wcb-center-label">${t.final}</span>
+                    <span class="wcb-center-label">🏆 ${t.final}</span>
                     ${card(104, 'final', 'final')}
                 </div>
                 <div class="wcb-center-third${focusKey === 'thirdPlace' ? ' is-phase-focus' : ' is-phase-dim'}" data-focus-phase="thirdPlace">
-                    <span class="wcb-center-label">${t.thirdPlace}</span>
+                    <span class="wcb-center-label">🥉 ${t.thirdPlace}</span>
                     ${card(103, 'thirdPlace', 'final')}
                 </div>
             `
@@ -1361,7 +1353,19 @@ function renderKnockoutBracketView() {
 
     return `
         <div class="wcb-road">
+            <div class="wcb-road-intro">
+                <p class="wcb-road-kicker">Road to the Trophy</p>
+                <p class="wcb-road-hint">Chave clássica · do 16-avos ao campeão. Use as fases acima para focar e centralizar o caminho.</p>
+            </div>
             <div class="wcb-scroll" tabindex="0" aria-label="Chaveamento clássico do mata-mata">
+                <div class="wcb-phase-bar">
+                    ${phaseLabels.map((label, index) => {
+                        const colPhase = columns[index]?.phaseKey;
+                        const isFocus = colPhase === focusKey
+                            || (index === CENTER_COLUMN_INDEX && (focusKey === 'final' || focusKey === 'thirdPlace'));
+                        return `<span class="wcb-phase-label ${index === CENTER_COLUMN_INDEX ? 'wcb-phase-label-center' : ''} ${isFocus ? 'is-focus' : ''}">${label}</span>`;
+                    }).join('')}
+                </div>
                 <div class="wcb-bracket" data-focus-phase="${focusKey}">
                     ${columns.map((column) => {
                         if (column.side === 'center') {
@@ -1386,15 +1390,42 @@ export function renderKnockoutStage() {
     ensureKnockoutViewMode();
     ensureSelectedKnockoutPhase();
 
+    const t = translations.pt;
+    const activeLabel = getPhaseLabelByKey(selectedKnockoutPhase, t);
     const isBracket = knockoutViewMode === 'bracket';
+    const subheadline = isBracket
+        ? 'Chave clássica — road to the trophy até a final.'
+        : 'Lista detalhada da fase selecionada (placar, sede e status).';
 
-    // Sem cabeçalho: apenas seletor de fases + conteúdo
     container.innerHTML = `
-        ${renderKnockoutPhasePicker(translations.pt)}
+        <div class="knockout-header-copy">
+            <div>
+                <p class="knockout-kicker">Mata-Mata · Copa do Mundo FIFA 2026</p>
+                <h3 class="knockout-headline">${isBracket ? `🏆 ${activeLabel}` : activeLabel}</h3>
+                <p class="knockout-subheadline">${subheadline}</p>
+            </div>
+            <div class="knockout-controls">
+                <div class="knockout-view-toggle" role="tablist" aria-label="${t.knockoutViewLabel}">
+                    <button class="knockout-view-btn ${knockoutViewMode === 'list' ? 'is-active' : ''}" data-knockout-view="list">📋 ${t.knockoutListMode}</button>
+                    <button class="knockout-view-btn ${knockoutViewMode === 'bracket' ? 'is-active' : ''}" data-knockout-view="bracket">🏆 ${t.knockoutBracketMode}</button>
+                </div>
+            </div>
+        </div>
+        ${renderKnockoutPhasePicker(t)}
         <div class="knockout-content">
             ${isBracket ? renderKnockoutBracketView() : renderKnockoutListView()}
         </div>
     `;
+
+    container.querySelectorAll('[data-knockout-view]').forEach((btn) => {
+        btn.addEventListener('click', () => {
+            const nextMode = btn.getAttribute('data-knockout-view');
+            if (!nextMode || nextMode === knockoutViewMode) return;
+            knockoutViewMode = nextMode;
+            localStorage.setItem('wc2026_knockout_view', knockoutViewMode);
+            renderKnockoutStage();
+        });
+    });
 
     bindKnockoutPhasePicker(container);
 

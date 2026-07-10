@@ -1,12 +1,17 @@
 @media (max-width: 1279px) {
+  .wcb-phase-bar,
   .wcb-bracket {
     grid-template-columns: repeat(9, minmax(8.5rem, 1fr));
   }
 }
 
 @media (max-width: 1024px) {
+  .wcb-phase-bar,
   .wcb-bracket {
     grid-template-columns: repeat(9, minmax(8rem, 1fr));
+  }
+
+  .wcb-bracket {
     min-height: 34rem;
   }
 }
@@ -21,16 +26,20 @@
     max-width: none;
   }
 
+  .wcb-phase-bar,
   .wcb-bracket {
     grid-template-columns: repeat(9, minmax(7.5rem, 1fr));
+  }
+
+  .wcb-bracket {
     min-height: 32rem;
+  }
+
+  .wcb-road-hint {
+    font-size: 0.72rem;
   }
 
   .ko-list-stack {
     max-width: none;
-  }
-
-  .wcb-trophy-img {
-    max-height: 6.5rem;
   }
 }
